@@ -13,6 +13,7 @@
 		F513497E17AC0A5300869D16 /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F513497D17AC0A5300869D16 /* AssetsLibrary.framework */; };
 		F513498017AC0A8700869D16 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F513497F17AC0A8700869D16 /* CoreVideo.framework */; };
 		F513498217AC0D2200869D16 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F513498117AC0D2200869D16 /* QuartzCore.framework */; };
+		F513498417AC138E00869D16 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F513498317AC138E00869D16 /* CoreMedia.framework */; };
 		F5F5256D17ABF84600BFF158 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5F5256C17ABF84600BFF158 /* UIKit.framework */; };
 		F5F5256F17ABF84600BFF158 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5F5256E17ABF84600BFF158 /* Foundation.framework */; };
 		F5F5257117ABF84600BFF158 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5F5257017ABF84600BFF158 /* CoreGraphics.framework */; };
@@ -47,6 +48,7 @@
 		F513497D17AC0A5300869D16 /* AssetsLibrary.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AssetsLibrary.framework; path = System/Library/Frameworks/AssetsLibrary.framework; sourceTree = SDKROOT; };
 		F513497F17AC0A8700869D16 /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
 		F513498117AC0D2200869D16 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		F513498317AC138E00869D16 /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
 		F5F5256917ABF84600BFF158 /* SelfieCam.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SelfieCam.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F5F5256C17ABF84600BFF158 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		F5F5256E17ABF84600BFF158 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -75,6 +77,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F513498417AC138E00869D16 /* CoreMedia.framework in Frameworks */,
 				F513498217AC0D2200869D16 /* QuartzCore.framework in Frameworks */,
 				F513498017AC0A8700869D16 /* CoreVideo.framework in Frameworks */,
 				F513497E17AC0A5300869D16 /* AssetsLibrary.framework in Frameworks */,
@@ -126,6 +129,7 @@
 				F513497717AC084D00869D16 /* AVFoundation.framework */,
 				F5F5257017ABF84600BFF158 /* CoreGraphics.framework */,
 				F513497917AC0A4200869D16 /* CoreImage.framework */,
+				F513498317AC138E00869D16 /* CoreMedia.framework */,
 				F513497F17AC0A8700869D16 /* CoreVideo.framework */,
 				F5F5256E17ABF84600BFF158 /* Foundation.framework */,
 				F513497B17AC0A4900869D16 /* ImageIO.framework */,
