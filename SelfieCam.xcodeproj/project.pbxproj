@@ -1,0 +1,483 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		F513497817AC084D00869D16 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F513497717AC084D00869D16 /* AVFoundation.framework */; };
+		F513497A17AC0A4200869D16 /* CoreImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F513497917AC0A4200869D16 /* CoreImage.framework */; };
+		F513497C17AC0A4900869D16 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F513497B17AC0A4900869D16 /* ImageIO.framework */; };
+		F513497E17AC0A5300869D16 /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F513497D17AC0A5300869D16 /* AssetsLibrary.framework */; };
+		F513498017AC0A8700869D16 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F513497F17AC0A8700869D16 /* CoreVideo.framework */; };
+		F513498217AC0D2200869D16 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F513498117AC0D2200869D16 /* QuartzCore.framework */; };
+		F5F5256D17ABF84600BFF158 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5F5256C17ABF84600BFF158 /* UIKit.framework */; };
+		F5F5256F17ABF84600BFF158 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5F5256E17ABF84600BFF158 /* Foundation.framework */; };
+		F5F5257117ABF84600BFF158 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5F5257017ABF84600BFF158 /* CoreGraphics.framework */; };
+		F5F5257717ABF84600BFF158 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = F5F5257517ABF84600BFF158 /* InfoPlist.strings */; };
+		F5F5257917ABF84600BFF158 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F5F5257817ABF84600BFF158 /* main.m */; };
+		F5F5257D17ABF84600BFF158 /* CBPAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = F5F5257C17ABF84600BFF158 /* CBPAppDelegate.m */; };
+		F5F5257F17ABF84600BFF158 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = F5F5257E17ABF84600BFF158 /* Default.png */; };
+		F5F5258117ABF84600BFF158 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F5F5258017ABF84600BFF158 /* Default@2x.png */; };
+		F5F5258317ABF84600BFF158 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F5F5258217ABF84600BFF158 /* Default-568h@2x.png */; };
+		F5F5258617ABF84600BFF158 /* CBPViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F5F5258517ABF84600BFF158 /* CBPViewController.m */; };
+		F5F5259117ABF84600BFF158 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5F5259017ABF84600BFF158 /* SenTestingKit.framework */; };
+		F5F5259217ABF84600BFF158 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5F5256C17ABF84600BFF158 /* UIKit.framework */; };
+		F5F5259317ABF84600BFF158 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5F5256E17ABF84600BFF158 /* Foundation.framework */; };
+		F5F5259B17ABF84600BFF158 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = F5F5259917ABF84600BFF158 /* InfoPlist.strings */; };
+		F5F5259E17ABF84600BFF158 /* SelfieCamTests.m in Sources */ = {isa = PBXBuildFile; fileRef = F5F5259D17ABF84600BFF158 /* SelfieCamTests.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		F5F5259417ABF84600BFF158 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F5F5256117ABF84600BFF158 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F5F5256817ABF84600BFF158;
+			remoteInfo = SelfieCam;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		F513497717AC084D00869D16 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		F513497917AC0A4200869D16 /* CoreImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreImage.framework; path = System/Library/Frameworks/CoreImage.framework; sourceTree = SDKROOT; };
+		F513497B17AC0A4900869D16 /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
+		F513497D17AC0A5300869D16 /* AssetsLibrary.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AssetsLibrary.framework; path = System/Library/Frameworks/AssetsLibrary.framework; sourceTree = SDKROOT; };
+		F513497F17AC0A8700869D16 /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
+		F513498117AC0D2200869D16 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		F5F5256917ABF84600BFF158 /* SelfieCam.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SelfieCam.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F5F5256C17ABF84600BFF158 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		F5F5256E17ABF84600BFF158 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		F5F5257017ABF84600BFF158 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		F5F5257417ABF84600BFF158 /* SelfieCam-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "SelfieCam-Info.plist"; sourceTree = "<group>"; };
+		F5F5257617ABF84600BFF158 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		F5F5257817ABF84600BFF158 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		F5F5257A17ABF84600BFF158 /* SelfieCam-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SelfieCam-Prefix.pch"; sourceTree = "<group>"; };
+		F5F5257B17ABF84600BFF158 /* CBPAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBPAppDelegate.h; sourceTree = "<group>"; };
+		F5F5257C17ABF84600BFF158 /* CBPAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CBPAppDelegate.m; sourceTree = "<group>"; };
+		F5F5257E17ABF84600BFF158 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
+		F5F5258017ABF84600BFF158 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
+		F5F5258217ABF84600BFF158 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
+		F5F5258417ABF84600BFF158 /* CBPViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBPViewController.h; sourceTree = "<group>"; };
+		F5F5258517ABF84600BFF158 /* CBPViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CBPViewController.m; sourceTree = "<group>"; };
+		F5F5258F17ABF84600BFF158 /* SelfieCamTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SelfieCamTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
+		F5F5259017ABF84600BFF158 /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
+		F5F5259817ABF84600BFF158 /* SelfieCamTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "SelfieCamTests-Info.plist"; sourceTree = "<group>"; };
+		F5F5259A17ABF84600BFF158 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		F5F5259C17ABF84600BFF158 /* SelfieCamTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SelfieCamTests.h; sourceTree = "<group>"; };
+		F5F5259D17ABF84600BFF158 /* SelfieCamTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SelfieCamTests.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		F5F5256617ABF84600BFF158 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F513498217AC0D2200869D16 /* QuartzCore.framework in Frameworks */,
+				F513498017AC0A8700869D16 /* CoreVideo.framework in Frameworks */,
+				F513497E17AC0A5300869D16 /* AssetsLibrary.framework in Frameworks */,
+				F513497C17AC0A4900869D16 /* ImageIO.framework in Frameworks */,
+				F513497A17AC0A4200869D16 /* CoreImage.framework in Frameworks */,
+				F513497817AC084D00869D16 /* AVFoundation.framework in Frameworks */,
+				F5F5256D17ABF84600BFF158 /* UIKit.framework in Frameworks */,
+				F5F5256F17ABF84600BFF158 /* Foundation.framework in Frameworks */,
+				F5F5257117ABF84600BFF158 /* CoreGraphics.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F5F5258B17ABF84600BFF158 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F5F5259117ABF84600BFF158 /* SenTestingKit.framework in Frameworks */,
+				F5F5259217ABF84600BFF158 /* UIKit.framework in Frameworks */,
+				F5F5259317ABF84600BFF158 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		F5F5256017ABF84600BFF158 = {
+			isa = PBXGroup;
+			children = (
+				F5F5257217ABF84600BFF158 /* SelfieCam */,
+				F5F5259617ABF84600BFF158 /* SelfieCamTests */,
+				F5F5256B17ABF84600BFF158 /* Frameworks */,
+				F5F5256A17ABF84600BFF158 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		F5F5256A17ABF84600BFF158 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F5F5256917ABF84600BFF158 /* SelfieCam.app */,
+				F5F5258F17ABF84600BFF158 /* SelfieCamTests.octest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		F5F5256B17ABF84600BFF158 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				F513497D17AC0A5300869D16 /* AssetsLibrary.framework */,
+				F513497717AC084D00869D16 /* AVFoundation.framework */,
+				F5F5257017ABF84600BFF158 /* CoreGraphics.framework */,
+				F513497917AC0A4200869D16 /* CoreImage.framework */,
+				F513497F17AC0A8700869D16 /* CoreVideo.framework */,
+				F5F5256E17ABF84600BFF158 /* Foundation.framework */,
+				F513497B17AC0A4900869D16 /* ImageIO.framework */,
+				F513498117AC0D2200869D16 /* QuartzCore.framework */,
+				F5F5259017ABF84600BFF158 /* SenTestingKit.framework */,
+				F5F5256C17ABF84600BFF158 /* UIKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		F5F5257217ABF84600BFF158 /* SelfieCam */ = {
+			isa = PBXGroup;
+			children = (
+				F5F5257B17ABF84600BFF158 /* CBPAppDelegate.h */,
+				F5F5257C17ABF84600BFF158 /* CBPAppDelegate.m */,
+				F5F5258417ABF84600BFF158 /* CBPViewController.h */,
+				F5F5258517ABF84600BFF158 /* CBPViewController.m */,
+				F5F5257317ABF84600BFF158 /* Supporting Files */,
+			);
+			path = SelfieCam;
+			sourceTree = "<group>";
+		};
+		F5F5257317ABF84600BFF158 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				F5F5257417ABF84600BFF158 /* SelfieCam-Info.plist */,
+				F5F5257517ABF84600BFF158 /* InfoPlist.strings */,
+				F5F5257817ABF84600BFF158 /* main.m */,
+				F5F5257A17ABF84600BFF158 /* SelfieCam-Prefix.pch */,
+				F5F5257E17ABF84600BFF158 /* Default.png */,
+				F5F5258017ABF84600BFF158 /* Default@2x.png */,
+				F5F5258217ABF84600BFF158 /* Default-568h@2x.png */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		F5F5259617ABF84600BFF158 /* SelfieCamTests */ = {
+			isa = PBXGroup;
+			children = (
+				F5F5259C17ABF84600BFF158 /* SelfieCamTests.h */,
+				F5F5259D17ABF84600BFF158 /* SelfieCamTests.m */,
+				F5F5259717ABF84600BFF158 /* Supporting Files */,
+			);
+			path = SelfieCamTests;
+			sourceTree = "<group>";
+		};
+		F5F5259717ABF84600BFF158 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				F5F5259817ABF84600BFF158 /* SelfieCamTests-Info.plist */,
+				F5F5259917ABF84600BFF158 /* InfoPlist.strings */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		F5F5256817ABF84600BFF158 /* SelfieCam */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F5F525A117ABF84600BFF158 /* Build configuration list for PBXNativeTarget "SelfieCam" */;
+			buildPhases = (
+				F5F5256517ABF84600BFF158 /* Sources */,
+				F5F5256617ABF84600BFF158 /* Frameworks */,
+				F5F5256717ABF84600BFF158 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SelfieCam;
+			productName = SelfieCam;
+			productReference = F5F5256917ABF84600BFF158 /* SelfieCam.app */;
+			productType = "com.apple.product-type.application";
+		};
+		F5F5258E17ABF84600BFF158 /* SelfieCamTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F5F525A417ABF84600BFF158 /* Build configuration list for PBXNativeTarget "SelfieCamTests" */;
+			buildPhases = (
+				F5F5258A17ABF84600BFF158 /* Sources */,
+				F5F5258B17ABF84600BFF158 /* Frameworks */,
+				F5F5258C17ABF84600BFF158 /* Resources */,
+				F5F5258D17ABF84600BFF158 /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				F5F5259517ABF84600BFF158 /* PBXTargetDependency */,
+			);
+			name = SelfieCamTests;
+			productName = SelfieCamTests;
+			productReference = F5F5258F17ABF84600BFF158 /* SelfieCamTests.octest */;
+			productType = "com.apple.product-type.bundle";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		F5F5256117ABF84600BFF158 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				CLASSPREFIX = CBP;
+				LastUpgradeCheck = 0460;
+				ORGANIZATIONNAME = "Karl Monaghan";
+			};
+			buildConfigurationList = F5F5256417ABF84600BFF158 /* Build configuration list for PBXProject "SelfieCam" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = F5F5256017ABF84600BFF158;
+			productRefGroup = F5F5256A17ABF84600BFF158 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				F5F5256817ABF84600BFF158 /* SelfieCam */,
+				F5F5258E17ABF84600BFF158 /* SelfieCamTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		F5F5256717ABF84600BFF158 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F5F5257717ABF84600BFF158 /* InfoPlist.strings in Resources */,
+				F5F5257F17ABF84600BFF158 /* Default.png in Resources */,
+				F5F5258117ABF84600BFF158 /* Default@2x.png in Resources */,
+				F5F5258317ABF84600BFF158 /* Default-568h@2x.png in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F5F5258C17ABF84600BFF158 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F5F5259B17ABF84600BFF158 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		F5F5258D17ABF84600BFF158 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		F5F5256517ABF84600BFF158 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F5F5257917ABF84600BFF158 /* main.m in Sources */,
+				F5F5257D17ABF84600BFF158 /* CBPAppDelegate.m in Sources */,
+				F5F5258617ABF84600BFF158 /* CBPViewController.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F5F5258A17ABF84600BFF158 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F5F5259E17ABF84600BFF158 /* SelfieCamTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		F5F5259517ABF84600BFF158 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F5F5256817ABF84600BFF158 /* SelfieCam */;
+			targetProxy = F5F5259417ABF84600BFF158 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		F5F5257517ABF84600BFF158 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				F5F5257617ABF84600BFF158 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		F5F5259917ABF84600BFF158 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				F5F5259A17ABF84600BFF158 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		F5F5259F17ABF84600BFF158 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		F5F525A017ABF84600BFF158 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
+				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		F5F525A217ABF84600BFF158 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "SelfieCam/SelfieCam-Prefix.pch";
+				INFOPLIST_FILE = "SelfieCam/SelfieCam-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		F5F525A317ABF84600BFF158 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "SelfieCam/SelfieCam-Prefix.pch";
+				INFOPLIST_FILE = "SelfieCam/SelfieCam-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+		F5F525A517ABF84600BFF158 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/SelfieCam.app/SelfieCam";
+				FRAMEWORK_SEARCH_PATHS = (
+					"\"$(SDKROOT)/Developer/Library/Frameworks\"",
+					"\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "SelfieCam/SelfieCam-Prefix.pch";
+				INFOPLIST_FILE = "SelfieCamTests/SelfieCamTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = Debug;
+		};
+		F5F525A617ABF84600BFF158 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/SelfieCam.app/SelfieCam";
+				FRAMEWORK_SEARCH_PATHS = (
+					"\"$(SDKROOT)/Developer/Library/Frameworks\"",
+					"\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "SelfieCam/SelfieCam-Prefix.pch";
+				INFOPLIST_FILE = "SelfieCamTests/SelfieCamTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		F5F5256417ABF84600BFF158 /* Build configuration list for PBXProject "SelfieCam" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F5F5259F17ABF84600BFF158 /* Debug */,
+				F5F525A017ABF84600BFF158 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F5F525A117ABF84600BFF158 /* Build configuration list for PBXNativeTarget "SelfieCam" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F5F525A217ABF84600BFF158 /* Debug */,
+				F5F525A317ABF84600BFF158 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F5F525A417ABF84600BFF158 /* Build configuration list for PBXNativeTarget "SelfieCamTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F5F525A517ABF84600BFF158 /* Debug */,
+				F5F525A617ABF84600BFF158 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = F5F5256117ABF84600BFF158 /* Project object */;
+}
