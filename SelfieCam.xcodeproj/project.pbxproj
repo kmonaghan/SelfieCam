@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		349FD30617AE96800030703E /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 349FD30517AE96800030703E /* CFNetwork.framework */; };
+		349FD30817AE96AD0030703E /* Reveal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 349FD30717AE96AD0030703E /* Reveal.framework */; };
 		F513497817AC084D00869D16 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F513497717AC084D00869D16 /* AVFoundation.framework */; };
 		F513497A17AC0A4200869D16 /* CoreImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F513497917AC0A4200869D16 /* CoreImage.framework */; };
 		F513497C17AC0A4900869D16 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F513497B17AC0A4900869D16 /* ImageIO.framework */; };
@@ -42,6 +44,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		349FD30517AE96800030703E /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
+		349FD30717AE96AD0030703E /* Reveal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Reveal.framework; path = "../../../../Applications/Reveal.app/Contents/SharedSupport/iOS-Libraries/Reveal.framework"; sourceTree = "<group>"; };
 		F513497717AC084D00869D16 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		F513497917AC0A4200869D16 /* CoreImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreImage.framework; path = System/Library/Frameworks/CoreImage.framework; sourceTree = SDKROOT; };
 		F513497B17AC0A4900869D16 /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
@@ -77,6 +81,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				349FD30617AE96800030703E /* CFNetwork.framework in Frameworks */,
 				F513498417AC138E00869D16 /* CoreMedia.framework in Frameworks */,
 				F513498217AC0D2200869D16 /* QuartzCore.framework in Frameworks */,
 				F513498017AC0A8700869D16 /* CoreVideo.framework in Frameworks */,
@@ -87,6 +92,7 @@
 				F5F5256D17ABF84600BFF158 /* UIKit.framework in Frameworks */,
 				F5F5256F17ABF84600BFF158 /* Foundation.framework in Frameworks */,
 				F5F5257117ABF84600BFF158 /* CoreGraphics.framework in Frameworks */,
+				349FD30817AE96AD0030703E /* Reveal.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -106,6 +112,7 @@
 		F5F5256017ABF84600BFF158 = {
 			isa = PBXGroup;
 			children = (
+				349FD30517AE96800030703E /* CFNetwork.framework */,
 				F5F5257217ABF84600BFF158 /* SelfieCam */,
 				F5F5259617ABF84600BFF158 /* SelfieCamTests */,
 				F5F5256B17ABF84600BFF158 /* Frameworks */,
@@ -125,6 +132,7 @@
 		F5F5256B17ABF84600BFF158 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				349FD30717AE96AD0030703E /* Reveal.framework */,
 				F513497D17AC0A5300869D16 /* AssetsLibrary.framework */,
 				F513497717AC084D00869D16 /* AVFoundation.framework */,
 				F5F5257017ABF84600BFF158 /* CoreGraphics.framework */,
@@ -398,6 +406,10 @@
 		F5F525A217ABF84600BFF158 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SYSTEM_APPS_DIR)/Reveal.app/Contents/SharedSupport/iOS-Libraries\"",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "SelfieCam/SelfieCam-Prefix.pch";
 				INFOPLIST_FILE = "SelfieCam/SelfieCam-Info.plist";
@@ -409,6 +421,10 @@
 		F5F525A317ABF84600BFF158 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SYSTEM_APPS_DIR)/Reveal.app/Contents/SharedSupport/iOS-Libraries\"",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "SelfieCam/SelfieCam-Prefix.pch";
 				INFOPLIST_FILE = "SelfieCam/SelfieCam-Info.plist";

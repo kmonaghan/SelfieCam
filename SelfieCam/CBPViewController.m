@@ -14,7 +14,7 @@
 
 #import "CBPViewController.h"
 
-#define CAPTURE_FPS 30
+#define TOTALFACE_FRAMES 15
 
 static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
 
@@ -22,6 +22,7 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
 {
     UILabel *countdownLabel;
     int count;
+    BOOL isTakingPhoto;
     
     UIButton *takePhotoButton;
     
@@ -33,9 +34,13 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
     
     dispatch_queue_t videoDataOutputQueue;
     
+    BOOL isMirrored;
+    
     CIDetector *faceDetector;
     
-    int frameNum;
+    UIView *faceBox;
+    
+    int faceFrameCount;
 }
 @end
 
@@ -53,6 +58,8 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
     [self setupAVCapture];
 	NSDictionary *detectorOptions = @{CIDetectorAccuracy : CIDetectorAccuracyLow };
 	faceDetector = [CIDetector detectorOfType:CIDetectorTypeFace context:nil options:detectorOptions];
+    
+    isTakingPhoto = NO;
 }
 
 - (void)didReceiveMemoryWarning
@@ -64,11 +71,26 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
 - (void)loadView
 {
     UIView *view = [[UIView alloc] initWithFrame:[UIScreen mainScreen].bounds];
+        
+    cameraView = [[UIView alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    cameraView.backgroundColor = [UIColor whiteColor];
     
-    CGFloat cameraHeight = [UIScreen mainScreen].bounds.size.height - 50.0f;
+    [view addSubview:cameraView];
     
-    UIView *controlView = [[UIView alloc] initWithFrame:CGRectMake(0, cameraHeight, [UIScreen mainScreen].bounds.size.width, 50.0f)];
+    countdownLabel = [[UILabel alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    countdownLabel.font = [UIFont boldSystemFontOfSize:200.0f];
+    countdownLabel.textColor = [UIColor blackColor];
+    countdownLabel.backgroundColor = [UIColor clearColor];
+    countdownLabel.text = @"3";
+    [countdownLabel sizeToFit];
+    countdownLabel.center = view.center;
+    countdownLabel.alpha = 0;
+    
+    [view addSubview:countdownLabel];
+    
+    UIView *controlView = [[UIView alloc] initWithFrame:CGRectMake(0, [UIScreen mainScreen].bounds.size.height - 50.0f, [UIScreen mainScreen].bounds.size.width, 50.0f)];
     controlView.backgroundColor = [UIColor blackColor];
+    controlView.alpha = 0.5f;
     
     takePhotoButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
     [takePhotoButton setTitle:@"Photo" forState:UIControlStateNormal];
@@ -81,22 +103,6 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
     [controlView addSubview:takePhotoButton];
     
     [view addSubview:controlView];
-    
-    cameraView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, cameraHeight)];
-    cameraView.backgroundColor = [UIColor whiteColor];
-    
-    [view addSubview:cameraView];
-    
-    countdownLabel = [[UILabel alloc] initWithFrame:[UIScreen mainScreen].bounds];
-    countdownLabel.text = @"3";
-    countdownLabel.font = [UIFont boldSystemFontOfSize:150.0f];
-    countdownLabel.textColor = [UIColor whiteColor];
-    countdownLabel.backgroundColor = [UIColor clearColor];
-    [countdownLabel sizeToFit];
-    countdownLabel.center = view.center;
-    countdownLabel.alpha = 0;
-    
-    [view addSubview:countdownLabel];
     
     self.view = view;
 }
@@ -112,11 +118,13 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
 {
 	NSError *error = nil;
 	
-	AVCaptureSession *session = [AVCaptureSession new];
-	[session setSessionPreset:AVCaptureSessionPresetPhoto];
+    AVCaptureSession *session = [AVCaptureSession new];
+    
+    [session setSessionPreset:AVCaptureSessionPreset640x480];
 	
     // Select a video device, make an input
-	AVCaptureDevice *device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
+	AVCaptureDevice *device;
+    
     for (AVCaptureDevice *d in [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo]) {
 		if ([d position] == AVCaptureDevicePositionFront) {
 			device = d;
@@ -127,14 +135,9 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
 	AVCaptureDeviceInput *deviceInput = [AVCaptureDeviceInput deviceInputWithDevice:device error:&error];
 	require( error == nil, bail );
 	{
-        if ( [session canAddInput:deviceInput] )
+        if ( [session canAddInput:deviceInput] ) {
             [session addInput:deviceInput];
-        
-        // Make a still image output
-        stillImageOutput = [AVCaptureStillImageOutput new];
-        
-        if ( [session canAddOutput:stillImageOutput] )
-            [session addOutput:stillImageOutput];
+        }
         
         // Make a video data output
         videoDataOutput = [AVCaptureVideoDataOutput new];
@@ -144,7 +147,6 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
                                            [NSNumber numberWithInt:kCMPixelFormat_32BGRA] forKey:(id)kCVPixelBufferPixelFormatTypeKey];
         [videoDataOutput setVideoSettings:rgbOutputSettings];
         [videoDataOutput setAlwaysDiscardsLateVideoFrames:YES]; // discard if the data output queue is blocked (as we process the still image)
-        [[videoDataOutput connectionWithMediaType:AVMediaTypeVideo] setEnabled:YES];
         
         // create a serial dispatch queue used for the sample buffer delegate as well as when a still image is captured
         // a serial dispatch queue must be used to guarantee that video frames will be delivered in order
@@ -154,7 +156,7 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
         
         if ( [session canAddOutput:videoDataOutput] )
             [session addOutput:videoDataOutput];
-        [[videoDataOutput connectionWithMediaType:AVMediaTypeVideo] setEnabled:NO];
+        [[videoDataOutput connectionWithMediaType:AVMediaTypeVideo] setEnabled:YES];
         
         previewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:session];
         [previewLayer setBackgroundColor:[[UIColor blackColor] CGColor]];
@@ -163,9 +165,10 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
         [rootLayer setMasksToBounds:YES];
         [previewLayer setFrame:[rootLayer bounds]];
         [rootLayer addSublayer:previewLayer];
+        
         [session startRunning];
         
-        frameNum = 0;
+        faceFrameCount = 0;
     }
 bail:
     {
@@ -179,8 +182,6 @@ bail:
             [self teardownAVCapture];
         }
     }
-    
-    
 }
 
 - (void)teardownAVCapture
@@ -242,39 +243,28 @@ bail:
         [view removeFromSuperview];
     }
     
-	NSArray *sublayers = [NSArray arrayWithArray:[previewLayer sublayers]];
-	NSInteger sublayersCount = [sublayers count], currentSublayer = 0;
-	NSInteger featuresCount = [features count], currentFeature = 0;
-	
-	[CATransaction begin];
-	[CATransaction setValue:(id)kCFBooleanTrue forKey:kCATransactionDisableActions];
-	
-	// hide all the face layers
-	for ( CALayer *layer in sublayers ) {
-		if ( [[layer name] isEqualToString:@"FaceLayer"] )
-			[layer setHidden:YES];
-	}
-    
 	CGSize parentFrameSize = [cameraView frame].size;
 	NSString *gravity = [previewLayer videoGravity];
-	BOOL isMirrored = [previewLayer isMirrored];
+
 	CGRect previewBox = [CBPViewController videoPreviewBoxForGravity:gravity
                                                                  frameSize:parentFrameSize
                                                               apertureSize:clap.size];
-	
+	   
 	for ( CIFaceFeature *ff in features ) {
 		// find the correct position for the square layer within the previewLayer
 		// the feature box originates in the bottom left of the video frame.
 		// (Bottom right if mirroring is turned on)
 		CGRect faceRect = [ff bounds];
-        
+       // DLog(@"faceRect: %@", NSStringFromCGRect(faceRect));
 		// flip preview width and height
+        /*
 		CGFloat temp = faceRect.size.width;
 		faceRect.size.width = faceRect.size.height;
 		faceRect.size.height = temp;
 		temp = faceRect.origin.x;
 		faceRect.origin.x = faceRect.origin.y;
 		faceRect.origin.y = temp;
+        
 		// scale coordinates so they fit in the preview box, which may be scaled
 		CGFloat widthScaleBy = previewBox.size.width / clap.size.height;
 		CGFloat heightScaleBy = previewBox.size.height / clap.size.width;
@@ -287,20 +277,10 @@ bail:
 			faceRect = CGRectOffset(faceRect, previewBox.origin.x + previewBox.size.width - faceRect.size.width - (faceRect.origin.x * 2), previewBox.origin.y);
 		else
 			faceRect = CGRectOffset(faceRect, previewBox.origin.x, previewBox.origin.y);
-		
-		CALayer *featureLayer = nil;
-		
-		// re-use an existing layer if possible
-		while ( !featureLayer && (currentSublayer < sublayersCount) ) {
-			CALayer *currentLayer = [sublayers objectAtIndex:currentSublayer++];
-			if ( [[currentLayer name] isEqualToString:@"FaceLayer"] ) {
-				featureLayer = currentLayer;
-				[currentLayer setHidden:NO];
-			}
-		}
-		
-		// create a new one if necessary
-		if ( !featureLayer ) {
+		*/
+        //DLog(@"faceRect (transformed): %@", NSStringFromCGRect(faceRect));
+        
+
             UIView *view = [[UIView alloc] initWithFrame:faceRect];
             
             view.layer.borderWidth = 4.0f;
@@ -308,36 +288,14 @@ bail:
             view.layer.borderColor = [UIColor greenColor].CGColor;
             
             [cameraView addSubview:view];
-		}
-        
-		[featureLayer setFrame:faceRect];
 		
-		switch (orientation) {
-			case UIDeviceOrientationPortrait:
-				[featureLayer setAffineTransform:CGAffineTransformMakeRotation(DegreesToRadians(0.))];
-				break;
-			case UIDeviceOrientationPortraitUpsideDown:
-				[featureLayer setAffineTransform:CGAffineTransformMakeRotation(DegreesToRadians(180.))];
-				break;
-			case UIDeviceOrientationLandscapeLeft:
-				[featureLayer setAffineTransform:CGAffineTransformMakeRotation(DegreesToRadians(90.))];
-				break;
-			case UIDeviceOrientationLandscapeRight:
-				[featureLayer setAffineTransform:CGAffineTransformMakeRotation(DegreesToRadians(-90.))];
-				break;
-			case UIDeviceOrientationFaceUp:
-			case UIDeviceOrientationFaceDown:
-			default:
-				break; // leave the layer in its last known orientation
-		}
-		currentFeature++;
 	}
-	
-	[CATransaction commit];
 }
 
 - (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection
 {
+    isMirrored = [connection isVideoMirrored];
+    
 	// got an image
 	CVPixelBufferRef pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
 	CFDictionaryRef attachments = CMCopyDictionaryOfAttachments(kCFAllocatorDefault, sampleBuffer, kCMAttachmentMode_ShouldPropagate);
@@ -385,13 +343,23 @@ bail:
     
 	imageOptions = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:exifOrientation] forKey:CIDetectorImageOrientation];
 	NSArray *features = [faceDetector featuresInImage:ciImage options:imageOptions];
-	
+
     // get the clean aperture
     // the clean aperture is a rectangle that defines the portion of the encoded pixel dimensions
     // that represents image data valid for display.
 	CMFormatDescriptionRef fdesc = CMSampleBufferGetFormatDescription(sampleBuffer);
 	CGRect clap = CMVideoFormatDescriptionGetCleanAperture(fdesc, false /*originIsTopLeft == false*/);
 	
+    if ([features count]) {
+        faceFrameCount++;
+        
+        if (faceFrameCount == TOTALFACE_FRAMES) {
+            [self startCountdown];
+        }
+    } else {
+        faceFrameCount = 0;
+    }
+    
 	dispatch_async(dispatch_get_main_queue(), ^(void) {
 		[self drawFaceBoxesForFeatures:features forVideoBox:clap orientation:curDeviceOrientation];
 	});
@@ -401,26 +369,34 @@ bail:
 #pragma mark - Camera actions
 - (void)startCountdown
 {
-    count = 3;
-    takePhotoButton.enabled = NO;
+    if (!isTakingPhoto) {
+        [self.view bringSubviewToFront:countdownLabel];
+        
+        count = 3;
+        takePhotoButton.enabled = NO;
     
-    [self showCountDown];
+        [self showCountDown];
+        
+        isTakingPhoto = YES;
+    }
 }
 
 - (void)showCountDown
 {
     if (count != 0) {
-        countdownLabel.text = [NSString stringWithFormat:@"%d", count];
-        count--;
-        countdownLabel.alpha = 1;
-        
-        [UIView animateWithDuration:1.0f
-                         animations:^() {
-                             countdownLabel.alpha = 0;
-                         }
-                         completion:^(BOOL finished) {
-                             [self showCountDown];
-                         }];
+        dispatch_async(dispatch_get_main_queue(), ^(void) {
+            countdownLabel.text = [NSString stringWithFormat:@"%d", count];
+            count--;
+            countdownLabel.alpha = 1.0f;
+            
+            [UIView animateWithDuration:1.0f
+                             animations:^() {
+                                 countdownLabel.alpha = 0;
+                             }
+                             completion:^(BOOL finished) {
+                                 [self showCountDown];
+                             }];
+        });
     } else {
         [self takePhoto];
     }
@@ -443,6 +419,8 @@ bail:
                          [flashView removeFromSuperview];
                      }
      ];
+    
+    isTakingPhoto = NO;
 }
 
 @end
