@@ -16,8 +16,14 @@
 
 #define TOTALFACE_FRAMES 15
 
+const CGFloat FACE_RECT_BORDER_WIDTH = 3;
+
+static char * const AVCaptureStillImageIsCapturingStillImageContext = "AVCaptureStillImageIsCapturingStillImageContext";
+
 static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
 
+void displayErrorOnMainQueue(NSError *error, NSString *message);
+    
 @interface CBPViewController ()
 {
     UILabel *countdownLabel;
@@ -25,23 +31,23 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
     BOOL isTakingPhoto;
     
     UIButton *takePhotoButton;
-    
-    UIView *cameraView;
-    
-    AVCaptureStillImageOutput *stillImageOutput;
-    AVCaptureVideoDataOutput *videoDataOutput;
-    AVCaptureVideoPreviewLayer *previewLayer;
-    
-    dispatch_queue_t videoDataOutputQueue;
-    
+
     BOOL isMirrored;
-    
-    CIDetector *faceDetector;
-    
+
     UIView *faceBox;
     
     int faceFrameCount;
 }
+@property (strong, nonatomic) UIView* cameraView;
+
+@property (strong,nonatomic) AVCaptureSession* session;
+@property (strong,nonatomic) AVCaptureVideoPreviewLayer *previewLayer;
+@property (strong,nonatomic) AVCaptureVideoDataOutput *videoDataOutput;
+@property (strong,nonatomic) AVCaptureStillImageOutput *stillImageOutput;
+
+@property (strong,nonatomic) CIDetector *faceDetector;
+@property (strong,nonatomic) NSMutableArray *ciFaceLayers;
+
 @end
 
 @implementation CBPViewController
@@ -56,8 +62,9 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
 	// Do any additional setup after loading the view, typically from a nib.
     
     [self setupAVCapture];
-	NSDictionary *detectorOptions = @{CIDetectorAccuracy : CIDetectorAccuracyLow };
-	faceDetector = [CIDetector detectorOfType:CIDetectorTypeFace context:nil options:detectorOptions];
+	NSDictionary *detectorOptions = @{CIDetectorAccuracy : CIDetectorAccuracyHigh, CIDetectorTracking : @(YES) };
+    //, CIDetectorEyeBlink : @(YES),  CIDetectorSmile : @(YES) };
+	self.faceDetector = [CIDetector detectorOfType:CIDetectorTypeFace context:nil options:detectorOptions];
     
     isTakingPhoto = NO;
 }
@@ -72,10 +79,10 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
 {
     UIView *view = [[UIView alloc] initWithFrame:[UIScreen mainScreen].bounds];
         
-    cameraView = [[UIView alloc] initWithFrame:[UIScreen mainScreen].bounds];
-    cameraView.backgroundColor = [UIColor whiteColor];
+    self.cameraView = [[UIView alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    self.cameraView.backgroundColor = [UIColor whiteColor];
     
-    [view addSubview:cameraView];
+    [view addSubview:self.cameraView];
     
     countdownLabel = [[UILabel alloc] initWithFrame:[UIScreen mainScreen].bounds];
     countdownLabel.font = [UIFont boldSystemFontOfSize:200.0f];
@@ -116,82 +123,159 @@ static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
 #pragma mark - AV setup
 - (void)setupAVCapture
 {
-	NSError *error = nil;
+	self.session = [AVCaptureSession new];
+	[self.session setSessionPreset:AVCaptureSessionPresetPhoto]; // high-res stills, screen-size video
 	
-    AVCaptureSession *session = [AVCaptureSession new];
-    
-    [session setSessionPreset:AVCaptureSessionPreset640x480];
+	[self updateCameraSelection];
 	
-    // Select a video device, make an input
-	AVCaptureDevice *device;
-    
-    for (AVCaptureDevice *d in [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo]) {
-		if ([d position] == AVCaptureDevicePositionFront) {
-			device = d;
-			break;
-		}
+	// For displaying live feed to screen
+	CALayer *rootLayer = self.cameraView.layer;
+	[rootLayer setMasksToBounds:YES];
+	self.previewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:self.session];
+	[self.previewLayer setBackgroundColor:[[UIColor blackColor] CGColor]];
+	[self.previewLayer setVideoGravity:AVLayerVideoGravityResizeAspectFill];
+	[self.previewLayer setFrame:[rootLayer bounds]];
+	[rootLayer addSublayer:self.previewLayer];
+	
+	self.ciFaceLayers = [NSMutableArray arrayWithCapacity:10];
+	
+	NSDictionary *detectorOptions = @{ CIDetectorAccuracy : CIDetectorAccuracyLow, CIDetectorTracking : @(YES) };
+	self.faceDetector = [CIDetector detectorOfType:CIDetectorTypeFace context:nil options:detectorOptions];
+	
+	self.videoDataOutput = [AVCaptureVideoDataOutput new];
+	NSDictionary *rgbOutputSettings = @{ (__bridge NSString*)kCVPixelBufferPixelFormatTypeKey : [NSNumber numberWithInt:kCMPixelFormat_32BGRA] };
+	[self.videoDataOutput setVideoSettings:rgbOutputSettings];
+	
+	if ( ! [self.session canAddOutput:self.videoDataOutput] ) {
+		[self teardownAVCapture];
+		return;
 	}
     
-	AVCaptureDeviceInput *deviceInput = [AVCaptureDeviceInput deviceInputWithDevice:device error:&error];
-	require( error == nil, bail );
-	{
-        if ( [session canAddInput:deviceInput] ) {
-            [session addInput:deviceInput];
-        }
-        
-        // Make a video data output
-        videoDataOutput = [AVCaptureVideoDataOutput new];
-        
-        // we want BGRA, both CoreGraphics and OpenGL work well with 'BGRA'
-        NSDictionary *rgbOutputSettings = [NSDictionary dictionaryWithObject:
-                                           [NSNumber numberWithInt:kCMPixelFormat_32BGRA] forKey:(id)kCVPixelBufferPixelFormatTypeKey];
-        [videoDataOutput setVideoSettings:rgbOutputSettings];
-        [videoDataOutput setAlwaysDiscardsLateVideoFrames:YES]; // discard if the data output queue is blocked (as we process the still image)
-        
-        // create a serial dispatch queue used for the sample buffer delegate as well as when a still image is captured
-        // a serial dispatch queue must be used to guarantee that video frames will be delivered in order
-        // see the header doc for setSampleBufferDelegate:queue: for more information
-        videoDataOutputQueue = dispatch_queue_create("VideoDataOutputQueue", DISPATCH_QUEUE_SERIAL);
-        [videoDataOutput setSampleBufferDelegate:self queue:videoDataOutputQueue];
-        
-        if ( [session canAddOutput:videoDataOutput] )
-            [session addOutput:videoDataOutput];
-        [[videoDataOutput connectionWithMediaType:AVMediaTypeVideo] setEnabled:YES];
-        
-        previewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:session];
-        [previewLayer setBackgroundColor:[[UIColor blackColor] CGColor]];
-        [previewLayer setVideoGravity:AVLayerVideoGravityResizeAspectFill];
-        CALayer *rootLayer = [cameraView layer];
-        [rootLayer setMasksToBounds:YES];
-        [previewLayer setFrame:[rootLayer bounds]];
-        [rootLayer addSublayer:previewLayer];
-        
-        [session startRunning];
-        
-        faceFrameCount = 0;
-    }
-bail:
-    {
-        if (error) {
-            [[[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"Failed with error %d", (int)[error code]]
-                                        message:[error localizedDescription]
-                                       delegate:nil
-                              cancelButtonTitle:@"Dismiss"
-                              otherButtonTitles:nil] show];
-            
-            [self teardownAVCapture];
-        }
-    }
+	// CoreImage face detection is CPU intensive and runs at reduced framerate.
+	// Thus we set AlwaysDiscardsLateVideoFrames, and operate a separate dispatch queue
+	[self.videoDataOutput setAlwaysDiscardsLateVideoFrames:YES];
+	dispatch_queue_t videoDataOutputQueue = dispatch_queue_create("VideoDataOutputQueue", DISPATCH_QUEUE_SERIAL);
+	[self.videoDataOutput setSampleBufferDelegate:self queue:videoDataOutputQueue];
+	
+	[self.session addOutput:self.videoDataOutput];
+	
+	[self updateCoreImageDetection:nil];
+	
+	// this will allow us to sync freezing the preview when the image is being captured
+	[self.stillImageOutput addObserver:self forKeyPath:@"capturingStillImage" options:NSKeyValueObservingOptionNew context:AVCaptureStillImageIsCapturingStillImageContext];
+    
+	[self.session startRunning];
 }
 
 - (void)teardownAVCapture
 {
-	[stillImageOutput removeObserver:self forKeyPath:@"isCapturingStillImage"];
+    [self.session stopRunning];
+	
+	[self.stillImageOutput removeObserver:self forKeyPath:@"capturingStillImage"];
+	
+    if ( self.videoDataOutput )
+		[self.session removeOutput:self.videoDataOutput];
+	self.videoDataOutput = nil;
+	self.faceDetector = nil;
+	[self resizeCoreImageFaceLayerCache:0];
+	self.ciFaceLayers = nil;
+	
+	[self.previewLayer removeFromSuperlayer];
+	self.previewLayer = nil;
+	
+	self.session = nil;
+}
+
+- (IBAction) updateCoreImageDetection:(UISwitch *)sender {
+	if ( !self.videoDataOutput )
+		return;
+	
+    BOOL detectFaces = YES;
     
-	[previewLayer removeFromSuperlayer];
+	// enable/disable the AVCaptureVideoDataOutput to control the flow of AVCaptureVideoDataOutputSampleBufferDelegate calls
+	[[self.videoDataOutput connectionWithMediaType:AVMediaTypeVideo] setEnabled:detectFaces];
+	
+	// update graphics associated with previously detected faces
+	[CATransaction begin];
+	[CATransaction setValue:(id)kCFBooleanTrue forKey:kCATransactionDisableActions];
+	[CATransaction commit];
+	
+	if ( ! detectFaces ) {
+		// dispatch to the end of queue in case a delegate call was already pending before we stopped the output
+		dispatch_async(dispatch_get_main_queue(), ^(void) { [self resizeCoreImageFaceLayerCache:0]; });
+	}
+}
+
+- (void) updateCameraSelection
+{
+	// Changing the camera device will reset connection state, so we call the
+	// update*Detection functions to resync them.  When making multiple
+	// session changes, wrap in a beginConfiguration / commitConfiguration.
+	// This will avoid consecutive session restarts for each configuration
+	// change (noticeable delay and camera flickering)
+	
+	[self.session beginConfiguration];
+	
+	// have to remove old inputs before we test if we can add a new input
+	NSArray* oldInputs = [self.session inputs];
+	for (AVCaptureInput *oldInput in oldInputs)
+		[self.session removeInput:oldInput];
+	
+	AVCaptureDeviceInput* input = [self pickCamera];
+	if ( ! input ) {
+		// failed, restore old inputs
+		for (AVCaptureInput *oldInput in oldInputs)
+			[self.session addInput:oldInput];
+	} else {
+		// succeeded, set input and update connection states
+		[self.session addInput:input];
+		[self updateCoreImageDetection:nil];
+	}
+	[self.session commitConfiguration];
+}
+
+- (AVCaptureDeviceInput*) pickCamera
+{
+	AVCaptureDevicePosition desiredPosition = (YES) ? AVCaptureDevicePositionFront : AVCaptureDevicePositionBack;
+	BOOL hadError = NO;
+	for (AVCaptureDevice *d in [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo]) {
+		if ([d position] == desiredPosition) {
+			NSError *error = nil;
+			AVCaptureDeviceInput *input = [AVCaptureDeviceInput deviceInputWithDevice:d error:&error];
+			if (error) {
+				hadError = YES;
+				displayErrorOnMainQueue(error, @"Could not initialize for AVMediaTypeVideo");
+			} else if ( [self.session canAddInput:input] ) {
+				return input;
+			}
+		}
+	}
+	if ( ! hadError ) {
+		// no errors, simply couldn't find a matching camera
+		displayErrorOnMainQueue(nil, @"No camera found for requested orientation");
+	}
+	return nil;
 }
 
 #pragma mark -
+- (void) resizeCoreImageFaceLayerCache:(NSInteger)newSize
+{
+	while( [self.ciFaceLayers count] < newSize) {
+		// add required layers
+		CALayer *featureLayer = [CALayer new];
+		//[featureLayer setContents:(id)[mustache CGImage]];
+		[featureLayer setBorderColor:[[UIColor redColor] CGColor]];
+		[featureLayer setBorderWidth:FACE_RECT_BORDER_WIDTH];
+		[self.previewLayer addSublayer:featureLayer];
+		[self.ciFaceLayers addObject:featureLayer];
+	}
+	while(newSize < [self.ciFaceLayers count]) {
+		// delete extra layers
+		[(CALayer*)[self.ciFaceLayers lastObject] removeFromSuperlayer];
+		[self.ciFaceLayers removeLastObject];
+	}
+}
+
 // find where the video box is positioned within the preview layer based on the video size and gravity
 + (CGRect)videoPreviewBoxForGravity:(NSString *)gravity frameSize:(CGSize)frameSize apertureSize:(CGSize)apertureSize
 {
@@ -239,12 +323,12 @@ bail:
 // to detect features and for each draw the red square in a layer and set appropriate orientation
 - (void)drawFaceBoxesForFeatures:(NSArray *)features forVideoBox:(CGRect)clap orientation:(UIDeviceOrientation)orientation
 {
-    for (UIView *view in [cameraView subviews]) {
+    for (UIView *view in [self.cameraView subviews]) {
         [view removeFromSuperview];
     }
     
-	CGSize parentFrameSize = [cameraView frame].size;
-	NSString *gravity = [previewLayer videoGravity];
+	CGSize parentFrameSize = [self.cameraView frame].size;
+	NSString *gravity = [self.previewLayer videoGravity];
 
 	CGRect previewBox = [CBPViewController videoPreviewBoxForGravity:gravity
                                                                  frameSize:parentFrameSize
@@ -287,7 +371,7 @@ bail:
             
             view.layer.borderColor = [UIColor greenColor].CGColor;
             
-            [cameraView addSubview:view];
+            [self.cameraView addSubview:view];
 		
 	}
 }
@@ -342,7 +426,7 @@ bail:
 	}
     
 	imageOptions = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:exifOrientation] forKey:CIDetectorImageOrientation];
-	NSArray *features = [faceDetector featuresInImage:ciImage options:imageOptions];
+	NSArray *features = [self.faceDetector featuresInImage:ciImage options:imageOptions];
 
     // get the clean aperture
     // the clean aperture is a rectangle that defines the portion of the encoded pixel dimensions
@@ -424,3 +508,18 @@ bail:
 }
 
 @end
+
+void displayErrorOnMainQueue(NSError *error, NSString *message)
+{
+	dispatch_async(dispatch_get_main_queue(), ^(void) {
+		UIAlertView* alert = [UIAlertView new];
+		if(error) {
+			alert.title = [NSString stringWithFormat:@"%@ (%zd)", message, error.code];
+			alert.message = [error localizedDescription];
+		} else {
+			alert.title = message;
+		}
+		[alert addButtonWithTitle:@"Dismiss"];
+		[alert show];
+	});
+}
