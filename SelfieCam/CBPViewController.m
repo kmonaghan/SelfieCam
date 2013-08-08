@@ -28,18 +28,18 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     
 @interface CBPViewController ()
 {
+    UIView *cameraView;
+    UIView *flashView;
     UILabel *countdownLabel;
+    
     int count;
     BOOL isTakingPhoto;
     
+    UISwitch *autoPhoto;
     UIButton *takePhotoButton;
-
-    UIView *faceBox;
     
     int faceFrameCount;
 }
-@property (strong, nonatomic) UIView *cameraView;
-@property (strong, nonatomic) UIView *flashView;
 
 @property (strong,nonatomic) AVCaptureSession *session;
 @property (strong,nonatomic) AVCaptureVideoPreviewLayer *previewLayer;
@@ -68,6 +68,8 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 	self.faceDetector = [CIDetector detectorOfType:CIDetectorTypeFace context:nil options:detectorOptions];
     
     isTakingPhoto = NO;
+    
+    autoPhoto.on = NO;
 }
 
 - (void)didReceiveMemoryWarning
@@ -80,10 +82,10 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 {
     UIView *view = [[UIView alloc] initWithFrame:[UIScreen mainScreen].bounds];
         
-    self.cameraView = [[UIView alloc] initWithFrame:[UIScreen mainScreen].bounds];
-    self.cameraView.backgroundColor = [UIColor whiteColor];
+    cameraView = [[UIView alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    cameraView.backgroundColor = [UIColor whiteColor];
     
-    [view addSubview:self.cameraView];
+    [view addSubview:cameraView];
     
     countdownLabel = [[UILabel alloc] initWithFrame:[UIScreen mainScreen].bounds];
     countdownLabel.font = [UIFont boldSystemFontOfSize:200.0f];
@@ -96,14 +98,22 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     
     [view addSubview:countdownLabel];
     
-    self.flashView = [[UIView alloc] initWithFrame:self.cameraView.frame];
-    self.flashView.alpha = 0.0f;
-    self.flashView.backgroundColor = [UIColor whiteColor];
-    [view addSubview:self.flashView];
+    flashView = [[UIView alloc] initWithFrame:cameraView.frame];
+    flashView.alpha = 0.0f;
+    flashView.backgroundColor = [UIColor whiteColor];
+    [view addSubview:flashView];
     
     UIView *controlView = [[UIView alloc] initWithFrame:CGRectMake(0, [UIScreen mainScreen].bounds.size.height - 50.0f, [UIScreen mainScreen].bounds.size.width, 50.0f)];
-    controlView.backgroundColor = [UIColor blackColor];
-    controlView.alpha = 0.5f;
+    
+    UIView *controlBackgroundView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320.0f, 50.0f)];
+    controlBackgroundView.backgroundColor = [UIColor blackColor];
+    controlBackgroundView.alpha = 0.5f;
+    
+    [controlView addSubview:controlBackgroundView];
+    
+    autoPhoto = [[UISwitch alloc] init];
+    autoPhoto.center = CGPointMake(controlView.frame.size.width / 4, controlView.frame.size.height / 2);
+    [controlView addSubview:autoPhoto];
     
     takePhotoButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
     [takePhotoButton setTitle:@"Photo" forState:UIControlStateNormal];
@@ -111,7 +121,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
                         action:@selector(startCountdown)
               forControlEvents:UIControlEventTouchUpInside];
     [takePhotoButton sizeToFit];
-    takePhotoButton.center = CGPointMake([UIScreen mainScreen].bounds.size.width / 2, 25.0f);
+    takePhotoButton.center = CGPointMake(controlView.frame.size.width / 2, controlView.frame.size.height / 2);
     
     [controlView addSubview:takePhotoButton];
     
@@ -135,7 +145,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 	[self updateCameraSelection];
 	
 	// For displaying live feed to screen
-	CALayer *rootLayer = self.cameraView.layer;
+	CALayer *rootLayer = cameraView.layer;
 	[rootLayer setMasksToBounds:YES];
 	self.previewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:self.session];
 	[self.previewLayer setBackgroundColor:[[UIColor blackColor] CGColor]];
@@ -293,18 +303,18 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 // to detect features and for each draw the red square in a layer and set appropriate orientation
 - (void)drawFaceBoxesForFeatures:(NSArray *)features forVideoBox:(CGRect)clap orientation:(UIDeviceOrientation)orientation
 {
+    if (![features count])
+    {
+        return;
+    }
+    
 	// Update the face graphics
 	[CATransaction begin];
 	[CATransaction setAnimationDuration:1];
     
 	[self resizeCoreImageFaceLayerCache:[features count]];
-	
-	CGSize parentFrameSize = self.cameraView.frame.size;
-	NSString *gravity = self.previewLayer.videoGravity;
-	BOOL isMirrored = self.previewLayer.connection.isVideoMirrored;
-	CGRect previewBox = videoPreviewBoxForGravity(gravity, parentFrameSize, clap.size);
-	
-   // NSLog(@"previewBox: %@", NSStringFromCGRect(previewBox));
+
+	CGRect previewBox = videoPreviewBoxForGravity(self.previewLayer.videoGravity, cameraView.frame.size, clap.size);
     
 	NSInteger currentFeature = 0;
 	for ( CIFaceFeature *ff in features ) {
@@ -312,7 +322,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 		// The feature box originates in the bottom left of the video frame.
 		// (Bottom right if mirroring is turned on)
 		CGRect faceRect = [ff bounds];
-		NSLog(@"Start faceRect: %@", NSStringFromCGRect(faceRect));
+
 		// flip preview width and height
 		CGFloat temp = faceRect.size.width;
 		faceRect.size.width = faceRect.size.height;
@@ -327,15 +337,6 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 		faceRect.size.height *= heightScaleBy;
 		faceRect.origin.x *= widthScaleBy;
 		faceRect.origin.y *= heightScaleBy;
-		
-        NSLog(@"faceRect: %@", NSStringFromCGRect(faceRect));
-        /*
-		if ( isMirrored )
-			faceRect = CGRectOffset(faceRect, previewBox.origin.x + previewBox.size.width - faceRect.size.width - (faceRect.origin.x * 2), previewBox.origin.y);
-		else
-			faceRect = CGRectOffset(faceRect, previewBox.origin.x, previewBox.origin.y);
-		*/
-        NSLog(@"End faceRect: %@", NSStringFromCGRect(faceRect));
         
 		CALayer *featureLayer = [self.ciFaceLayers objectAtIndex:currentFeature];
 		
@@ -418,7 +419,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     if ([features count]) {
         faceFrameCount++;
         
-        if (faceFrameCount > TOTALFACE_FRAMES) {
+        if ((faceFrameCount > TOTALFACE_FRAMES) && (autoPhoto.on)) {
             [self startCountdown];
             
             faceFrameCount = 0;
@@ -485,7 +486,6 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 	[self.stillImageOutput captureStillImageAsynchronouslyFromConnection:stillImageConnection
                                                        completionHandler:^(CMSampleBufferRef imageDataSampleBuffer, NSError *error) {
                                                            if (error) {
-                                                               NSLog(@"error: %@", error);
                                                                displayErrorOnMainQueue(error, @"Take picture failed");
                                                            } else if ( ! imageDataSampleBuffer ) {
                                                                displayErrorOnMainQueue(nil, @"Take picture failed: received null sample buffer");
@@ -510,7 +510,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 		if ( isCapturingStillImage ) {
             dispatch_async(dispatch_get_main_queue(), ^(void) {
                 [UIView animateWithDuration:.2f
-                                 animations:^{ self.flashView.alpha=1.0f; }
+                                 animations:^{ flashView.alpha=1.0f; }
                  ];
             });
 			self.previewLayer.connection.enabled = NO;
@@ -522,11 +522,11 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 - (void) unfreezePreview
 {
 	self.previewLayer.connection.enabled = YES;
-            dispatch_async(dispatch_get_main_queue(), ^(void) {
-	[UIView animateWithDuration:.2f
-					 animations:^{ self.flashView.alpha=0; }
-					 completion:nil];
-            });
+    dispatch_async(dispatch_get_main_queue(), ^(void) {
+        [UIView animateWithDuration:.2f
+                         animations:^{ flashView.alpha=0; }
+                         completion:nil];
+    });
     isTakingPhoto = NO;
     takePhotoButton.enabled = YES;
 }
