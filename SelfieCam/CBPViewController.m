@@ -36,6 +36,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     BOOL isTakingPhoto;
     
     UISwitch *autoPhoto;
+    UISwitch *smileActivation;
     UIButton *takePhotoButton;
     
     int faceFrameCount;
@@ -63,8 +64,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 	// Do any additional setup after loading the view, typically from a nib.
     
     [self setupAVCapture];
-	NSDictionary *detectorOptions = @{CIDetectorAccuracy : CIDetectorAccuracyLow, CIDetectorTracking : @(YES) };
-    //, CIDetectorEyeBlink : @(YES),  CIDetectorSmile : @(YES) };
+	NSDictionary *detectorOptions = @{CIDetectorAccuracy : CIDetectorAccuracyLow, CIDetectorTracking : @YES};
 	self.faceDetector = [CIDetector detectorOfType:CIDetectorTypeFace context:nil options:detectorOptions];
     
     isTakingPhoto = NO;
@@ -125,6 +125,10 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     
     [controlView addSubview:takePhotoButton];
     
+    smileActivation = [[UISwitch alloc] init];
+    smileActivation.center = CGPointMake((controlView.frame.size.width * 3) / 4, controlView.frame.size.height / 2);
+    [controlView addSubview:smileActivation];
+    
     [view addSubview:controlView];
     
     self.view = view;
@@ -149,7 +153,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 	[rootLayer setMasksToBounds:YES];
 	self.previewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:self.session];
 	[self.previewLayer setBackgroundColor:[[UIColor blackColor] CGColor]];
-	[self.previewLayer setVideoGravity:AVLayerVideoGravityResizeAspectFill];
+	[self.previewLayer setVideoGravity:AVLayerVideoGravityResizeAspect];
 	[self.previewLayer setFrame:[rootLayer bounds]];
 	[rootLayer addSublayer:self.previewLayer];
 	
@@ -286,7 +290,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 	while( [self.ciFaceLayers count] < newSize) {
 		// add required layers
 		CALayer *featureLayer = [CALayer new];
-		//[featureLayer setContents:(id)[mustache CGImage]];
+
 		[featureLayer setBorderColor:[[UIColor redColor] CGColor]];
 		[featureLayer setBorderWidth:FACE_RECT_BORDER_WIDTH];
 		[self.previewLayer addSublayer:featureLayer];
@@ -311,18 +315,30 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 	// Update the face graphics
 	[CATransaction begin];
 	[CATransaction setAnimationDuration:1];
-    
-	[self resizeCoreImageFaceLayerCache:[features count]];
 
+    [self resizeCoreImageFaceLayerCache:[features count]];
+    
 	CGRect previewBox = videoPreviewBoxForGravity(self.previewLayer.videoGravity, cameraView.frame.size, clap.size);
     
 	NSInteger currentFeature = 0;
+    BOOL isMirrored = self.previewLayer.connection.isVideoMirrored;
+    
 	for ( CIFaceFeature *ff in features ) {
 		// Find the correct position for the mustache layer within the previewLayer
 		// The feature box originates in the bottom left of the video frame.
 		// (Bottom right if mirroring is turned on)
 		CGRect faceRect = [ff bounds];
-
+        
+        if (&CIDetectorEyeBlink != NULL)
+        {
+            if (ff.hasSmile && smileActivation.on)
+            {
+                [self startCountdown];
+                
+                NSLog(@"Smile!");
+            }
+        }
+        
 		// flip preview width and height
 		CGFloat temp = faceRect.size.width;
 		faceRect.size.width = faceRect.size.height;
@@ -337,6 +353,11 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 		faceRect.size.height *= heightScaleBy;
 		faceRect.origin.x *= widthScaleBy;
 		faceRect.origin.y *= heightScaleBy;
+        
+        if ( isMirrored )
+			faceRect = CGRectOffset(faceRect, previewBox.origin.x + previewBox.size.width - faceRect.size.width - (faceRect.origin.x * 2), previewBox.origin.y);
+		else
+			faceRect = CGRectOffset(faceRect, previewBox.origin.x, previewBox.origin.y);
         
 		CALayer *featureLayer = [self.ciFaceLayers objectAtIndex:currentFeature];
 		
@@ -363,7 +384,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 		currentFeature++;
 		
 	}
-	
+    
 	[CATransaction commit];
 }
 
@@ -410,7 +431,16 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 	}
 
     
-	NSDictionary *imageOptions = @{CIDetectorImageOrientation: @(exifOrientation)};
+	NSDictionary *imageOptions;
+    if (&CIDetectorEyeBlink != NULL)
+    {
+        imageOptions = @{CIDetectorImageOrientation: @(exifOrientation), CIDetectorSmile:@YES, CIDetectorEyeBlink:@YES};
+    }
+    else
+    {
+        imageOptions = @{CIDetectorImageOrientation: @(exifOrientation)};
+    }
+    
 	NSArray *features = [self.faceDetector featuresInImage:ciImage options:imageOptions];
 
 	CMFormatDescriptionRef fdesc = CMSampleBufferGetFormatDescription(sampleBuffer);
@@ -529,6 +559,9 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     });
     isTakingPhoto = NO;
     takePhotoButton.enabled = YES;
+    faceFrameCount = 0;
+    
+    [autoPhoto setOn:NO animated:YES];
 }
 
 @end
@@ -605,7 +638,7 @@ void writeJPEGDataToCameraRoll(NSData* data, NSDictionary* metadata)
 // converts UIDeviceOrientation to AVCaptureVideoOrientation
 static AVCaptureVideoOrientation avOrientationForDeviceOrientation(UIDeviceOrientation deviceOrientation)
 {
-	AVCaptureVideoOrientation result = deviceOrientation;
+	AVCaptureVideoOrientation result = AVCaptureVideoOrientationPortrait;
 	if ( deviceOrientation == UIDeviceOrientationLandscapeLeft )
 		result = AVCaptureVideoOrientationLandscapeRight;
 	else if ( deviceOrientation == UIDeviceOrientationLandscapeRight )
