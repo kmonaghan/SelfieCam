@@ -30,14 +30,20 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 {
     UIView *cameraView;
     UIView *flashView;
+    UIView *settingsView;
     UILabel *countdownLabel;
     
     int count;
     BOOL isTakingPhoto;
+    BOOL detectedFeature;
     
     UISwitch *autoPhoto;
     UISwitch *smileActivation;
+    UISwitch *winkActivation;
     UIButton *takePhotoButton;
+    UIButton *settingsButton;
+    UIButton *aboutButton;
+    UIButton *doneButton;
     
     int faceFrameCount;
 }
@@ -92,9 +98,11 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     countdownLabel.textColor = [UIColor whiteColor];
     countdownLabel.backgroundColor = [UIColor clearColor];
     countdownLabel.text = @"3";
-    [countdownLabel sizeToFit];
+    countdownLabel.textAlignment = NSTextAlignmentCenter;
     countdownLabel.center = view.center;
     countdownLabel.alpha = 0;
+    countdownLabel.minimumScaleFactor = 0.01f;
+    countdownLabel.adjustsFontSizeToFitWidth = YES;
     
     [view addSubview:countdownLabel];
     
@@ -106,7 +114,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     UIView *controlView = [[UIView alloc] initWithFrame:CGRectMake(0, [UIScreen mainScreen].bounds.size.height - 50.0f, [UIScreen mainScreen].bounds.size.width, 50.0f)];
     
     UIView *controlBackgroundView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320.0f, 50.0f)];
-    controlBackgroundView.backgroundColor = [UIColor blackColor];
+    controlBackgroundView.backgroundColor = [UIColor whiteColor];
     controlBackgroundView.alpha = 0.5f;
     
     [controlView addSubview:controlBackgroundView];
@@ -115,8 +123,8 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     autoPhoto.center = CGPointMake(controlView.frame.size.width / 4, controlView.frame.size.height / 2);
     [controlView addSubview:autoPhoto];
     
-    takePhotoButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-    [takePhotoButton setTitle:@"Photo" forState:UIControlStateNormal];
+    takePhotoButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [takePhotoButton setTitle:NSLocalizedString(@"Photo", nil) forState:UIControlStateNormal];
     [takePhotoButton addTarget:self
                         action:@selector(startCountdown)
               forControlEvents:UIControlEventTouchUpInside];
@@ -125,11 +133,60 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     
     [controlView addSubview:takePhotoButton];
     
-    smileActivation = [[UISwitch alloc] init];
-    smileActivation.center = CGPointMake((controlView.frame.size.width * 3) / 4, controlView.frame.size.height / 2);
-    [controlView addSubview:smileActivation];
+    settingsButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [settingsButton addTarget:self action:@selector(showSettings) forControlEvents:UIControlEventTouchUpInside];
+    [settingsButton setTitle:NSLocalizedString(@"Settings", nil) forState:UIControlStateNormal];
+    [settingsButton sizeToFit];
+    settingsButton.center = CGPointMake((controlView.frame.size.width / 4) * 3, controlView.frame.size.height / 2);
+
+    [controlView addSubview:settingsButton];
     
     [view addSubview:controlView];
+    
+    settingsView = [[UIView alloc] initWithFrame:CGRectMake(0, view.frame.size.height, 320.0f, 150.0f)];
+    settingsView.backgroundColor = [UIColor blackColor];
+    
+    UILabel *smileLabel = [[UILabel alloc] initWithFrame:CGRectMake(10.0f, 10.0f, 0, 31.0f)];
+    smileLabel.text = NSLocalizedString(@"Take photo when you smile", nil);
+    smileLabel.textColor = [UIColor whiteColor];
+    [smileLabel sizeToFit];
+    
+    [settingsView addSubview:smileLabel];
+    
+    smileActivation = [[UISwitch alloc] init];
+    smileActivation.frame = CGRectMake(259.0f, 10.0f, 51.0f, 31.0f);
+    
+    [settingsView addSubview:smileActivation];
+    
+    UILabel *winkLabel = [[UILabel alloc] initWithFrame:CGRectMake(10.0f, 51.0f, 0, 31.0f)];
+    winkLabel.text = NSLocalizedString(@"Take photo when you wink", nil);
+    winkLabel.textColor = [UIColor whiteColor];
+    [winkLabel sizeToFit];
+    
+    [settingsView addSubview:winkLabel];
+    
+    winkActivation = [[UISwitch alloc] init];
+    winkActivation.frame = CGRectMake(259.0f, 51.0f, 51.0f, 31.0f);
+
+    [settingsView addSubview:winkActivation];
+
+    aboutButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [aboutButton setTitle:NSLocalizedString(@"About", nil) forState:UIControlStateNormal];
+    [aboutButton addTarget:self action:@selector(about) forControlEvents:UIControlEventTouchUpInside];
+    aboutButton.frame = CGRectMake(10.0f, 100.0f, 0, 0);
+    [aboutButton sizeToFit];
+
+    [settingsView addSubview:aboutButton];
+    
+    doneButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    doneButton.frame = CGRectMake(267.0f, 100.0f, 0, 0);
+    [doneButton setTitle:NSLocalizedString(@"Done", nil) forState:UIControlStateNormal];
+    [doneButton addTarget:self action:@selector(hideSettings) forControlEvents:UIControlEventTouchUpInside];
+    [doneButton sizeToFit];
+
+    [settingsView addSubview:doneButton];
+    
+    [view addSubview:settingsView];
     
     self.view = view;
 }
@@ -329,13 +386,20 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 		// (Bottom right if mirroring is turned on)
 		CGRect faceRect = [ff bounds];
         
-        if (&CIDetectorEyeBlink != NULL)
+        if ((&CIDetectorEyeBlink != NULL) && (!detectedFeature))
         {
             if (ff.hasSmile && smileActivation.on)
             {
-                [self startCountdown];
+                detectedFeature = YES;
                 
-                NSLog(@"Smile!");
+                [self updateCountdownLabel:NSLocalizedString(@"Smile!", nil) forDuration:1.0f onCompletion:^(){[self startCountdown];}];
+            }
+            
+            if ((ff.rightEyeClosed || ff.leftEyeClosed) && winkActivation.on)
+            {
+                detectedFeature = YES;
+                
+                [self updateCountdownLabel:NSLocalizedString(@"Wink!", nil) forDuration:1.0f onCompletion:^(){[self startCountdown];}];
             }
         }
         
@@ -482,22 +546,28 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 - (void)showCountDown
 {
     if (count != 0) {
-        dispatch_async(dispatch_get_main_queue(), ^(void) {
-            countdownLabel.text = [NSString stringWithFormat:@"%d", count];
-            count--;
-            countdownLabel.alpha = 1.0f;
-            countdownLabel.font = [UIFont boldSystemFontOfSize:200.0f];
-            [UIView animateWithDuration:1.0f
-                             animations:^() {
-                                 countdownLabel.alpha = 0;
-                             }
-                             completion:^(BOOL finished) {
-                                 [self showCountDown];
-                             }];
-        });
+        [self updateCountdownLabel:[NSString stringWithFormat:@"%d", count] forDuration:1.0f onCompletion:^(){[self showCountDown];}];
+        count--;
     } else {
         [self takePhoto];
     }
+}
+
+- (void)updateCountdownLabel:(NSString *)text forDuration:(CGFloat)duration onCompletion:(void (^)(void))complete
+{
+    dispatch_async(dispatch_get_main_queue(), ^(void) {
+        countdownLabel.text = text;
+        [countdownLabel sizeThatFits:CGSizeMake(320.0f, MAXFLOAT)];
+        countdownLabel.center = self.view.center;
+        countdownLabel.alpha = 1.0f;
+        [UIView animateWithDuration:duration
+                         animations:^() {
+                             countdownLabel.alpha = 0;
+                         }
+                         completion:^(BOOL finished) {
+                             complete();
+                         }];
+    });
 }
 
 - (void)takePhoto
@@ -558,12 +628,34 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
                          completion:nil];
     });
     isTakingPhoto = NO;
+    detectedFeature = NO;
     takePhotoButton.enabled = YES;
     faceFrameCount = 0;
     
     [autoPhoto setOn:NO animated:YES];
 }
 
+#pragma mark -
+- (void)showSettings
+{
+    [UIView animateWithDuration:0.3f
+                     animations:^() {
+                         settingsView.frame = CGRectMake(0, self.view.frame.size.height - settingsView.frame.size.height, settingsView.frame.size.width, settingsView.frame.size.height);
+                     }];
+}
+
+- (void)hideSettings
+{
+    [UIView animateWithDuration:0.3f
+                     animations:^() {
+                         settingsView.frame = CGRectMake(0, self.view.frame.size.height, settingsView.frame.size.width, settingsView.frame.size.height);
+                     }];
+}
+
+- (void)about
+{
+    
+}
 @end
 
 // Finds where the video box is positioned within the preview layer based on the video size and gravity
