@@ -241,6 +241,11 @@
 				CLASSPREFIX = CBP;
 				LastUpgradeCheck = 0460;
 				ORGANIZATIONNAME = "Karl Monaghan";
+				TargetAttributes = {
+					F5F5256817ABF84600BFF158 = {
+						DevelopmentTeam = 733QMTEL36;
+					};
+				};
 			};
 			buildConfigurationList = F5F5256417ABF84600BFF158 /* Build configuration list for PBXProject "SelfieCam" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -359,6 +364,7 @@
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -390,6 +396,7 @@
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -406,6 +413,7 @@
 		F5F525A217ABF84600BFF158 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer: Karl Monaghan (9UK6HQ9N49)";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SYSTEM_APPS_DIR)/Reveal.app/Contents/SharedSupport/iOS-Libraries\"",
@@ -421,6 +429,7 @@
 		F5F525A317ABF84600BFF158 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer: Karl Monaghan (9UK6HQ9N49)";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SYSTEM_APPS_DIR)/Reveal.app/Contents/SharedSupport/iOS-Libraries\"",
