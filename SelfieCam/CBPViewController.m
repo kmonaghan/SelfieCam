@@ -38,8 +38,13 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     BOOL detectedFeature;
     
     UISwitch *autoPhoto;
+    UISwitch *faceActivation;
     UISwitch *smileActivation;
     UISwitch *winkActivation;
+    
+    UILabel *numberOfFacesLabel;
+    UIStepper *changeNumberOfFaces;
+    
     UIButton *takePhotoButton;
     UIButton *settingsButton;
     UIButton *aboutButton;
@@ -143,22 +148,45 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     
     [view addSubview:controlView];
     
-    settingsView = [[UIView alloc] initWithFrame:CGRectMake(0, view.frame.size.height, 320.0f, 150.0f)];
+    settingsView = [[UIView alloc] initWithFrame:CGRectMake(0, view.frame.size.height, 320.0f, 220.0f)];
     settingsView.backgroundColor = [UIColor blackColor];
     
-    UILabel *smileLabel = [[UILabel alloc] initWithFrame:CGRectMake(10.0f, 10.0f, 0, 31.0f)];
+    UILabel *faceLabel = [[UILabel alloc] initWithFrame:CGRectMake(10.0f, 10.0f, 0, 31.0f)];
+    faceLabel.text = NSLocalizedString(@"Take photo when a face in shot", nil);
+    faceLabel.textColor = [UIColor whiteColor];
+    [faceLabel sizeToFit];
+    [settingsView addSubview:faceLabel];
+    
+    faceActivation = [[UISwitch alloc] initWithFrame:CGRectMake(259.0f, 10.0f, 51.0f, 31.0f)];
+    
+    [settingsView addSubview:faceActivation];
+    
+    numberOfFacesLabel = [[UILabel alloc] initWithFrame:CGRectMake(10.0f, 51.0f, 0, 31.0f)];
+    numberOfFacesLabel.textColor = [UIColor whiteColor];
+
+    [settingsView addSubview:numberOfFacesLabel];
+    
+    changeNumberOfFaces = [[UIStepper alloc] initWithFrame:CGRectMake(219.0f, 51.0f, 51.0f, 31.0f)];
+    changeNumberOfFaces.minimumValue = 1;
+    changeNumberOfFaces.maximumValue = 5;
+    [changeNumberOfFaces addTarget:self action:@selector(numberOfFacesChanged) forControlEvents:UIControlEventValueChanged];
+    
+    [settingsView addSubview:changeNumberOfFaces];
+    
+    [self numberOfFacesChanged];
+
+    UILabel *smileLabel = [[UILabel alloc] initWithFrame:CGRectMake(10.0f, 91.0f, 0, 31.0f)];
     smileLabel.text = NSLocalizedString(@"Take photo when you smile", nil);
     smileLabel.textColor = [UIColor whiteColor];
     [smileLabel sizeToFit];
     
     [settingsView addSubview:smileLabel];
     
-    smileActivation = [[UISwitch alloc] init];
-    smileActivation.frame = CGRectMake(259.0f, 10.0f, 51.0f, 31.0f);
+    smileActivation = [[UISwitch alloc] initWithFrame:CGRectMake(259.0f, 91.0f, 51.0f, 31.0f)];
     
     [settingsView addSubview:smileActivation];
     
-    UILabel *winkLabel = [[UILabel alloc] initWithFrame:CGRectMake(10.0f, 51.0f, 0, 31.0f)];
+    UILabel *winkLabel = [[UILabel alloc] initWithFrame:CGRectMake(10.0f, 132.0f, 0, 31.0f)];
     winkLabel.text = NSLocalizedString(@"Take photo when you wink", nil);
     winkLabel.textColor = [UIColor whiteColor];
     [winkLabel sizeToFit];
@@ -166,20 +194,20 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     [settingsView addSubview:winkLabel];
     
     winkActivation = [[UISwitch alloc] init];
-    winkActivation.frame = CGRectMake(259.0f, 51.0f, 51.0f, 31.0f);
+    winkActivation.frame = CGRectMake(259.0f, 132.0f, 51.0f, 31.0f);
 
     [settingsView addSubview:winkActivation];
 
     aboutButton = [UIButton buttonWithType:UIButtonTypeCustom];
     [aboutButton setTitle:NSLocalizedString(@"About", nil) forState:UIControlStateNormal];
     [aboutButton addTarget:self action:@selector(about) forControlEvents:UIControlEventTouchUpInside];
-    aboutButton.frame = CGRectMake(10.0f, 100.0f, 0, 0);
+    aboutButton.frame = CGRectMake(10.0f, 173.0f, 0, 0);
     [aboutButton sizeToFit];
 
     [settingsView addSubview:aboutButton];
     
     doneButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    doneButton.frame = CGRectMake(267.0f, 100.0f, 0, 0);
+    doneButton.frame = CGRectMake(267.0f, 173.0f, 0, 0);
     [doneButton setTitle:NSLocalizedString(@"Done", nil) forState:UIControlStateNormal];
     [doneButton addTarget:self action:@selector(hideSettings) forControlEvents:UIControlEventTouchUpInside];
     [doneButton sizeToFit];
@@ -386,7 +414,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 		// (Bottom right if mirroring is turned on)
 		CGRect faceRect = [ff bounds];
         
-        if ((&CIDetectorEyeBlink != NULL) && (!detectedFeature))
+        if ((&CIDetectorEyeBlink != NULL) && !detectedFeature && autoPhoto.on)
         {
             if (ff.hasSmile && smileActivation.on)
             {
@@ -510,10 +538,10 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 	CMFormatDescriptionRef fdesc = CMSampleBufferGetFormatDescription(sampleBuffer);
 	CGRect clap = CMVideoFormatDescriptionGetCleanAperture(fdesc, false /*originIsTopLeft*/);
 	
-    if ([features count]) {
+    if (([features count] == changeNumberOfFaces.value) && autoPhoto.on) {
         faceFrameCount++;
         
-        if ((faceFrameCount > TOTALFACE_FRAMES) && (autoPhoto.on)) {
+        if (faceFrameCount > TOTALFACE_FRAMES) {
             [self startCountdown];
             
             faceFrameCount = 0;
@@ -652,10 +680,18 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
                      }];
 }
 
+- (void)numberOfFacesChanged
+{
+    NSString *facestring = [NSString stringWithFormat:@"%.f face%@ should be visible", changeNumberOfFaces.value, ((changeNumberOfFaces.value > 1) ? @"s": @"")];
+    numberOfFacesLabel.text = NSLocalizedString(facestring, nil);
+    [numberOfFacesLabel sizeToFit];
+}
+
 - (void)about
 {
     
 }
+
 @end
 
 // Finds where the video box is positioned within the preview layer based on the video size and gravity

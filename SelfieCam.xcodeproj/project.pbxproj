@@ -112,7 +112,6 @@
 		F5F5256017ABF84600BFF158 = {
 			isa = PBXGroup;
 			children = (
-				349FD30517AE96800030703E /* CFNetwork.framework */,
 				F5F5257217ABF84600BFF158 /* SelfieCam */,
 				F5F5259617ABF84600BFF158 /* SelfieCamTests */,
 				F5F5256B17ABF84600BFF158 /* Frameworks */,
@@ -132,9 +131,9 @@
 		F5F5256B17ABF84600BFF158 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				349FD30717AE96AD0030703E /* Reveal.framework */,
 				F513497D17AC0A5300869D16 /* AssetsLibrary.framework */,
 				F513497717AC084D00869D16 /* AVFoundation.framework */,
+				349FD30517AE96800030703E /* CFNetwork.framework */,
 				F5F5257017ABF84600BFF158 /* CoreGraphics.framework */,
 				F513497917AC0A4200869D16 /* CoreImage.framework */,
 				F513498317AC138E00869D16 /* CoreMedia.framework */,
@@ -142,6 +141,7 @@
 				F5F5256E17ABF84600BFF158 /* Foundation.framework */,
 				F513497B17AC0A4900869D16 /* ImageIO.framework */,
 				F513498117AC0D2200869D16 /* QuartzCore.framework */,
+				349FD30717AE96AD0030703E /* Reveal.framework */,
 				F5F5259017ABF84600BFF158 /* SenTestingKit.framework */,
 				F5F5256C17ABF84600BFF158 /* UIKit.framework */,
 			);
