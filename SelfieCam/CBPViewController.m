@@ -93,7 +93,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 {
     UIView *view = [[UIView alloc] initWithFrame:[UIScreen mainScreen].bounds];
         
-    cameraView = [[UIView alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    cameraView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320.0f, 427.0f)];
     cameraView.backgroundColor = [UIColor whiteColor];
     
     [view addSubview:cameraView];
@@ -151,69 +151,135 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     settingsView = [[UIView alloc] initWithFrame:CGRectMake(0, view.frame.size.height, 320.0f, 220.0f)];
     settingsView.backgroundColor = [UIColor blackColor];
     
-    UILabel *faceLabel = [[UILabel alloc] initWithFrame:CGRectMake(10.0f, 10.0f, 0, 31.0f)];
+    UILabel *faceLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     faceLabel.text = NSLocalizedString(@"Take photo when a face in shot", nil);
     faceLabel.textColor = [UIColor whiteColor];
-    [faceLabel sizeToFit];
+    faceLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    faceLabel.numberOfLines = 2;
     [settingsView addSubview:faceLabel];
     
-    faceActivation = [[UISwitch alloc] initWithFrame:CGRectMake(259.0f, 10.0f, 51.0f, 31.0f)];
-    
+    faceActivation = [[UISwitch alloc] init];
+    faceActivation.translatesAutoresizingMaskIntoConstraints = NO;
     [settingsView addSubview:faceActivation];
     
-    numberOfFacesLabel = [[UILabel alloc] initWithFrame:CGRectMake(10.0f, 51.0f, 0, 31.0f)];
+    [settingsView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"|-[faceLabel][faceActivation]-|"
+                                                                         options:0
+                                                                         metrics:nil
+                                                                           views:NSDictionaryOfVariableBindings(faceLabel, faceActivation)]];
+    
+    [settingsView addConstraint:[NSLayoutConstraint constraintWithItem:faceLabel
+                                                             attribute:NSLayoutAttributeCenterY
+                                                             relatedBy:NSLayoutRelationEqual
+                                                                toItem:faceActivation
+                                                             attribute:NSLayoutAttributeCenterY
+                                                            multiplier:1.0f
+                                                              constant:0.0f]];
+    
+    numberOfFacesLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     numberOfFacesLabel.textColor = [UIColor whiteColor];
-
+    numberOfFacesLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    numberOfFacesLabel.numberOfLines = 2;
     [settingsView addSubview:numberOfFacesLabel];
     
-    changeNumberOfFaces = [[UIStepper alloc] initWithFrame:CGRectMake(219.0f, 51.0f, 51.0f, 31.0f)];
+    changeNumberOfFaces = [[UIStepper alloc] init];
     changeNumberOfFaces.minimumValue = 1;
     changeNumberOfFaces.maximumValue = 5;
     [changeNumberOfFaces addTarget:self action:@selector(numberOfFacesChanged) forControlEvents:UIControlEventValueChanged];
-    
+    changeNumberOfFaces.translatesAutoresizingMaskIntoConstraints = NO;
     [settingsView addSubview:changeNumberOfFaces];
     
+    [settingsView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"|-[numberOfFacesLabel][changeNumberOfFaces]-|"
+                                                                         options:0
+                                                                         metrics:nil
+                                                                           views:NSDictionaryOfVariableBindings(numberOfFacesLabel, changeNumberOfFaces)]];
+    
     [self numberOfFacesChanged];
-
-    UILabel *smileLabel = [[UILabel alloc] initWithFrame:CGRectMake(10.0f, 91.0f, 0, 31.0f)];
+    
+    [settingsView addConstraint:[NSLayoutConstraint constraintWithItem:numberOfFacesLabel
+                                                             attribute:NSLayoutAttributeCenterY
+                                                             relatedBy:NSLayoutRelationEqual
+                                                                toItem:changeNumberOfFaces
+                                                             attribute:NSLayoutAttributeCenterY
+                                                            multiplier:1.0f
+                                                              constant:0.0f]];
+    
+    UILabel *smileLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     smileLabel.text = NSLocalizedString(@"Take photo when you smile", nil);
     smileLabel.textColor = [UIColor whiteColor];
-    [smileLabel sizeToFit];
+    smileLabel.translatesAutoresizingMaskIntoConstraints = NO;
     
     [settingsView addSubview:smileLabel];
     
-    smileActivation = [[UISwitch alloc] initWithFrame:CGRectMake(259.0f, 91.0f, 51.0f, 31.0f)];
-    
+    smileActivation = [[UISwitch alloc] init];
+    smileActivation.translatesAutoresizingMaskIntoConstraints = NO;
     [settingsView addSubview:smileActivation];
     
-    UILabel *winkLabel = [[UILabel alloc] initWithFrame:CGRectMake(10.0f, 132.0f, 0, 31.0f)];
+    [settingsView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"|-[smileLabel][smileActivation]-|"
+                                                                         options:0
+                                                                         metrics:nil
+                                                                           views:NSDictionaryOfVariableBindings(smileLabel, smileActivation)]];
+    
+    [settingsView addConstraint:[NSLayoutConstraint constraintWithItem:smileLabel
+                                                             attribute:NSLayoutAttributeCenterY
+                                                             relatedBy:NSLayoutRelationEqual
+                                                                toItem:smileActivation
+                                                             attribute:NSLayoutAttributeCenterY
+                                                            multiplier:1.0f
+                                                              constant:0.0f]];
+
+
+    UILabel *winkLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     winkLabel.text = NSLocalizedString(@"Take photo when you wink", nil);
     winkLabel.textColor = [UIColor whiteColor];
-    [winkLabel sizeToFit];
+    winkLabel.translatesAutoresizingMaskIntoConstraints = NO;
     
     [settingsView addSubview:winkLabel];
     
     winkActivation = [[UISwitch alloc] init];
-    winkActivation.frame = CGRectMake(259.0f, 132.0f, 51.0f, 31.0f);
+    winkActivation.translatesAutoresizingMaskIntoConstraints = NO;
 
     [settingsView addSubview:winkActivation];
 
-    aboutButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [settingsView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"|-[winkLabel][winkActivation]-|"
+                                                                         options:0
+                                                                         metrics:nil
+                                                                           views:NSDictionaryOfVariableBindings(winkLabel, winkActivation)]];
+    
+    [settingsView addConstraint:[NSLayoutConstraint constraintWithItem:winkLabel
+                                                             attribute:NSLayoutAttributeCenterY
+                                                             relatedBy:NSLayoutRelationEqual
+                                                                toItem:winkActivation
+                                                             attribute:NSLayoutAttributeCenterY
+                                                            multiplier:1.0f
+                                                              constant:0.0f]];
+    
+    aboutButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [aboutButton setTitle:NSLocalizedString(@"About", nil) forState:UIControlStateNormal];
     [aboutButton addTarget:self action:@selector(about) forControlEvents:UIControlEventTouchUpInside];
-    aboutButton.frame = CGRectMake(10.0f, 173.0f, 0, 0);
-    [aboutButton sizeToFit];
-
+    aboutButton.translatesAutoresizingMaskIntoConstraints = NO;
     [settingsView addSubview:aboutButton];
     
-    doneButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    doneButton.frame = CGRectMake(267.0f, 173.0f, 0, 0);
+    doneButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [doneButton setTitle:NSLocalizedString(@"Done", nil) forState:UIControlStateNormal];
     [doneButton addTarget:self action:@selector(hideSettings) forControlEvents:UIControlEventTouchUpInside];
-    [doneButton sizeToFit];
-
+    doneButton.translatesAutoresizingMaskIntoConstraints = NO;
     [settingsView addSubview:doneButton];
+
+    [settingsView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[aboutButton]-|"
+                                                                         options:0
+                                                                         metrics:nil
+                                                                           views:NSDictionaryOfVariableBindings(aboutButton)]];
     
+    [settingsView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"|-[aboutButton(==doneButton)]-[doneButton]-|"
+                                                                         options:0
+                                                                         metrics:nil
+                                                                           views:NSDictionaryOfVariableBindings(aboutButton, doneButton)]];
+
+    [settingsView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-[faceActivation]-[changeNumberOfFaces]-[smileActivation]-[winkActivation]-[doneButton]-|"
+                                                                         options:0
+                                                                         metrics:nil
+                                                                           views:NSDictionaryOfVariableBindings(faceActivation, changeNumberOfFaces, smileActivation, winkActivation, doneButton)]];
+     
     [view addSubview:settingsView];
     
     self.view = view;
@@ -684,7 +750,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 {
     NSString *facestring = [NSString stringWithFormat:@"%.f face%@ should be visible", changeNumberOfFaces.value, ((changeNumberOfFaces.value > 1) ? @"s": @"")];
     numberOfFacesLabel.text = NSLocalizedString(facestring, nil);
-    [numberOfFacesLabel sizeToFit];
+    //[numberOfFacesLabel sizeToFit];
 }
 
 - (void)about
