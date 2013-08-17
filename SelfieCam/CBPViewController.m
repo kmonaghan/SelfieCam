@@ -25,11 +25,12 @@ static AVCaptureVideoOrientation avOrientationForDeviceOrientation(UIDeviceOrien
 CGRect videoPreviewBoxForGravity(NSString *gravity, CGSize frameSize, CGSize apertureSize);
 
 void displayErrorOnMainQueue(NSError *error, NSString *message);
-    
+
 @interface CBPViewController ()
 {
     UIView *cameraView;
     UIView *flashView;
+    UIView *controlView;
     UIView *settingsView;
     UILabel *countdownLabel;
     
@@ -51,6 +52,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     UIButton *doneButton;
     
     int faceFrameCount;
+    CGFloat topOffset;
 }
 
 @property (strong,nonatomic) AVCaptureSession *session;
@@ -61,6 +63,14 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 @property (strong,nonatomic) CIDetector *faceDetector;
 @property (strong,nonatomic) NSMutableArray *ciFaceLayers;
 
+@property (strong, nonatomic) NSLayoutConstraint *settingsBottomConstraint;
+@property (strong, nonatomic) NSLayoutConstraint *controlTopConstraint;
+@property (strong, nonatomic) NSArray *controlButtonPortraitConstraints;
+@property (strong, nonatomic) NSArray *controlButtonLandscapeConstraints;
+@property (strong, nonatomic) NSArray *controlPortraitConstraints;
+@property (strong, nonatomic) NSArray *controlLandscapeConstraints;
+@property (strong, nonatomic) NSArray *controlLandscapeLeftConstraints;
+@property (strong, nonatomic) NSArray *controlLandscapeRightConstraints;
 @end
 
 @implementation CBPViewController
@@ -92,8 +102,10 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 - (void)loadView
 {
     UIView *view = [[UIView alloc] initWithFrame:[UIScreen mainScreen].bounds];
-        
-    cameraView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320.0f, 427.0f)];
+    view.backgroundColor = [UIColor greenColor];
+    topOffset = 44.0f;
+    
+    cameraView = [[UIView alloc] initWithFrame:CGRectMake(0, topOffset, 320.0f, 427.0f)];
     cameraView.backgroundColor = [UIColor whiteColor];
     
     [view addSubview:cameraView];
@@ -111,46 +123,156 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     
     [view addSubview:countdownLabel];
     
-    flashView = [[UIView alloc] initWithFrame:cameraView.frame];
+    flashView = [[UIView alloc] initWithFrame:CGRectZero];
     flashView.alpha = 0.0f;
     flashView.backgroundColor = [UIColor whiteColor];
+    flashView.translatesAutoresizingMaskIntoConstraints = NO;
+    
     [view addSubview:flashView];
     
-    UIView *controlView = [[UIView alloc] initWithFrame:CGRectMake(0, [UIScreen mainScreen].bounds.size.height - 50.0f, [UIScreen mainScreen].bounds.size.width, 50.0f)];
+    [view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"|[flashView]|"
+                                                                 options:0
+                                                                 metrics:nil
+                                                                   views:NSDictionaryOfVariableBindings(flashView)]];
+    [view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[flashView]|"
+                                                                 options:0
+                                                                 metrics:nil
+                                                                   views:NSDictionaryOfVariableBindings(flashView)]];
     
-    UIView *controlBackgroundView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 320.0f, 50.0f)];
+    controlView = [[UIView alloc] initWithFrame:CGRectZero];
+    controlView.translatesAutoresizingMaskIntoConstraints = NO;
+    
+    UIView *controlBackgroundView = [[UIView alloc] initWithFrame:CGRectZero];
     controlBackgroundView.backgroundColor = [UIColor whiteColor];
     controlBackgroundView.alpha = 0.5f;
+    controlBackgroundView.translatesAutoresizingMaskIntoConstraints = NO;
     
     [controlView addSubview:controlBackgroundView];
     
+    [controlView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"|[controlBackgroundView]|"
+                                                                        options:0
+                                                                        metrics:nil
+                                                                          views:NSDictionaryOfVariableBindings(controlBackgroundView)]];
+    [controlView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[controlBackgroundView]|"
+                                                                        options:0
+                                                                        metrics:nil
+                                                                          views:NSDictionaryOfVariableBindings(controlBackgroundView)]];
     autoPhoto = [[UISwitch alloc] init];
-    autoPhoto.center = CGPointMake(controlView.frame.size.width / 4, controlView.frame.size.height / 2);
+    autoPhoto.translatesAutoresizingMaskIntoConstraints = NO;
+
     [controlView addSubview:autoPhoto];
     
     takePhotoButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    takePhotoButton.translatesAutoresizingMaskIntoConstraints = NO;
     [takePhotoButton setTitle:NSLocalizedString(@"Photo", nil) forState:UIControlStateNormal];
     [takePhotoButton addTarget:self
                         action:@selector(startCountdown)
               forControlEvents:UIControlEventTouchUpInside];
     [takePhotoButton sizeToFit];
-    takePhotoButton.center = CGPointMake(controlView.frame.size.width / 2, controlView.frame.size.height / 2);
     
     [controlView addSubview:takePhotoButton];
     
     settingsButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    settingsButton.translatesAutoresizingMaskIntoConstraints = NO;
     [settingsButton addTarget:self action:@selector(showSettings) forControlEvents:UIControlEventTouchUpInside];
     [settingsButton setTitle:NSLocalizedString(@"Settings", nil) forState:UIControlStateNormal];
     [settingsButton sizeToFit];
-    settingsButton.center = CGPointMake((controlView.frame.size.width / 4) * 3, controlView.frame.size.height / 2);
-
+    
     [controlView addSubview:settingsButton];
     
+    
+    NSMutableArray *verticalbuttonConstraints = [NSMutableArray arrayWithArray:[NSLayoutConstraint constraintsWithVisualFormat:@"|-[autoPhoto]-[takePhotoButton]-[settingsButton]-|"
+                                                                                                               options:0
+                                                                                                               metrics:nil
+                                                                                                                 views:NSDictionaryOfVariableBindings(autoPhoto, takePhotoButton, settingsButton)]];
+    [verticalbuttonConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-[autoPhoto]-|"
+                                                                                   options:0
+                                                                                   metrics:nil
+                                                                                     views:NSDictionaryOfVariableBindings(autoPhoto)]];
+    
+    [verticalbuttonConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-[takePhotoButton]-|"
+                                                                                   options:0
+                                                                                   metrics:nil
+                                                                                     views:NSDictionaryOfVariableBindings(takePhotoButton)]];
+    
+    [verticalbuttonConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-[settingsButton]-|"
+                                                                                   options:0
+                                                                                   metrics:nil
+                                                                                     views:NSDictionaryOfVariableBindings(settingsButton)]];
+    
+    [controlView addConstraints:verticalbuttonConstraints];
+    
+    self.controlButtonPortraitConstraints = verticalbuttonConstraints;
+    
+    NSMutableArray *horizontalButtonConstraints = @[].mutableCopy;
+    
+    [horizontalButtonConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-[autoPhoto]"
+                                                                                   options:0
+                                                                                   metrics:nil
+                                                                                     views:NSDictionaryOfVariableBindings(autoPhoto)]];
+    
+    [horizontalButtonConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"|[autoPhoto]"
+                                                                                             options:0
+                                                                                             metrics:nil
+                                                                                               views:NSDictionaryOfVariableBindings(autoPhoto)]];
+    
+    [horizontalButtonConstraints addObject:[NSLayoutConstraint constraintWithItem:takePhotoButton
+                                                                        attribute:NSLayoutAttributeCenterY
+                                                                        relatedBy:NSLayoutRelationEqual
+                                                                           toItem:controlView
+                                                                        attribute:NSLayoutAttributeCenterY
+                                                                       multiplier:1.0f
+                                                                         constant:0.0f]];
+    
+    [horizontalButtonConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"|[takePhotoButton]"
+                                                                                             options:0
+                                                                                             metrics:nil
+                                                                                               views:NSDictionaryOfVariableBindings(takePhotoButton)]];
+    
+    [horizontalButtonConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[settingsButton]-|"
+                                                                                   options:0
+                                                                                   metrics:nil
+                                                                                     views:NSDictionaryOfVariableBindings(settingsButton)]];
+    
+    [horizontalButtonConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"|[settingsButton]"
+                                                                                             options:0
+                                                                                             metrics:nil
+                                                                                               views:NSDictionaryOfVariableBindings(settingsButton)]];
+    
+    self.controlLandscapeConstraints = horizontalButtonConstraints;
+    
     [view addSubview:controlView];
+
+    [view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"|[controlView]|"
+                                                                 options:0
+                                                                 metrics:nil
+                                                                   views:NSDictionaryOfVariableBindings(controlView)]];
     
-    settingsView = [[UIView alloc] initWithFrame:CGRectMake(0, view.frame.size.height, 320.0f, 220.0f)];
+    self.controlTopConstraint = [NSLayoutConstraint constraintWithItem:controlView
+                                                             attribute:NSLayoutAttributeTop
+                                                             relatedBy:NSLayoutRelationEqual
+                                                                toItem:cameraView
+                                                             attribute:NSLayoutAttributeBottom
+                                                            multiplier:1.0f
+                                                              constant:0.0f];
+    
+    NSMutableArray *landscape = [NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"|[controlView(%f)]", view.frame.size.height - 427 - topOffset]
+                                                                         options:0
+                                                                         metrics:nil
+                                                                           views:NSDictionaryOfVariableBindings(controlView)].mutableCopy;
+    [landscape addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[controlView]|"
+                                                                           options:0
+                                                                           metrics:nil
+                                                                             views:NSDictionaryOfVariableBindings(controlView)]];
+    
+    self.controlLandscapeLeftConstraints = landscape;
+    
+    [view addConstraint:self.controlTopConstraint];
+    
+    settingsView = [[UIView alloc] initWithFrame:CGRectZero];
     settingsView.backgroundColor = [UIColor blackColor];
-    
+    settingsView.translatesAutoresizingMaskIntoConstraints = NO;
+
     UILabel *faceLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     faceLabel.text = NSLocalizedString(@"Take photo when a face in shot", nil);
     faceLabel.textColor = [UIColor whiteColor];
@@ -226,8 +348,8 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
                                                              attribute:NSLayoutAttributeCenterY
                                                             multiplier:1.0f
                                                               constant:0.0f]];
-
-
+    
+    
     UILabel *winkLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     winkLabel.text = NSLocalizedString(@"Take photo when you wink", nil);
     winkLabel.textColor = [UIColor whiteColor];
@@ -237,9 +359,9 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     
     winkActivation = [[UISwitch alloc] init];
     winkActivation.translatesAutoresizingMaskIntoConstraints = NO;
-
+    
     [settingsView addSubview:winkActivation];
-
+    
     [settingsView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"|-[winkLabel][winkActivation]-|"
                                                                          options:0
                                                                          metrics:nil
@@ -257,38 +379,112 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     [aboutButton setTitle:NSLocalizedString(@"About", nil) forState:UIControlStateNormal];
     [aboutButton addTarget:self action:@selector(about) forControlEvents:UIControlEventTouchUpInside];
     aboutButton.translatesAutoresizingMaskIntoConstraints = NO;
+    [aboutButton sizeToFit];
+    
     [settingsView addSubview:aboutButton];
     
     doneButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [doneButton setTitle:NSLocalizedString(@"Done", nil) forState:UIControlStateNormal];
     [doneButton addTarget:self action:@selector(hideSettings) forControlEvents:UIControlEventTouchUpInside];
     doneButton.translatesAutoresizingMaskIntoConstraints = NO;
+    [doneButton sizeToFit];
+    
     [settingsView addSubview:doneButton];
-
+    
     [settingsView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[aboutButton]-|"
                                                                          options:0
                                                                          metrics:nil
                                                                            views:NSDictionaryOfVariableBindings(aboutButton)]];
     
-    [settingsView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"|-[aboutButton(==doneButton)]-[doneButton]-|"
+    [settingsView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"|-[aboutButton]"
                                                                          options:0
                                                                          metrics:nil
-                                                                           views:NSDictionaryOfVariableBindings(aboutButton, doneButton)]];
-
+                                                                           views:NSDictionaryOfVariableBindings(aboutButton)]];
+    
+    [settingsView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"[doneButton]-|"
+                                                                         options:0
+                                                                         metrics:nil
+                                                                           views:NSDictionaryOfVariableBindings(doneButton)]];
+    
     [settingsView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-[faceActivation]-[changeNumberOfFaces]-[smileActivation]-[winkActivation]-[doneButton]-|"
                                                                          options:0
                                                                          metrics:nil
                                                                            views:NSDictionaryOfVariableBindings(faceActivation, changeNumberOfFaces, smileActivation, winkActivation, doneButton)]];
-     
+    
     [view addSubview:settingsView];
     
+    self.settingsBottomConstraint = [NSLayoutConstraint constraintWithItem:settingsView
+                                                                 attribute:NSLayoutAttributeTop
+                                                                 relatedBy:NSLayoutRelationEqual
+                                                                    toItem:view
+                                                                 attribute:NSLayoutAttributeBottom
+                                                                multiplier:1.0
+                                                                  constant:0];
+    [view addConstraint:self.settingsBottomConstraint];
+
+    [view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[settingsView(220)]"
+                                                                 options:0
+                                                                 metrics:nil
+                                                                   views:NSDictionaryOfVariableBindings(settingsView)]];
+    
+    [view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"|[settingsView]|"
+                                                                         options:0
+                                                                         metrics:nil
+                                                                           views:NSDictionaryOfVariableBindings(settingsView)]];
     self.view = view;
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
-    // Return YES for supported orientations
 	return (interfaceOrientation != UIInterfaceOrientationPortraitUpsideDown);
+}
+
+//Inspired by http://stackoverflow.com/a/7284073/806442
+- (void) willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
+    
+    float rotation = 0;
+    CGRect cameraframe = CGRectMake(0, topOffset, 320.0f, 427.0f);
+
+    if (toInterfaceOrientation == UIInterfaceOrientationLandscapeLeft) {
+        rotation = M_PI/2;
+        cameraframe = CGRectMake(self.view.frame.size.height - 427 - topOffset, 0, 427.0f, 320.0f);
+    } else if (toInterfaceOrientation == UIInterfaceOrientationLandscapeRight) {
+        rotation = -M_PI/2;
+        cameraframe = CGRectMake(topOffset, 0, 427.0f, 320.0f);
+    }
+    
+    if ((toInterfaceOrientation == UIInterfaceOrientationLandscapeLeft) || (toInterfaceOrientation == UIInterfaceOrientationLandscapeRight))
+    {
+        [self.view removeConstraint:self.controlTopConstraint];
+        [controlView removeConstraints:self.controlButtonPortraitConstraints];
+        [self.view addConstraints:self.controlLandscapeLeftConstraints];
+        [controlView addConstraints:self.controlLandscapeConstraints];
+        
+        if (toInterfaceOrientation == UIInterfaceOrientationLandscapeLeft)
+        {
+           // [controlView addConstraints:self.controlLandscapeLeftConstraints];
+        }
+        else
+        {
+          //  [controlView addConstraints:self.controlLandscapeRightConstraints];
+        }
+    }
+    else
+    {
+        [self.view addConstraint:self.controlTopConstraint];
+        [controlView addConstraints:self.controlButtonPortraitConstraints];
+        [self.view removeConstraints:self.controlLandscapeLeftConstraints];
+        [controlView removeConstraints:self.controlLandscapeConstraints];
+        [controlView removeConstraints:self.controlLandscapeLeftConstraints];
+        [controlView removeConstraints:self.controlLandscapeRightConstraints];
+    }
+    
+    [UIView animateWithDuration:duration animations:^{
+        cameraView.transform = CGAffineTransformMakeRotation(rotation);
+        cameraView.frame = cameraframe;
+        
+        [self.view layoutIfNeeded];
+    }];
 }
 
 #pragma mark - AV setup
@@ -441,7 +637,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 	while( [self.ciFaceLayers count] < newSize) {
 		// add required layers
 		CALayer *featureLayer = [CALayer new];
-
+        
 		[featureLayer setBorderColor:[[UIColor redColor] CGColor]];
 		[featureLayer setBorderWidth:FACE_RECT_BORDER_WIDTH];
 		[self.previewLayer addSublayer:featureLayer];
@@ -458,6 +654,8 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 // to detect features and for each draw the red square in a layer and set appropriate orientation
 - (void)drawFaceBoxesForFeatures:(NSArray *)features forVideoBox:(CGRect)clap orientation:(UIDeviceOrientation)orientation
 {
+    [self resizeCoreImageFaceLayerCache:[features count]];
+    
     if (![features count])
     {
         return;
@@ -466,8 +664,8 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 	// Update the face graphics
 	[CATransaction begin];
 	[CATransaction setAnimationDuration:1];
-
-    [self resizeCoreImageFaceLayerCache:[features count]];
+    
+    
     
 	CGRect previewBox = videoPreviewBoxForGravity(self.previewLayer.videoGravity, cameraView.frame.size, clap.size);
     
@@ -587,7 +785,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 			exifOrientation = PHOTOS_EXIF_0ROW_RIGHT_0COL_TOP;
 			break;
 	}
-
+    
     
 	NSDictionary *imageOptions;
     if (&CIDetectorEyeBlink != NULL)
@@ -600,7 +798,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     }
     
 	NSArray *features = [self.faceDetector featuresInImage:ciImage options:imageOptions];
-
+    
 	CMFormatDescriptionRef fdesc = CMSampleBufferGetFormatDescription(sampleBuffer);
 	CGRect clap = CMVideoFormatDescriptionGetCleanAperture(fdesc, false /*originIsTopLeft*/);
 	
@@ -630,7 +828,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
         
         count = 3;
         takePhotoButton.enabled = NO;
-    
+        
         [self showCountDown];
         
         isTakingPhoto = YES;
@@ -676,7 +874,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 	[stillImageConnection setVideoMirrored:[self.previewLayer.connection isVideoMirrored]];
     
     [self.stillImageOutput setOutputSettings:@{AVVideoCodecKey: AVVideoCodecJPEG}];
-
+    
 	[self.stillImageOutput captureStillImageAsynchronouslyFromConnection:stillImageConnection
                                                        completionHandler:^(CMSampleBufferRef imageDataSampleBuffer, NSError *error) {
                                                            if (error) {
@@ -732,17 +930,21 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 #pragma mark -
 - (void)showSettings
 {
+    self.settingsBottomConstraint.constant = -settingsView.frame.size.height;
+    
     [UIView animateWithDuration:0.3f
                      animations:^() {
-                         settingsView.frame = CGRectMake(0, self.view.frame.size.height - settingsView.frame.size.height, settingsView.frame.size.width, settingsView.frame.size.height);
+                         [self.view layoutIfNeeded];
                      }];
 }
 
 - (void)hideSettings
 {
+    self.settingsBottomConstraint.constant = 0;
+    
     [UIView animateWithDuration:0.3f
                      animations:^() {
-                         settingsView.frame = CGRectMake(0, self.view.frame.size.height, settingsView.frame.size.width, settingsView.frame.size.height);
+                         [self.view layoutIfNeeded];
                      }];
 }
 
