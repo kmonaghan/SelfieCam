@@ -254,7 +254,7 @@
         
         [tweetSheet addURL: [NSURL URLWithString:[NSString stringWithFormat:@"https://itunes.apple.com/ie/app/id%@?mt=8", kAppId]]];
         
-        [self.navigationController presentModalViewController:tweetSheet animated:YES];
+        [self.navigationController presentViewController:tweetSheet animated:YES completion:nil];
     }
     else
     {
@@ -285,7 +285,7 @@
         NSString *body = [NSString stringWithFormat:@"Hi,<br /><br />I thought you might like %@.  You can download it from the <a href=\"%@\">iTunes App Store</a>.", [infoDictionary objectForKey:@"CFBundleName"], [NSString stringWithFormat:@"https://itunes.apple.com/ie/app/id%@?mt=8", kAppId]];
         [mailer setMessageBody:body isHTML:YES];
 
-        [self.navigationController presentModalViewController:mailer animated:YES];
+        [self.navigationController presentViewController:mailer animated:YES completion:nil];
     }
     else
     {
@@ -315,7 +315,7 @@
         
         [mailer setToRecipients:@[@"feedback@crayonsandbrownpaper.com"]];
          
-        [self.navigationController presentModalViewController:mailer animated:YES];
+        [self.navigationController presentViewController:mailer animated:YES completion:nil];
     }
     else
     {
