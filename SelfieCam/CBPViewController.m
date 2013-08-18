@@ -51,6 +51,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     UIButton *settingsButton;
     UIButton *aboutButton;
     UIButton *doneButton;
+    UIButton *switchCamerasButton;
     
     int faceFrameCount;
     CGFloat topOffset;
@@ -118,6 +119,23 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     cameraView.backgroundColor = [UIColor whiteColor];
     
     [view addSubview:cameraView];
+    
+    switchCamerasButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    [switchCamerasButton setTitle:NSLocalizedString(@"Switch", nil) forState:UIControlStateNormal];
+    [switchCamerasButton addTarget:self action:@selector(updateCameraSelection) forControlEvents:UIControlEventTouchUpInside];
+    [switchCamerasButton sizeToFit];
+    switchCamerasButton.translatesAutoresizingMaskIntoConstraints = NO;
+    
+    [view addSubview:switchCamerasButton];
+    
+    [view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"[switchCamerasButton]-|"
+                                                                 options:0
+                                                                 metrics:nil
+                                                                   views:NSDictionaryOfVariableBindings(switchCamerasButton)]];
+    [view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(5)-[switchCamerasButton]"
+                                                                 options:0
+                                                                 metrics:nil
+                                                                   views:NSDictionaryOfVariableBindings(switchCamerasButton)]];
     
     countdownLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     countdownLabel.font = [UIFont boldSystemFontOfSize:200.0f];
