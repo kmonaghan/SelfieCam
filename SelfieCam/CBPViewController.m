@@ -73,6 +73,8 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 @property (strong, nonatomic) NSArray *controlButtonLandscapeConstraints;
 @property (strong, nonatomic) NSArray *controlLandscapeLeftConstraints;
 @property (strong, nonatomic) NSArray *controlLandscapeRightConstraints;
+@property (strong, nonatomic) NSArray *switchCameraPortraitConstraints;
+@property (strong, nonatomic) NSArray *switchCameraLandscapeRightConstraints;
 @end
 
 @implementation CBPViewController
@@ -129,14 +131,33 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     
     [view addSubview:switchCamerasButton];
     
-    [view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"[switchCamerasButton]-|"
-                                                                 options:0
-                                                                 metrics:nil
-                                                                   views:NSDictionaryOfVariableBindings(switchCamerasButton)]];
-    [view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(5)-[switchCamerasButton]"
-                                                                 options:0
-                                                                 metrics:nil
-                                                                   views:NSDictionaryOfVariableBindings(switchCamerasButton)]];
+    NSMutableArray *portraitButton = @[].mutableCopy;
+    [portraitButton addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"[switchCamerasButton]-|"
+                                                                                options:0
+                                                                                metrics:nil
+                                                                                  views:NSDictionaryOfVariableBindings(switchCamerasButton)]];
+    
+    [portraitButton addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(5)-[switchCamerasButton]"
+                                                                                options:0
+                                                                                metrics:nil
+                                                                                  views:NSDictionaryOfVariableBindings(switchCamerasButton)]];
+    
+    [view addConstraints:portraitButton];
+    
+    self.switchCameraPortraitConstraints = portraitButton;
+    
+    NSMutableArray *landScapeButton = @[].mutableCopy;
+    [landScapeButton addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"|-[switchCamerasButton]"
+                                                                                options:0
+                                                                                metrics:nil
+                                                                                  views:NSDictionaryOfVariableBindings(switchCamerasButton)]];
+    
+    [landScapeButton addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(5)-[switchCamerasButton]"
+                                                                                options:0
+                                                                                metrics:nil
+                                                                                  views:NSDictionaryOfVariableBindings(switchCamerasButton)]];
+    
+    self.switchCameraLandscapeRightConstraints = landScapeButton;
     
     countdownLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     countdownLabel.font = [UIFont boldSystemFontOfSize:200.0f];
@@ -581,11 +602,23 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     
     if ((self.interfaceOrientation == UIInterfaceOrientationPortrait) || (self.interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown))
     {
+        [self.view removeConstraints:self.switchCameraLandscapeRightConstraints];
+        [self.view addConstraints:self.switchCameraPortraitConstraints];
         [controlView removeConstraints:self.controlButtonLandscapeConstraints];
         [controlView addConstraints:self.controlButtonPortraitConstraints];
     }
     else
     {
+        if (self.interfaceOrientation == UIInterfaceOrientationLandscapeRight)
+        {
+            [self.view removeConstraints:self.switchCameraPortraitConstraints];
+            [self.view addConstraints:self.switchCameraLandscapeRightConstraints];
+        }
+        else
+        {
+            [self.view removeConstraints:self.switchCameraLandscapeRightConstraints];
+            [self.view addConstraints:self.switchCameraPortraitConstraints];
+        }
         [controlView removeConstraints:self.controlButtonPortraitConstraints];
         [controlView addConstraints:self.controlButtonLandscapeConstraints];
     }
