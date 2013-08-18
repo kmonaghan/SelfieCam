@@ -13,6 +13,7 @@
 #import <AssetsLibrary/AssetsLibrary.h>
 
 #import "CBPViewController.h"
+#import "CBPAboutViewController.h"
 
 #define TOTALFACE_FRAMES 15
 
@@ -1070,7 +1071,11 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 
 - (void)about
 {
+    CBPAboutViewController *vc = [[CBPAboutViewController alloc] initWithStyle:UITableViewStyleGrouped];
     
+    UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:vc];
+    
+    [self presentViewController:nav animated:YES completion:nil];
 }
 
 @end
