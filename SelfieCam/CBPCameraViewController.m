@@ -41,12 +41,8 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     
     UISwitch *autoPhoto;
     
-    UILabel *numberOfFacesLabel;
-
-
     UIButton *takePhotoButton;
     UIButton *settingsButton;
-
     UIButton *doneButton;
     UIButton *switchCamerasButton;
     
@@ -63,7 +59,6 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 @property (strong,nonatomic) CIDetector *faceDetector;
 @property (strong,nonatomic) NSMutableArray *ciFaceLayers;
 
-@property (strong, nonatomic) NSLayoutConstraint *settingsBottomConstraint;
 @property (strong, nonatomic) NSArray *controlButtonPortraitConstraints;
 @property (strong, nonatomic) NSArray *controlPortraitConstraints;
 @property (strong, nonatomic) NSArray *controlButtonLandscapeConstraints;
@@ -71,6 +66,8 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 @property (strong, nonatomic) NSArray *controlLandscapeRightConstraints;
 @property (strong, nonatomic) NSArray *switchCameraPortraitConstraints;
 @property (strong, nonatomic) NSArray *switchCameraLandscapeRightConstraints;
+
+@property (strong, nonatomic) NSUserDefaults *userDefaults;
 @end
 
 @implementation CBPCameraViewController
@@ -85,13 +82,17 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 	// Do any additional setup after loading the view, typically from a nib.
     useFrontCamera = NO;
     
-    [self setupAVCapture];
-	NSDictionary *detectorOptions = @{CIDetectorAccuracy : CIDetectorAccuracyLow, CIDetectorTracking : @YES};
-	self.faceDetector = [CIDetector detectorOfType:CIDetectorTypeFace context:nil options:detectorOptions];
-    
     isTakingPhoto = NO;
     
     autoPhoto.on = NO;
+    
+    self.userDefaults = [NSUserDefaults standardUserDefaults];
+    
+    [self loadSettings];
+    
+    [self setupAVCapture];
+	NSDictionary *detectorOptions = @{CIDetectorAccuracy : CIDetectorAccuracyLow, CIDetectorTracking : @YES};
+	self.faceDetector = [CIDetector detectorOfType:CIDetectorTypeFace context:nil options:detectorOptions];
 }
 
 - (void)didReceiveMemoryWarning
@@ -144,14 +145,14 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     
     NSMutableArray *landScapeButton = @[].mutableCopy;
     [landScapeButton addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"|-[switchCamerasButton]"
-                                                                                options:0
-                                                                                metrics:nil
-                                                                                  views:NSDictionaryOfVariableBindings(switchCamerasButton)]];
+                                                                                 options:0
+                                                                                 metrics:nil
+                                                                                   views:NSDictionaryOfVariableBindings(switchCamerasButton)]];
     
     [landScapeButton addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(5)-[switchCamerasButton]"
-                                                                                options:0
-                                                                                metrics:nil
-                                                                                  views:NSDictionaryOfVariableBindings(switchCamerasButton)]];
+                                                                                 options:0
+                                                                                 metrics:nil
+                                                                                   views:NSDictionaryOfVariableBindings(switchCamerasButton)]];
     
     self.switchCameraLandscapeRightConstraints = landScapeButton;
     
@@ -212,10 +213,10 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
                                                                         options:0
                                                                         metrics:nil
                                                                           views:NSDictionaryOfVariableBindings(controlBackgroundView)]];
-
+    
     autoPhoto = [[UISwitch alloc] init];
     autoPhoto.translatesAutoresizingMaskIntoConstraints = NO;
-
+    
     [controlView addSubview:autoPhoto];
     
     takePhotoButton = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -240,12 +241,12 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     NSMutableArray *verticalbuttonConstraints = @[].mutableCopy;
     
     [verticalbuttonConstraints addObject:[NSLayoutConstraint constraintWithItem:autoPhoto
-                                                                               attribute:NSLayoutAttributeCenterY
-                                                                               relatedBy:NSLayoutRelationEqual
-                                                                                  toItem:controlView
-                                                                               attribute:NSLayoutAttributeCenterY
-                                                                              multiplier:1.0f
-                                                                                constant:0.0f]];
+                                                                      attribute:NSLayoutAttributeCenterY
+                                                                      relatedBy:NSLayoutRelationEqual
+                                                                         toItem:controlView
+                                                                      attribute:NSLayoutAttributeCenterY
+                                                                     multiplier:1.0f
+                                                                       constant:0.0f]];
     
     [verticalbuttonConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"|-[autoPhoto]"
                                                                                            options:0
@@ -276,9 +277,9 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
                                                                        constant:0.0f]];
     
     [verticalbuttonConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"[settingsButton]-|"
-                                                                                             options:0
-                                                                                             metrics:nil
-                                                                                               views:NSDictionaryOfVariableBindings(settingsButton)]];
+                                                                                           options:0
+                                                                                           metrics:nil
+                                                                                             views:NSDictionaryOfVariableBindings(settingsButton)]];
     
     [controlView addConstraints:verticalbuttonConstraints];
     
@@ -332,8 +333,8 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     self.controlButtonLandscapeConstraints = horizontalButtonConstraints;
     
     [view addSubview:controlView];
-
-
+    
+    
     self.view = view;
     
     NSMutableArray *portrait = [NSLayoutConstraint constraintsWithVisualFormat:@"|[controlView]|"
@@ -362,13 +363,13 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     self.controlLandscapeLeftConstraints = landscapeLeft;
     
     NSMutableArray *landscapeRight = [NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"[controlView(%f)]|", bottomOffset]
-                                                                            options:0
-                                                                            metrics:nil
-                                                                              views:NSDictionaryOfVariableBindings(controlView)].mutableCopy;
+                                                                             options:0
+                                                                             metrics:nil
+                                                                               views:NSDictionaryOfVariableBindings(controlView)].mutableCopy;
     [landscapeRight addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[controlView]|"
-                                                                               options:0
-                                                                               metrics:nil
-                                                                                 views:NSDictionaryOfVariableBindings(controlView)]];
+                                                                                options:0
+                                                                                metrics:nil
+                                                                                  views:NSDictionaryOfVariableBindings(controlView)]];
     
     self.controlLandscapeRightConstraints = landscapeRight;
 }
@@ -389,7 +390,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 - (void) willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
     float rotation = 0;
     CGRect cameraframe = CGRectMake(0, topOffset, 320.0f, 427.0f);
-
+    
     if (toInterfaceOrientation == UIInterfaceOrientationLandscapeLeft) {
         rotation = M_PI/2;
         cameraframe = CGRectMake(bottomOffset, 0, 427.0f, 320.0f);
@@ -658,15 +659,13 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
         
         if ((&CIDetectorEyeBlink != NULL) && !detectedFeature && autoPhoto.on)
         {
-            //FIXME
-            if (ff.hasSmile && NO) //smileActivation.on)
+            if (ff.hasSmile && [self.userDefaults boolForKey:@"smile"])
             {
                 detectedFeature = YES;
                 
                 [self updateCountdownLabel:NSLocalizedString(@"Smile!", nil) forDuration:1.0f onCompletion:^(){[self startCountdown];}];
             }
-            //FIXME
-            if ((ff.rightEyeClosed || ff.leftEyeClosed) && NO)//winkActivation.on)
+            if ((ff.rightEyeClosed || ff.leftEyeClosed) && [self.userDefaults boolForKey:@"wink"])
             {
                 detectedFeature = YES;
                 
@@ -781,9 +780,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 	CMFormatDescriptionRef fdesc = CMSampleBufferGetFormatDescription(sampleBuffer);
 	CGRect clap = CMVideoFormatDescriptionGetCleanAperture(fdesc, false /*originIsTopLeft*/);
 	
-    //FIXME
-    //if (([features count] == changeNumberOfFaces.value) && autoPhoto.on) {
-    if (autoPhoto.on) {
+    if (([features count] == [self.userDefaults doubleForKey:@"faces"]) && autoPhoto.on) {
         faceFrameCount++;
         
         if (faceFrameCount > TOTALFACE_FRAMES) {
@@ -830,7 +827,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 {
     dispatch_async(dispatch_get_main_queue(), ^(void) {
         countdownLabel.text = text;
-
+        
         countdownLabel.alpha = 1.0f;
         [UIView animateWithDuration:duration
                          animations:^() {
@@ -914,7 +911,21 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     
     UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:vc];
     
-    [self presentViewController:nav animated:YES completion:nil];
+    [self presentViewController:nav animated:YES
+                     completion:^(){
+                         [self loadSettings];
+                     }];
+}
+
+- (void)loadSettings
+{
+    [self.userDefaults synchronize];
+    
+    if ([self.userDefaults doubleForKey:@"faces"] < 1)
+    {
+        [self.userDefaults setDouble:1 forKey:@"faces"];
+        [self.userDefaults synchronize];
+    }
 }
 
 @end

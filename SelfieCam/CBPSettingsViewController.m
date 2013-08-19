@@ -13,6 +13,7 @@
 @property (strong, nonatomic) UIStepper *changeNumberOfFaces;
 @property (strong, nonatomic) UISwitch *smileActivation;
 @property (strong, nonatomic) UISwitch *winkActivation;
+@property (strong, nonatomic) NSUserDefaults *userDefaults;
 @end
 
 @implementation CBPSettingsViewController
@@ -24,12 +25,19 @@
         // Custom initialization
         self.title = NSLocalizedString(@"Settings", nil);
         
+        self.userDefaults = [NSUserDefaults standardUserDefaults];
+        
         self.changeNumberOfFaces = [UIStepper new];
         self.changeNumberOfFaces.minimumValue = 1;
         self.changeNumberOfFaces.maximumValue = 5;
+        self.changeNumberOfFaces.stepValue = [self.userDefaults doubleForKey:@"faces"];
+        [self.changeNumberOfFaces addTarget:self action:@selector(numberOfFacesChanged) forControlEvents:UIControlEventValueChanged];
         
         self.smileActivation = [UISwitch new];
+        self.smileActivation.on = [self.userDefaults boolForKey:@"smile"];
+        
         self.winkActivation = [UISwitch new];
+        self.winkActivation.on = [self.userDefaults boolForKey:@"wink"];
     }
     return self;
 }
@@ -51,6 +59,12 @@
 
 - (void)done
 {
+    [self.userDefaults setDouble:self.changeNumberOfFaces.value forKey:@"faces"];
+    [self.userDefaults setBool:self.smileActivation.on forKey:@"smile"];
+    [self.userDefaults setBool:self.winkActivation.on forKey:@"wink"];
+    
+    [self.userDefaults synchronize];
+    
     [[self parentViewController] dismissViewControllerAnimated:YES completion:nil];
 }
 
@@ -61,6 +75,11 @@
     UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:vc];
     
     [self presentViewController:nav animated:YES completion:nil];
+}
+
+- (void)numberOfFacesChanged
+{
+    [self.tableView reloadData];
 }
 
 #pragma mark - Table view data source
@@ -92,7 +111,7 @@
         
         switch (indexPath.row) {
             case 0:
-                cell.textLabel.text = [NSString stringWithFormat:NSLocalizedString(@"Number of faces in view: %.f", nil), self.changeNumberOfFaces.value];
+                cell.textLabel.text = [NSString stringWithFormat:NSLocalizedString(@"Faces in view: %.f", nil), self.changeNumberOfFaces.value];
                 cell.accessoryView = self.changeNumberOfFaces;
                 break;
             case 1:
