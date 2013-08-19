@@ -9,6 +9,6 @@
 #import <UIKit/UIKit.h>
 #import <AVFoundation/AVFoundation.h>
 
-@interface CBPViewController : UIViewController <AVCaptureVideoDataOutputSampleBufferDelegate>
+@interface CBPCameraViewController : UIViewController <AVCaptureVideoDataOutputSampleBufferDelegate>
 
 @end

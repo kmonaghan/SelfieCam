@@ -8,12 +8,12 @@
 
 #import <UIKit/UIKit.h>
 
-@class CBPViewController;
+@class CBPCameraViewController;
 
 @interface CBPAppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
 
-@property (strong, nonatomic) CBPViewController *viewController;
+@property (strong, nonatomic) CBPCameraViewController *viewController;
 
 @end

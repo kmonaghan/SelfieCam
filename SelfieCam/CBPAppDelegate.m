@@ -8,7 +8,7 @@
 
 #import "CBPAppDelegate.h"
 
-#import "CBPViewController.h"
+#import "CBPCameraViewController.h"
 
 @implementation CBPAppDelegate
 
@@ -21,7 +21,7 @@
     [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationNone];
 
     // Override point for customization after application launch.
-    self.viewController = [CBPViewController new];
+    self.viewController = [CBPCameraViewController new];
     self.window.rootViewController = self.viewController;
     [self.window makeKeyAndVisible];
     return YES;
