@@ -61,7 +61,8 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 
 @property (strong, nonatomic) NSArray *controlButtonPortraitConstraints;
 @property (strong, nonatomic) NSArray *controlPortraitConstraints;
-@property (strong, nonatomic) NSArray *controlButtonLandscapeConstraints;
+@property (strong, nonatomic) NSArray *controlButtonLandscapeLeftConstraints;
+@property (strong, nonatomic) NSArray *controlButtonLandscapeRightConstraints;
 @property (strong, nonatomic) NSArray *controlLandscapeLeftConstraints;
 @property (strong, nonatomic) NSArray *controlLandscapeRightConstraints;
 @property (strong, nonatomic) NSArray *switchCameraPortraitConstraints;
@@ -330,7 +331,54 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
                                                                                              metrics:nil
                                                                                                views:NSDictionaryOfVariableBindings(settingsButton)]];
     
-    self.controlButtonLandscapeConstraints = horizontalButtonConstraints;
+    self.controlButtonLandscapeLeftConstraints = horizontalButtonConstraints;
+    
+    NSMutableArray *horizontalRightButtonConstraints = @[].mutableCopy;
+    
+    [horizontalRightButtonConstraints addObject:[NSLayoutConstraint constraintWithItem:autoPhoto
+                                                                        attribute:NSLayoutAttributeCenterX
+                                                                        relatedBy:NSLayoutRelationEqual
+                                                                           toItem:controlView
+                                                                        attribute:NSLayoutAttributeCenterX
+                                                                       multiplier:1.0f
+                                                                         constant:0.0f]];
+    
+    [horizontalRightButtonConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[autoPhoto]-|"
+                                                                                             options:0
+                                                                                             metrics:nil
+                                                                                               views:NSDictionaryOfVariableBindings(autoPhoto)]];
+    
+    [horizontalRightButtonConstraints addObject:[NSLayoutConstraint constraintWithItem:takePhotoButton
+                                                                        attribute:NSLayoutAttributeCenterX
+                                                                        relatedBy:NSLayoutRelationEqual
+                                                                           toItem:controlView
+                                                                        attribute:NSLayoutAttributeCenterX
+                                                                       multiplier:1.0f
+                                                                         constant:0.0f]];
+    
+    [horizontalRightButtonConstraints addObject:[NSLayoutConstraint constraintWithItem:takePhotoButton
+                                                                        attribute:NSLayoutAttributeCenterY
+                                                                        relatedBy:NSLayoutRelationEqual
+                                                                           toItem:controlView
+                                                                        attribute:NSLayoutAttributeCenterY
+                                                                       multiplier:1.0f
+                                                                         constant:0.0f]];
+    
+    
+    [horizontalRightButtonConstraints addObject:[NSLayoutConstraint constraintWithItem:settingsButton
+                                                                        attribute:NSLayoutAttributeCenterX
+                                                                        relatedBy:NSLayoutRelationEqual
+                                                                           toItem:controlView
+                                                                        attribute:NSLayoutAttributeCenterX
+                                                                       multiplier:1.0f
+                                                                         constant:0.0f]];
+    
+    [horizontalRightButtonConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-[settingsButton]"
+                                                                                             options:0
+                                                                                             metrics:nil
+                                                                                               views:NSDictionaryOfVariableBindings(settingsButton)]];
+    
+    self.controlButtonLandscapeRightConstraints = horizontalRightButtonConstraints;
     
     [view addSubview:controlView];
     
@@ -435,11 +483,14 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     
     [UIView setAnimationsEnabled:YES];
     
+    [controlView removeConstraints:self.controlButtonPortraitConstraints];
+    [controlView removeConstraints:self.controlButtonLandscapeLeftConstraints];
+    [controlView removeConstraints:self.controlButtonLandscapeRightConstraints];
+    
     if ((self.interfaceOrientation == UIInterfaceOrientationPortrait) || (self.interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown))
     {
         [self.view removeConstraints:self.switchCameraLandscapeRightConstraints];
         [self.view addConstraints:self.switchCameraPortraitConstraints];
-        [controlView removeConstraints:self.controlButtonLandscapeConstraints];
         [controlView addConstraints:self.controlButtonPortraitConstraints];
     }
     else
@@ -448,14 +499,14 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
         {
             [self.view removeConstraints:self.switchCameraPortraitConstraints];
             [self.view addConstraints:self.switchCameraLandscapeRightConstraints];
+            [controlView addConstraints:self.controlButtonLandscapeRightConstraints];
         }
         else
         {
             [self.view removeConstraints:self.switchCameraLandscapeRightConstraints];
             [self.view addConstraints:self.switchCameraPortraitConstraints];
+            [controlView addConstraints:self.controlButtonLandscapeLeftConstraints];
         }
-        [controlView removeConstraints:self.controlButtonPortraitConstraints];
-        [controlView addConstraints:self.controlButtonLandscapeConstraints];
     }
     
     [UIView animateWithDuration:0.3f animations:^{
@@ -652,11 +703,6 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     BOOL isMirrored = self.previewLayer.connection.isVideoMirrored;
     
 	for ( CIFaceFeature *ff in features ) {
-		// Find the correct position for the mustache layer within the previewLayer
-		// The feature box originates in the bottom left of the video frame.
-		// (Bottom right if mirroring is turned on)
-		CGRect faceRect = [ff bounds];
-        
         if ((&CIDetectorEyeBlink != NULL) && !detectedFeature && autoPhoto.on)
         {
             if (ff.hasSmile && [self.userDefaults boolForKey:@"smile"])
@@ -673,48 +719,56 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
             }
         }
         
-		// flip preview width and height
-		CGFloat temp = faceRect.size.width;
-		faceRect.size.width = faceRect.size.height;
-		faceRect.size.height = temp;
-		temp = faceRect.origin.x;
-		faceRect.origin.x = faceRect.origin.y;
-		faceRect.origin.y = temp;
-		// scale coordinates so they fit in the preview box, which may be scaled
-		CGFloat widthScaleBy = previewBox.size.width / clap.size.height;
-		CGFloat heightScaleBy = previewBox.size.height / clap.size.width;
-		faceRect.size.width *= widthScaleBy;
-		faceRect.size.height *= heightScaleBy;
-		faceRect.origin.x *= widthScaleBy;
-		faceRect.origin.y *= heightScaleBy;
-        
-        if ( isMirrored )
-			faceRect = CGRectOffset(faceRect, previewBox.origin.x + previewBox.size.width - faceRect.size.width - (faceRect.origin.x * 2), previewBox.origin.y);
-		else
-			faceRect = CGRectOffset(faceRect, previewBox.origin.x, previewBox.origin.y);
-        
-		CALayer *featureLayer = [self.ciFaceLayers objectAtIndex:currentFeature];
-		
-		[featureLayer setFrame:faceRect];
-		
-		switch (orientation) {
-			case UIDeviceOrientationPortrait:
-				[featureLayer setAffineTransform:CGAffineTransformMakeRotation(DegreesToRadians(0.))];
-				break;
-			case UIDeviceOrientationPortraitUpsideDown:
-				[featureLayer setAffineTransform:CGAffineTransformMakeRotation(DegreesToRadians(180.))];
-				break;
-			case UIDeviceOrientationLandscapeLeft:
-				[featureLayer setAffineTransform:CGAffineTransformMakeRotation(DegreesToRadians(90.))];
-				break;
-			case UIDeviceOrientationLandscapeRight:
-				[featureLayer setAffineTransform:CGAffineTransformMakeRotation(DegreesToRadians(-90.))];
-				break;
-			case UIDeviceOrientationFaceUp:
-			case UIDeviceOrientationFaceDown:
-			default:
-				break; // leave the layer in its last known orientation
-		}
+        if ([self.userDefaults boolForKey:@"boxes"])
+        {
+            // Find the correct position for the face layer within the previewLayer
+            // The feature box originates in the bottom left of the video frame.
+            // (Bottom right if mirroring is turned on)
+            CGRect faceRect = [ff bounds];
+            
+            // flip preview width and height
+            CGFloat temp = faceRect.size.width;
+            faceRect.size.width = faceRect.size.height;
+            faceRect.size.height = temp;
+            temp = faceRect.origin.x;
+            faceRect.origin.x = faceRect.origin.y;
+            faceRect.origin.y = temp;
+            // scale coordinates so they fit in the preview box, which may be scaled
+            CGFloat widthScaleBy = previewBox.size.width / clap.size.height;
+            CGFloat heightScaleBy = previewBox.size.height / clap.size.width;
+            faceRect.size.width *= widthScaleBy;
+            faceRect.size.height *= heightScaleBy;
+            faceRect.origin.x *= widthScaleBy;
+            faceRect.origin.y *= heightScaleBy;
+            
+            if ( isMirrored )
+                faceRect = CGRectOffset(faceRect, previewBox.origin.x + previewBox.size.width - faceRect.size.width - (faceRect.origin.x * 2), previewBox.origin.y);
+            else
+                faceRect = CGRectOffset(faceRect, previewBox.origin.x, previewBox.origin.y);
+            
+            CALayer *featureLayer = [self.ciFaceLayers objectAtIndex:currentFeature];
+            
+            [featureLayer setFrame:faceRect];
+            
+            switch (orientation) {
+                case UIDeviceOrientationPortrait:
+                    [featureLayer setAffineTransform:CGAffineTransformMakeRotation(DegreesToRadians(0.))];
+                    break;
+                case UIDeviceOrientationPortraitUpsideDown:
+                    [featureLayer setAffineTransform:CGAffineTransformMakeRotation(DegreesToRadians(180.))];
+                    break;
+                case UIDeviceOrientationLandscapeLeft:
+                    [featureLayer setAffineTransform:CGAffineTransformMakeRotation(DegreesToRadians(90.))];
+                    break;
+                case UIDeviceOrientationLandscapeRight:
+                    [featureLayer setAffineTransform:CGAffineTransformMakeRotation(DegreesToRadians(-90.))];
+                    break;
+                case UIDeviceOrientationFaceUp:
+                case UIDeviceOrientationFaceDown:
+                default:
+                    break; // leave the layer in its last known orientation
+            }
+        }
 		currentFeature++;
 		
 	}
