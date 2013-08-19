@@ -20,6 +20,7 @@
 		F513498017AC0A8700869D16 /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F513497F17AC0A8700869D16 /* CoreVideo.framework */; };
 		F513498217AC0D2200869D16 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F513498117AC0D2200869D16 /* QuartzCore.framework */; };
 		F513498417AC138E00869D16 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F513498317AC138E00869D16 /* CoreMedia.framework */; };
+		F5D5D4FB17C2685800A22A7A /* CBPSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F5D5D4FA17C2685800A22A7A /* CBPSettingsViewController.m */; };
 		F5F5256D17ABF84600BFF158 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5F5256C17ABF84600BFF158 /* UIKit.framework */; };
 		F5F5256F17ABF84600BFF158 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5F5256E17ABF84600BFF158 /* Foundation.framework */; };
 		F5F5257117ABF84600BFF158 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5F5257017ABF84600BFF158 /* CoreGraphics.framework */; };
@@ -29,7 +30,7 @@
 		F5F5257F17ABF84600BFF158 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = F5F5257E17ABF84600BFF158 /* Default.png */; };
 		F5F5258117ABF84600BFF158 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F5F5258017ABF84600BFF158 /* Default@2x.png */; };
 		F5F5258317ABF84600BFF158 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F5F5258217ABF84600BFF158 /* Default-568h@2x.png */; };
-		F5F5258617ABF84600BFF158 /* CBPViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F5F5258517ABF84600BFF158 /* CBPViewController.m */; };
+		F5F5258617ABF84600BFF158 /* CBPCameraViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F5F5258517ABF84600BFF158 /* CBPCameraViewController.m */; };
 		F5F5259117ABF84600BFF158 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5F5259017ABF84600BFF158 /* SenTestingKit.framework */; };
 		F5F5259217ABF84600BFF158 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5F5256C17ABF84600BFF158 /* UIKit.framework */; };
 		F5F5259317ABF84600BFF158 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5F5256E17ABF84600BFF158 /* Foundation.framework */; };
@@ -62,6 +63,8 @@
 		F513497F17AC0A8700869D16 /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
 		F513498117AC0D2200869D16 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		F513498317AC138E00869D16 /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
+		F5D5D4F917C2685800A22A7A /* CBPSettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBPSettingsViewController.h; sourceTree = "<group>"; };
+		F5D5D4FA17C2685800A22A7A /* CBPSettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CBPSettingsViewController.m; sourceTree = "<group>"; };
 		F5F5256917ABF84600BFF158 /* SelfieCam.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SelfieCam.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F5F5256C17ABF84600BFF158 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		F5F5256E17ABF84600BFF158 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -75,8 +78,8 @@
 		F5F5257E17ABF84600BFF158 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
 		F5F5258017ABF84600BFF158 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
 		F5F5258217ABF84600BFF158 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
-		F5F5258417ABF84600BFF158 /* CBPViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBPViewController.h; sourceTree = "<group>"; };
-		F5F5258517ABF84600BFF158 /* CBPViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CBPViewController.m; sourceTree = "<group>"; };
+		F5F5258417ABF84600BFF158 /* CBPCameraViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBPCameraViewController.h; sourceTree = "<group>"; };
+		F5F5258517ABF84600BFF158 /* CBPCameraViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CBPCameraViewController.m; sourceTree = "<group>"; };
 		F5F5258F17ABF84600BFF158 /* SelfieCamTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SelfieCamTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F5F5259017ABF84600BFF158 /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
 		F5F5259817ABF84600BFF158 /* SelfieCamTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "SelfieCamTests-Info.plist"; sourceTree = "<group>"; };
@@ -170,8 +173,10 @@
 				34A4CDFA17C15EDD00C5ECA1 /* CBPAboutViewController.m */,
 				F5F5257B17ABF84600BFF158 /* CBPAppDelegate.h */,
 				F5F5257C17ABF84600BFF158 /* CBPAppDelegate.m */,
-				F5F5258417ABF84600BFF158 /* CBPViewController.h */,
-				F5F5258517ABF84600BFF158 /* CBPViewController.m */,
+				F5D5D4F917C2685800A22A7A /* CBPSettingsViewController.h */,
+				F5D5D4FA17C2685800A22A7A /* CBPSettingsViewController.m */,
+				F5F5258417ABF84600BFF158 /* CBPCameraViewController.h */,
+				F5F5258517ABF84600BFF158 /* CBPCameraViewController.m */,
 				F5F5257317ABF84600BFF158 /* Supporting Files */,
 			);
 			path = SelfieCam;
@@ -328,7 +333,8 @@
 				34A4CDFC17C164E600C5ECA1 /* CBPAboutViewController.m in Sources */,
 				F5F5257917ABF84600BFF158 /* main.m in Sources */,
 				F5F5257D17ABF84600BFF158 /* CBPAppDelegate.m in Sources */,
-				F5F5258617ABF84600BFF158 /* CBPViewController.m in Sources */,
+				F5F5258617ABF84600BFF158 /* CBPCameraViewController.m in Sources */,
+				F5D5D4FB17C2685800A22A7A /* CBPSettingsViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
