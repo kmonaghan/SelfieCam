@@ -13,6 +13,10 @@
 @property (strong, nonatomic) UIStepper *changeNumberOfFaces;
 @property (strong, nonatomic) UISwitch *smileActivation;
 @property (strong, nonatomic) UISwitch *winkActivation;
+@property (strong, nonatomic) UISwitch *showFaceBoxes;
+@property (strong, nonatomic) UISwitch *facebookShare;
+@property (strong, nonatomic) UISwitch *twitterShare;
+
 @property (strong, nonatomic) NSUserDefaults *userDefaults;
 @end
 
@@ -38,6 +42,15 @@
         
         self.winkActivation = [UISwitch new];
         self.winkActivation.on = [self.userDefaults boolForKey:@"wink"];
+        
+        self.showFaceBoxes = [UISwitch new];
+        self.showFaceBoxes.on = [self.userDefaults boolForKey:@"boxes"];
+        
+        self.facebookShare = [UISwitch new];
+        self.facebookShare.on = [self.userDefaults boolForKey:@"facebook"];
+        
+        self.twitterShare = [UISwitch new];
+        self.twitterShare.on = [self.userDefaults boolForKey:@"twitter"];
     }
     return self;
 }
@@ -51,17 +64,14 @@
                                                                                           action:@selector(done)];
 }
 
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
 - (void)done
 {
     [self.userDefaults setDouble:self.changeNumberOfFaces.value forKey:@"faces"];
     [self.userDefaults setBool:self.smileActivation.on forKey:@"smile"];
     [self.userDefaults setBool:self.winkActivation.on forKey:@"wink"];
+    [self.userDefaults setBool:self.showFaceBoxes.on forKey:@"boxes"];
+    [self.userDefaults setBool:self.facebookShare.on forKey:@"facebook"];
+    [self.userDefaults setBool:self.twitterShare.on forKey:@"twitter"];
     
     [self.userDefaults synchronize];
     
@@ -86,12 +96,26 @@
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-    return 2;
+    return 3;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return (section) ? 1 : 3;
+    int rows = 0;
+    
+    switch (section) {
+        case 0:
+            rows = 4;
+            break;
+        case 1:
+            rows = 2;
+            break;
+        case 2:
+            rows = 1;
+            break;
+    }
+    
+    return rows;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -122,13 +146,31 @@
                 cell.textLabel.text =  NSLocalizedString(@"Take photo when you wink", nil);
                 cell.accessoryView = self.winkActivation;
                 break;
+            case 3:
+                cell.textLabel.text =  NSLocalizedString(@"Show boxes around faces", nil);
+                cell.accessoryView = self.showFaceBoxes;
+                break;
             default:
                 break;
         }
+    } else if (indexPath.section == 1) {
+        cell.accessoryType = UITableViewCellAccessoryNone;
+        cell.accessoryView = nil;
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
         
-        
-        
-    } else {
+        switch (indexPath.row) {
+            case 0:
+                cell.textLabel.text = NSLocalizedString(@"Share to Facebook", nil);
+                cell.accessoryView = self.facebookShare;
+                break;
+            case 1:
+                cell.textLabel.text =  NSLocalizedString(@"Share on Twitter", nil);
+                cell.accessoryView = self.twitterShare;
+                break;
+            default:
+                break;
+        }
+    } else if (indexPath.section == 2) {
         cell.selectionStyle = UITableViewCellSelectionStyleGray;
         cell.accessoryType = UITableViewCellAccessoryNone;
         
@@ -149,13 +191,9 @@
 #pragma mark - UITableViewDelegate
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    switch (indexPath.row) {
-        case 0:
-            [self about];
-            break;
-            
-        default:
-            break;
+    if ((indexPath.section == 2) && (indexPath.row == 0))
+    {
+        [self about];
     }
 }
 @end
