@@ -228,27 +228,36 @@
 #pragma mark Facebook
 - (void)postToFacebookFeed
 {
-/*
-    NSMutableDictionary *params = [NSMutableDictionary dictionaryWithDictionary:@{@"name":[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"], @"link":[NSString stringWithFormat:@"https://itunes.apple.com/ie/app/id%@?mt=8", kAppId], @"description" : @"Work out how much tax you should be paying"}];
-    
-    // Initiate a Facebook instance
-    Facebook *facebook = [[Facebook alloc] initWithAppId:FBSession.activeSession.appID andDelegate:nil];
-    
-    // Set the session information for the Facebook instance
-    facebook.accessToken = FBSession.activeSession.accessToken;
-    facebook.expirationDate = FBSession.activeSession.expirationDate;
-    
-    // Invoke the dialog
-    [facebook dialog:@"feed" andParams:params andDelegate:nil];
-*/ 
+    if ([SLComposeViewController isAvailableForServiceType:SLServiceTypeFacebook])
+    {
+        SLComposeViewController *facebookSheet = [SLComposeViewController
+                                               composeViewControllerForServiceType:SLServiceTypeFacebook];
+        
+        [facebookSheet setInitialText:[NSString stringWithFormat:@"%@ is a great little app from @CrayonsBrownPap", self.appName]];
+        
+        [facebookSheet addURL: [NSURL URLWithString:[NSString stringWithFormat:@"https://itunes.apple.com/ie/app/id%@?mt=8", kAppId]]];
+        
+        [self.navigationController presentViewController:facebookSheet animated:YES completion:nil];
+    }
+    else
+    {
+        UIAlertView *alertView = [[UIAlertView alloc]
+                                  initWithTitle:NSLocalizedString(@"No Facebook Account", nil)
+                                  message:NSLocalizedString(@"You must set up at least one account in Settings > Facebook before you can share via Facebook", nil)
+                                  delegate:self
+                                  cancelButtonTitle:@"OK"
+                                  otherButtonTitles:nil];
+        [alertView show];
+    }
 }
 
 #pragma mark Twitter
 - (void)postToTwitter
 {
-    if ([TWTweetComposeViewController canSendTweet])
+    if ([SLComposeViewController isAvailableForServiceType:SLServiceTypeTwitter])
     {
-        TWTweetComposeViewController *tweetSheet = [[TWTweetComposeViewController alloc] init];
+        SLComposeViewController *tweetSheet = [SLComposeViewController
+                                               composeViewControllerForServiceType:SLServiceTypeTwitter];
         
         [tweetSheet setInitialText:[NSString stringWithFormat:@"%@ is a great little app from @CrayonsBrownPap", self.appName]];
         
