@@ -59,15 +59,6 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 @property (strong,nonatomic) CIDetector *faceDetector;
 @property (strong,nonatomic) NSMutableArray *ciFaceLayers;
 
-@property (strong, nonatomic) NSArray *controlButtonPortraitConstraints;
-@property (strong, nonatomic) NSArray *controlPortraitConstraints;
-@property (strong, nonatomic) NSArray *controlButtonLandscapeLeftConstraints;
-@property (strong, nonatomic) NSArray *controlButtonLandscapeRightConstraints;
-@property (strong, nonatomic) NSArray *controlLandscapeLeftConstraints;
-@property (strong, nonatomic) NSArray *controlLandscapeRightConstraints;
-@property (strong, nonatomic) NSArray *switchCameraPortraitConstraints;
-@property (strong, nonatomic) NSArray *switchCameraLandscapeRightConstraints;
-
 @property (strong, nonatomic) NSUserDefaults *userDefaults;
 @end
 
@@ -94,6 +85,25 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     [self setupAVCapture];
 	NSDictionary *detectorOptions = @{CIDetectorAccuracy : CIDetectorAccuracyLow, CIDetectorTracking : @YES};
 	self.faceDetector = [CIDetector detectorOfType:CIDetectorTypeFace context:nil options:detectorOptions];
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(orientationChanged:)
+                                                 name:UIDeviceOrientationDidChangeNotification
+                                               object:nil];
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:UIDeviceOrientationDidChangeNotification
+                                                  object:nil];
 }
 
 - (void)didReceiveMemoryWarning
@@ -141,21 +151,6 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
                                                                                   views:NSDictionaryOfVariableBindings(switchCamerasButton)]];
     
     [view addConstraints:portraitButton];
-    
-    self.switchCameraPortraitConstraints = portraitButton;
-    
-    NSMutableArray *landScapeButton = @[].mutableCopy;
-    [landScapeButton addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"|-[switchCamerasButton]"
-                                                                                 options:0
-                                                                                 metrics:nil
-                                                                                   views:NSDictionaryOfVariableBindings(switchCamerasButton)]];
-    
-    [landScapeButton addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(5)-[switchCamerasButton]"
-                                                                                 options:0
-                                                                                 metrics:nil
-                                                                                   views:NSDictionaryOfVariableBindings(switchCamerasButton)]];
-    
-    self.switchCameraLandscapeRightConstraints = landScapeButton;
     
     countdownLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     countdownLabel.font = [UIFont boldSystemFontOfSize:200.0f];
@@ -283,102 +278,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
                                                                                              views:NSDictionaryOfVariableBindings(settingsButton)]];
     
     [controlView addConstraints:verticalbuttonConstraints];
-    
-    self.controlButtonPortraitConstraints = verticalbuttonConstraints;
-    
-    NSMutableArray *horizontalButtonConstraints = @[].mutableCopy;
-    
-    [horizontalButtonConstraints addObject:[NSLayoutConstraint constraintWithItem:autoPhoto
-                                                                        attribute:NSLayoutAttributeCenterX
-                                                                        relatedBy:NSLayoutRelationEqual
-                                                                           toItem:controlView
-                                                                        attribute:NSLayoutAttributeCenterX
-                                                                       multiplier:1.0f
-                                                                         constant:0.0f]];
-    
-    [horizontalButtonConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-[autoPhoto]"
-                                                                                             options:0
-                                                                                             metrics:nil
-                                                                                               views:NSDictionaryOfVariableBindings(autoPhoto)]];
-    
-    [horizontalButtonConstraints addObject:[NSLayoutConstraint constraintWithItem:takePhotoButton
-                                                                        attribute:NSLayoutAttributeCenterX
-                                                                        relatedBy:NSLayoutRelationEqual
-                                                                           toItem:controlView
-                                                                        attribute:NSLayoutAttributeCenterX
-                                                                       multiplier:1.0f
-                                                                         constant:0.0f]];
-    
-    [horizontalButtonConstraints addObject:[NSLayoutConstraint constraintWithItem:takePhotoButton
-                                                                        attribute:NSLayoutAttributeCenterY
-                                                                        relatedBy:NSLayoutRelationEqual
-                                                                           toItem:controlView
-                                                                        attribute:NSLayoutAttributeCenterY
-                                                                       multiplier:1.0f
-                                                                         constant:0.0f]];
-    
-    
-    [horizontalButtonConstraints addObject:[NSLayoutConstraint constraintWithItem:settingsButton
-                                                                        attribute:NSLayoutAttributeCenterX
-                                                                        relatedBy:NSLayoutRelationEqual
-                                                                           toItem:controlView
-                                                                        attribute:NSLayoutAttributeCenterX
-                                                                       multiplier:1.0f
-                                                                         constant:0.0f]];
-    
-    [horizontalButtonConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[settingsButton]-|"
-                                                                                             options:0
-                                                                                             metrics:nil
-                                                                                               views:NSDictionaryOfVariableBindings(settingsButton)]];
-    
-    self.controlButtonLandscapeLeftConstraints = horizontalButtonConstraints;
-    
-    NSMutableArray *horizontalRightButtonConstraints = @[].mutableCopy;
-    
-    [horizontalRightButtonConstraints addObject:[NSLayoutConstraint constraintWithItem:autoPhoto
-                                                                        attribute:NSLayoutAttributeCenterX
-                                                                        relatedBy:NSLayoutRelationEqual
-                                                                           toItem:controlView
-                                                                        attribute:NSLayoutAttributeCenterX
-                                                                       multiplier:1.0f
-                                                                         constant:0.0f]];
-    
-    [horizontalRightButtonConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[autoPhoto]-|"
-                                                                                             options:0
-                                                                                             metrics:nil
-                                                                                               views:NSDictionaryOfVariableBindings(autoPhoto)]];
-    
-    [horizontalRightButtonConstraints addObject:[NSLayoutConstraint constraintWithItem:takePhotoButton
-                                                                        attribute:NSLayoutAttributeCenterX
-                                                                        relatedBy:NSLayoutRelationEqual
-                                                                           toItem:controlView
-                                                                        attribute:NSLayoutAttributeCenterX
-                                                                       multiplier:1.0f
-                                                                         constant:0.0f]];
-    
-    [horizontalRightButtonConstraints addObject:[NSLayoutConstraint constraintWithItem:takePhotoButton
-                                                                        attribute:NSLayoutAttributeCenterY
-                                                                        relatedBy:NSLayoutRelationEqual
-                                                                           toItem:controlView
-                                                                        attribute:NSLayoutAttributeCenterY
-                                                                       multiplier:1.0f
-                                                                         constant:0.0f]];
-    
-    
-    [horizontalRightButtonConstraints addObject:[NSLayoutConstraint constraintWithItem:settingsButton
-                                                                        attribute:NSLayoutAttributeCenterX
-                                                                        relatedBy:NSLayoutRelationEqual
-                                                                           toItem:controlView
-                                                                        attribute:NSLayoutAttributeCenterX
-                                                                       multiplier:1.0f
-                                                                         constant:0.0f]];
-    
-    [horizontalRightButtonConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-[settingsButton]"
-                                                                                             options:0
-                                                                                             metrics:nil
-                                                                                               views:NSDictionaryOfVariableBindings(settingsButton)]];
-    
-    self.controlButtonLandscapeRightConstraints = horizontalRightButtonConstraints;
+
     
     [view addSubview:controlView];
     
@@ -394,124 +294,54 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
                                                                           options:0
                                                                           metrics:nil
                                                                             views:NSDictionaryOfVariableBindings(controlView)]];
+
+    [view addConstraints:portrait];
     
-    self.controlPortraitConstraints = portrait;
-    
-    [view addConstraints:self.controlPortraitConstraints];
-    
-    NSMutableArray *landscapeLeft = [NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"|[controlView(%f)]", bottomOffset]
-                                                                            options:0
-                                                                            metrics:nil
-                                                                              views:NSDictionaryOfVariableBindings(controlView)].mutableCopy;
-    [landscapeLeft addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[controlView]|"
-                                                                               options:0
-                                                                               metrics:nil
-                                                                                 views:NSDictionaryOfVariableBindings(controlView)]];
-    
-    self.controlLandscapeLeftConstraints = landscapeLeft;
-    
-    NSMutableArray *landscapeRight = [NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"[controlView(%f)]|", bottomOffset]
-                                                                             options:0
-                                                                             metrics:nil
-                                                                               views:NSDictionaryOfVariableBindings(controlView)].mutableCopy;
-    [landscapeRight addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[controlView]|"
-                                                                                options:0
-                                                                                metrics:nil
-                                                                                  views:NSDictionaryOfVariableBindings(controlView)]];
-    
-    self.controlLandscapeRightConstraints = landscapeRight;
+
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+- (BOOL)shouldAutorotate
 {
-	return (interfaceOrientation != UIInterfaceOrientationPortraitUpsideDown);
+    return NO;
 }
 
-- (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration;
+#pragma mark - Notifications
+// From http://stackoverflow.com/a/15967305/806442
+- (void)orientationChanged:(NSNotification *)notification
 {
-    [UIView setAnimationsEnabled:NO];
+    UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
+    double rotation = 0;
     
-    [[self.videoDataOutput connectionWithMediaType:AVMediaTypeVideo] setEnabled:NO];
-}
-
-//Inspired by http://stackoverflow.com/a/7284073/806442
-- (void) willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
-    float rotation = 0;
-    CGRect cameraframe = CGRectMake(0, topOffset, 320.0f, 427.0f);
-    
-    if (toInterfaceOrientation == UIInterfaceOrientationLandscapeLeft) {
-        rotation = M_PI/2;
-        cameraframe = CGRectMake(bottomOffset, 0, 427.0f, 320.0f);
-    } else if (toInterfaceOrientation == UIInterfaceOrientationLandscapeRight) {
-        rotation = -M_PI/2;
-        cameraframe = CGRectMake(topOffset, 0, 427.0f, 320.0f);
+    switch (orientation) {
+        case UIDeviceOrientationPortrait:
+            rotation = 0;
+            break;
+        case UIDeviceOrientationPortraitUpsideDown:
+            rotation = M_PI;
+            break;
+        case UIDeviceOrientationLandscapeLeft:
+            rotation = M_PI_2;
+            break;
+        case UIDeviceOrientationLandscapeRight:
+            rotation = -M_PI_2;
+            break;
+        case UIDeviceOrientationFaceDown:
+        case UIDeviceOrientationFaceUp:
+        case UIDeviceOrientationUnknown:
+        default:
+            return;
     }
-    
-    if ((toInterfaceOrientation == UIInterfaceOrientationLandscapeLeft) || (toInterfaceOrientation == UIInterfaceOrientationLandscapeRight))
-    {
-        [self.view removeConstraints:self.controlPortraitConstraints];
-        
-        if (toInterfaceOrientation == UIInterfaceOrientationLandscapeLeft)
-        {
-            [self.view removeConstraints:self.controlLandscapeRightConstraints];
-            [self.view addConstraints:self.controlLandscapeLeftConstraints];
-        }
-        else
-        {
-            [self.view removeConstraints:self.controlLandscapeLeftConstraints];
-            [self.view addConstraints:self.controlLandscapeRightConstraints];
-        }
-    }
-    else
-    {
-        [self.view removeConstraints:self.controlLandscapeLeftConstraints];
-        [self.view removeConstraints:self.controlLandscapeRightConstraints];
-        [self.view addConstraints:self.controlPortraitConstraints];
-    }
-    
-    [self.view layoutIfNeeded];
-    
-    [UIView animateWithDuration:duration animations:^{
-        cameraView.transform = CGAffineTransformMakeRotation(rotation);
-        cameraView.frame = cameraframe;
-    }];
-}
-
-- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
-{
-    [[self.videoDataOutput connectionWithMediaType:AVMediaTypeVideo] setEnabled:YES];
-    
-    [UIView setAnimationsEnabled:YES];
-    
-    [controlView removeConstraints:self.controlButtonPortraitConstraints];
-    [controlView removeConstraints:self.controlButtonLandscapeLeftConstraints];
-    [controlView removeConstraints:self.controlButtonLandscapeRightConstraints];
-    
-    if ((self.interfaceOrientation == UIInterfaceOrientationPortrait) || (self.interfaceOrientation == UIInterfaceOrientationPortraitUpsideDown))
-    {
-        [self.view removeConstraints:self.switchCameraLandscapeRightConstraints];
-        [self.view addConstraints:self.switchCameraPortraitConstraints];
-        [controlView addConstraints:self.controlButtonPortraitConstraints];
-    }
-    else
-    {
-        if (self.interfaceOrientation == UIInterfaceOrientationLandscapeRight)
-        {
-            [self.view removeConstraints:self.switchCameraPortraitConstraints];
-            [self.view addConstraints:self.switchCameraLandscapeRightConstraints];
-            [controlView addConstraints:self.controlButtonLandscapeRightConstraints];
-        }
-        else
-        {
-            [self.view removeConstraints:self.switchCameraLandscapeRightConstraints];
-            [self.view addConstraints:self.switchCameraPortraitConstraints];
-            [controlView addConstraints:self.controlButtonLandscapeLeftConstraints];
-        }
-    }
-    
-    [UIView animateWithDuration:0.3f animations:^{
-        [controlView layoutIfNeeded];
-    }];
+    CGAffineTransform transform = CGAffineTransformMakeRotation(rotation);
+    [UIView animateWithDuration:0.3f
+                          delay:0
+                        options:UIViewAnimationOptionBeginFromCurrentState animations:^{
+                            autoPhoto.transform = transform;
+                            takePhotoButton.transform = transform;
+                            settingsButton.transform = transform;
+                            switchCamerasButton.transform = transform;
+                            countdownLabel.transform = transform;
+                        }
+                     completion:nil];
 }
 
 #pragma mark - AV setup

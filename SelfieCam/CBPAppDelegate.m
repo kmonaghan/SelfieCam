@@ -20,6 +20,8 @@
     
     [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationNone];
 
+    [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
+    
     // Override point for customization after application launch.
     self.viewController = [CBPCameraViewController new];
     self.window.rootViewController = self.viewController;
