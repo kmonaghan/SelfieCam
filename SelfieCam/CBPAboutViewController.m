@@ -6,7 +6,7 @@
 //  Copyright (c) 2012 Crayons and Brown Paper. All rights reserved.
 //
 
-#import <Twitter/Twitter.h>
+#import <Social/Social.h>
 
 #import "CBPAboutViewController.h"
 
