@@ -124,6 +124,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		F5B56EC117C36F1C008D6CDE /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				34A4CDFB17C15EDD00C5ECA1 /* CBPAboutViewController.h */,
+				34A4CDFA17C15EDD00C5ECA1 /* CBPAboutViewController.m */,
+				F5D5D4F917C2685800A22A7A /* CBPSettingsViewController.h */,
+				F5D5D4FA17C2685800A22A7A /* CBPSettingsViewController.m */,
+				F5F5258417ABF84600BFF158 /* CBPCameraViewController.h */,
+				F5F5258517ABF84600BFF158 /* CBPCameraViewController.m */,
+			);
+			name = Controllers;
+			sourceTree = "<group>";
+		};
 		F5F5256017ABF84600BFF158 = {
 			isa = PBXGroup;
 			children = (
@@ -169,14 +182,9 @@
 		F5F5257217ABF84600BFF158 /* SelfieCam */ = {
 			isa = PBXGroup;
 			children = (
-				34A4CDFB17C15EDD00C5ECA1 /* CBPAboutViewController.h */,
-				34A4CDFA17C15EDD00C5ECA1 /* CBPAboutViewController.m */,
+				F5B56EC117C36F1C008D6CDE /* Controllers */,
 				F5F5257B17ABF84600BFF158 /* CBPAppDelegate.h */,
 				F5F5257C17ABF84600BFF158 /* CBPAppDelegate.m */,
-				F5D5D4F917C2685800A22A7A /* CBPSettingsViewController.h */,
-				F5D5D4FA17C2685800A22A7A /* CBPSettingsViewController.m */,
-				F5F5258417ABF84600BFF158 /* CBPCameraViewController.h */,
-				F5F5258517ABF84600BFF158 /* CBPCameraViewController.m */,
 				F5F5257317ABF84600BFF158 /* Supporting Files */,
 			);
 			path = SelfieCam;
