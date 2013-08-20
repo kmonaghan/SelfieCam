@@ -53,6 +53,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 @property (assign, nonatomic) BOOL isTakingPhoto;
 @property (assign, nonatomic) BOOL detectedFeature;
 @property (assign, nonatomic) BOOL useFrontCamera;
+@property (assign, nonatomic) BOOL cancelPicture;
 
 @property (strong, nonatomic) AVCaptureSession *session;
 @property (strong, nonatomic) AVCaptureVideoPreviewLayer *previewLayer;
@@ -83,6 +84,8 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     
     self.autoPhoto.on = NO;
     
+    self.cancelPicture = NO;
+    
     self.userDefaults = [NSUserDefaults standardUserDefaults];
     
     [self loadSettings];
@@ -96,6 +99,8 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 {
     [super viewWillAppear:animated];
     
+    self.cancelPicture = NO;
+    
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(orientationChanged:)
                                                  name:UIDeviceOrientationDidChangeNotification
@@ -105,6 +110,8 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 - (void)viewWillDisappear:(BOOL)animated
 {
     [super viewWillDisappear:animated];
+    
+    self.cancelPicture = YES;
     
     [[NSNotificationCenter defaultCenter] removeObserver:self
                                                     name:UIDeviceOrientationDidChangeNotification
@@ -717,7 +724,8 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 #pragma mark - Camera actions
 - (void)startCountdown
 {
-    if (!self.isTakingPhoto) {
+    if (!self.isTakingPhoto)
+    {
         [self.view bringSubviewToFront:self.countdownLabel];
         
         self.count = 3;
@@ -731,7 +739,14 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 
 - (void)showCountDown
 {
-    if (self.count != 0) {
+    if (self.cancelPicture)
+    {
+        [self resetCamera];
+        return;
+    }
+    
+    if (self.count != 0)
+    {
         [self updateCountdownLabel:[NSString stringWithFormat:@"%d", self.count] forDuration:1.0f onCompletion:^(){[self showCountDown];}];
         self.count--;
     } else {
@@ -757,6 +772,12 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 
 - (void)takePhoto
 {
+    if (self.cancelPicture)
+    {
+        [self resetCamera];
+        return;
+    }
+    
 	// Find out the current orientation and tell the still image output.
 	AVCaptureConnection *stillImageConnection = [self.stillImageOutput connectionWithMediaType:AVMediaTypeVideo];
 	UIDeviceOrientation curDeviceOrientation = [[UIDevice currentDevice] orientation];
@@ -815,6 +836,13 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
                          animations:^{ self.flashView.alpha = 0; }
                          completion:nil];
     });
+
+    [self resetCamera];
+}
+
+- (void)resetCamera
+{
+    self.cancelPicture = NO;
     self.isTakingPhoto = NO;
     self.detectedFeature = NO;
     self.takePhotoButton.enabled = YES;
