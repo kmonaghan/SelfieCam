@@ -43,12 +43,15 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     
     UIButton *takePhotoButton;
     UIButton *settingsButton;
-    UIButton *doneButton;
     UIButton *switchCamerasButton;
     
     int faceFrameCount;
     CGFloat topOffset;
     CGFloat bottomOffset;
+    
+    UIImageView *thumbView;
+    UIButton *sharePhotoOnTwitter;
+    UIButton *sharePhotoOnFacebook;
 }
 
 @property (strong,nonatomic) AVCaptureSession *session;
@@ -210,11 +213,17 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
                                                                         metrics:nil
                                                                           views:NSDictionaryOfVariableBindings(controlBackgroundView)]];
     
+    thumbView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 50.0f, 50.0f)];
+    thumbView.contentMode = UIViewContentModeScaleAspectFit;
+    thumbView.translatesAutoresizingMaskIntoConstraints = NO;
+    
+    [controlView addSubview:thumbView];
+    
     autoPhoto = [[UISwitch alloc] init];
     autoPhoto.translatesAutoresizingMaskIntoConstraints = NO;
     
     [controlView addSubview:autoPhoto];
-    
+    /*
     takePhotoButton = [UIButton buttonWithType:UIButtonTypeCustom];
     takePhotoButton.translatesAutoresizingMaskIntoConstraints = NO;
     [takePhotoButton setTitle:NSLocalizedString(@"Photo", nil) forState:UIControlStateNormal];
@@ -224,7 +233,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     [takePhotoButton sizeToFit];
     
     [controlView addSubview:takePhotoButton];
-    
+    */
     settingsButton = [UIButton buttonWithType:UIButtonTypeCustom];
     settingsButton.translatesAutoresizingMaskIntoConstraints = NO;
     [settingsButton addTarget:self action:@selector(showSettings) forControlEvents:UIControlEventTouchUpInside];
@@ -236,7 +245,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     
     NSMutableArray *verticalbuttonConstraints = @[].mutableCopy;
     
-    [verticalbuttonConstraints addObject:[NSLayoutConstraint constraintWithItem:autoPhoto
+    [verticalbuttonConstraints addObject:[NSLayoutConstraint constraintWithItem:thumbView
                                                                       attribute:NSLayoutAttributeCenterY
                                                                       relatedBy:NSLayoutRelationEqual
                                                                          toItem:controlView
@@ -244,19 +253,19 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
                                                                      multiplier:1.0f
                                                                        constant:0.0f]];
     
-    [verticalbuttonConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"|-[autoPhoto]"
+    [verticalbuttonConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"|-[thumbView]"
                                                                                            options:0
                                                                                            metrics:nil
-                                                                                             views:NSDictionaryOfVariableBindings(autoPhoto)]];
+                                                                                             views:NSDictionaryOfVariableBindings(thumbView)]];
     
-    [verticalbuttonConstraints addObject:[NSLayoutConstraint constraintWithItem:takePhotoButton
+    [verticalbuttonConstraints addObject:[NSLayoutConstraint constraintWithItem:autoPhoto
                                                                       attribute:NSLayoutAttributeCenterX
                                                                       relatedBy:NSLayoutRelationEqual
                                                                          toItem:controlView
                                                                       attribute:NSLayoutAttributeCenterX
                                                                      multiplier:1.0f
                                                                        constant:0.0f]];
-    [verticalbuttonConstraints addObject:[NSLayoutConstraint constraintWithItem:takePhotoButton
+    [verticalbuttonConstraints addObject:[NSLayoutConstraint constraintWithItem:autoPhoto
                                                                       attribute:NSLayoutAttributeCenterY
                                                                       relatedBy:NSLayoutRelationEqual
                                                                          toItem:controlView
@@ -335,8 +344,8 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     [UIView animateWithDuration:0.3f
                           delay:0
                         options:UIViewAnimationOptionBeginFromCurrentState animations:^{
+                            thumbView.transform = transform;
                             autoPhoto.transform = transform;
-                            takePhotoButton.transform = transform;
                             settingsButton.transform = transform;
                             switchCamerasButton.transform = transform;
                             countdownLabel.transform = transform;
@@ -649,15 +658,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 	}
     
     
-	NSDictionary *imageOptions;
-    if (&CIDetectorEyeBlink != NULL)
-    {
-        imageOptions = @{CIDetectorImageOrientation: @(exifOrientation), CIDetectorSmile:@YES, CIDetectorEyeBlink:@YES};
-    }
-    else
-    {
-        imageOptions = @{CIDetectorImageOrientation: @(exifOrientation)};
-    }
+	NSDictionary *imageOptions = @{CIDetectorImageOrientation: @(exifOrientation), CIDetectorSmile:@YES, CIDetectorEyeBlink:@YES};
     
 	NSArray *features = [self.faceDetector featuresInImage:ciImage options:imageOptions];
     
@@ -746,6 +747,8 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
                                                                NSData *jpegData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
                                                                NSDictionary* attachments = (__bridge_transfer NSDictionary*) CMCopyDictionaryOfAttachments(kCFAllocatorDefault, imageDataSampleBuffer, kCMAttachmentMode_ShouldPropagate);
                                                                writeJPEGDataToCameraRoll(jpegData, attachments);
+                                                               
+                                                               //thumbView.image = [UIImage imageWithData:jpegData];
                                                            }
                                                            
                                                            dispatch_async(dispatch_get_main_queue(), ^(void) {
@@ -777,7 +780,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 	self.previewLayer.connection.enabled = YES;
     dispatch_async(dispatch_get_main_queue(), ^(void) {
         [UIView animateWithDuration:.2f
-                         animations:^{ flashView.alpha=0; }
+                         animations:^{ flashView.alpha = 0; }
                          completion:nil];
     });
     isTakingPhoto = NO;
