@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3428EF4617C56762008D7093 /* default.png in Resources */ = {isa = PBXBuildFile; fileRef = 3428EF4017C56762008D7093 /* default.png */; };
+		3428EF4717C56762008D7093 /* default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 3428EF4117C56762008D7093 /* default@2x.png */; };
+		3428EF4817C56762008D7093 /* facebook.png in Resources */ = {isa = PBXBuildFile; fileRef = 3428EF4217C56762008D7093 /* facebook.png */; };
+		3428EF4917C56762008D7093 /* facebook@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 3428EF4317C56762008D7093 /* facebook@2x.png */; };
+		3428EF4A17C56762008D7093 /* twitter.png in Resources */ = {isa = PBXBuildFile; fileRef = 3428EF4417C56762008D7093 /* twitter.png */; };
+		3428EF4B17C56762008D7093 /* twitter@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 3428EF4517C56762008D7093 /* twitter@2x.png */; };
 		3463DB8D17BFF1A900FC7F26 /* Reveal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3463DB8C17BFF1A900FC7F26 /* Reveal.framework */; };
 		349FD30617AE96800030703E /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 349FD30517AE96800030703E /* CFNetwork.framework */; };
 		34A4CDFC17C164E600C5ECA1 /* CBPAboutViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 34A4CDFA17C15EDD00C5ECA1 /* CBPAboutViewController.m */; };
@@ -50,6 +56,12 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		3428EF4017C56762008D7093 /* default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = default.png; sourceTree = "<group>"; };
+		3428EF4117C56762008D7093 /* default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "default@2x.png"; sourceTree = "<group>"; };
+		3428EF4217C56762008D7093 /* facebook.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = facebook.png; sourceTree = "<group>"; };
+		3428EF4317C56762008D7093 /* facebook@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "facebook@2x.png"; sourceTree = "<group>"; };
+		3428EF4417C56762008D7093 /* twitter.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = twitter.png; sourceTree = "<group>"; };
+		3428EF4517C56762008D7093 /* twitter@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "twitter@2x.png"; sourceTree = "<group>"; };
 		3463DB8C17BFF1A900FC7F26 /* Reveal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Reveal.framework; path = "../../../../Applications/Reveal.app/Contents/SharedSupport/iOS-Libraries/Reveal.framework"; sourceTree = "<group>"; };
 		349FD30517AE96800030703E /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		34A4CDFA17C15EDD00C5ECA1 /* CBPAboutViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CBPAboutViewController.m; sourceTree = "<group>"; };
@@ -127,6 +139,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3428EF3F17C56762008D7093 /* images */ = {
+			isa = PBXGroup;
+			children = (
+				3428EF4017C56762008D7093 /* default.png */,
+				3428EF4117C56762008D7093 /* default@2x.png */,
+				3428EF4217C56762008D7093 /* facebook.png */,
+				3428EF4317C56762008D7093 /* facebook@2x.png */,
+				3428EF4417C56762008D7093 /* twitter.png */,
+				3428EF4517C56762008D7093 /* twitter@2x.png */,
+			);
+			path = images;
+			sourceTree = "<group>";
+		};
 		34C339D117C4061600679BAD /* Additions */ = {
 			isa = PBXGroup;
 			children = (
@@ -206,6 +231,7 @@
 		F5F5257317ABF84600BFF158 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				3428EF3F17C56762008D7093 /* images */,
 				F5F5257417ABF84600BFF158 /* SelfieCam-Info.plist */,
 				F5F5257517ABF84600BFF158 /* InfoPlist.strings */,
 				F5F5257817ABF84600BFF158 /* main.m */,
@@ -313,10 +339,16 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3428EF4B17C56762008D7093 /* twitter@2x.png in Resources */,
 				F5F5257717ABF84600BFF158 /* InfoPlist.strings in Resources */,
 				F5F5257F17ABF84600BFF158 /* Default.png in Resources */,
+				3428EF4717C56762008D7093 /* default@2x.png in Resources */,
+				3428EF4817C56762008D7093 /* facebook.png in Resources */,
 				F5F5258117ABF84600BFF158 /* Default@2x.png in Resources */,
 				F5F5258317ABF84600BFF158 /* Default-568h@2x.png in Resources */,
+				3428EF4A17C56762008D7093 /* twitter.png in Resources */,
+				3428EF4917C56762008D7093 /* facebook@2x.png in Resources */,
+				3428EF4617C56762008D7093 /* default.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
