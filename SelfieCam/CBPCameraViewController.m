@@ -221,41 +221,57 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
                                                                         metrics:nil
                                                                           views:NSDictionaryOfVariableBindings(controlBackgroundView)]];
     
-    self.thumbView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 50.0f, 50.0f)];
-    self.thumbView.contentMode = UIViewContentModeScaleAspectFit;
+    self.thumbView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 50, 50)];
     self.thumbView.translatesAutoresizingMaskIntoConstraints = NO;
     
     [self.controlView addSubview:self.thumbView];
     
-    self.sharePhotoOnTwitter = [UIButton buttonWithType:UIButtonTypeSystem];
-    [self.sharePhotoOnTwitter setTitle:@"T" forState:UIControlStateNormal];
+    self.sharePhotoOnTwitter = [UIButton buttonWithType:UIButtonTypeCustom];
+    [self.sharePhotoOnTwitter setImage:[UIImage imageNamed:@"twitter.png"] forState:UIControlStateNormal];
     [self.sharePhotoOnTwitter addTarget:self action:@selector(shareOnTwitter) forControlEvents:UIControlEventTouchUpInside];
-    [self.sharePhotoOnTwitter sizeToFit];
+    self.sharePhotoOnTwitter.frame = CGRectMake(0, 0, 40.0f, 40.0f);
     self.sharePhotoOnTwitter.translatesAutoresizingMaskIntoConstraints = NO;
     
     [self.controlView addSubview:self.sharePhotoOnTwitter];
     
     self.sharePhotoOnFacebook = [UIButton buttonWithType:UIButtonTypeSystem];
-    [self.sharePhotoOnFacebook setTitle:@"F" forState:UIControlStateNormal];
+    [self.sharePhotoOnFacebook setImage:[UIImage imageNamed:@"facebook.png"] forState:UIControlStateNormal];
     [self.sharePhotoOnFacebook addTarget:self action:@selector(shareOnFacebook) forControlEvents:UIControlEventTouchUpInside];
-    [self.sharePhotoOnFacebook sizeToFit];
+    self.sharePhotoOnFacebook.frame = CGRectMake(0, 0, 40.0f, 40.0f);
+
     self.sharePhotoOnFacebook.translatesAutoresizingMaskIntoConstraints = NO;
     
     [self.controlView addSubview:self.sharePhotoOnFacebook];
     
-    
-    [self.controlView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-[_sharePhotoOnTwitter][_sharePhotoOnFacebook]-|"
+    [self.controlView addConstraint:[NSLayoutConstraint constraintWithItem:self.sharePhotoOnTwitter
+                                                                 attribute:NSLayoutAttributeCenterY
+                                                                 relatedBy:NSLayoutRelationEqual
+                                                                    toItem:self.controlView
+                                                                 attribute:NSLayoutAttributeCenterY
+                                                                multiplier:1.0f
+                                                                  constant:0.0f]];
+    [self.controlView addConstraint:[NSLayoutConstraint constraintWithItem:self.sharePhotoOnFacebook
+                                                                 attribute:NSLayoutAttributeCenterY
+                                                                 relatedBy:NSLayoutRelationEqual
+                                                                    toItem:self.controlView
+                                                                 attribute:NSLayoutAttributeCenterY
+                                                                multiplier:1.0f
+                                                                  constant:0.0f]];
+    /*
+    [self.controlView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-[_sharePhotoOnFacebook]-|"
                                                                         options:0
                                                                         metrics:nil
-                                                                          views:NSDictionaryOfVariableBindings(_sharePhotoOnTwitter, _sharePhotoOnFacebook)]];
+                                                                          views:NSDictionaryOfVariableBindings(_sharePhotoOnFacebook)]];
+    
     [self.controlView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"[_thumbView][_sharePhotoOnTwitter]"
                                                                         options:0
                                                                         metrics:nil
                                                                           views:NSDictionaryOfVariableBindings(_thumbView, _sharePhotoOnTwitter)]];
-    [self.controlView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"[_thumbView][_sharePhotoOnFacebook]"
+     */
+    [self.controlView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"[_thumbView]-[_sharePhotoOnTwitter]-[_sharePhotoOnFacebook]"
                                                                         options:0
                                                                         metrics:nil
-                                                                          views:NSDictionaryOfVariableBindings(_thumbView, _sharePhotoOnFacebook)]];
+                                                                          views:NSDictionaryOfVariableBindings(_thumbView, _sharePhotoOnTwitter, _sharePhotoOnFacebook)]];
     
     self.autoPhoto = [[UISwitch alloc] init];
     self.autoPhoto.translatesAutoresizingMaskIntoConstraints = NO;
@@ -352,9 +368,8 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     return NO;
 }
 
-#pragma mark - Notifications
-// From http://stackoverflow.com/a/15967305/806442
-- (void)orientationChanged:(NSNotification *)notification
+#pragma mark -
+- (double)rotation
 {
     UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
     double rotation = 0;
@@ -376,13 +391,24 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
         case UIDeviceOrientationFaceUp:
         case UIDeviceOrientationUnknown:
         default:
-            return;
+            rotation = 0;
+
     }
-    CGAffineTransform transform = CGAffineTransformMakeRotation(rotation);
+    
+    return rotation;
+}
+
+#pragma mark - Notifications
+// From http://stackoverflow.com/a/15967305/806442
+- (void)orientationChanged:(NSNotification *)notification
+{
+    CGAffineTransform transform = CGAffineTransformMakeRotation([self rotation]);
     [UIView animateWithDuration:0.3f
                           delay:0
                         options:UIViewAnimationOptionBeginFromCurrentState animations:^{
                             self.thumbView.transform = transform;
+                            self.sharePhotoOnTwitter.transform = transform;
+                            self.sharePhotoOnFacebook.transform = transform;
                             self.autoPhoto.transform = transform;
                             self.settingsButton.transform = transform;
                             self.switchCamerasButton.transform = transform;
@@ -561,7 +587,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 
 // called asynchronously as the capture output is capturing sample buffers, this method asks the face detector (if on)
 // to detect features and for each draw the red square in a layer and set appropriate orientation
-- (void)drawFaceBoxesForFeatures:(NSArray *)features forVideoBox:(CGRect)clap orientation:(UIDeviceOrientation)orientation
+- (void)drawFaceBoxesForFeatures:(NSArray *)features forVideoBox:(CGRect)clap
 {
     [self resizeCoreImageFaceLayerCache:[features count]];
     
@@ -627,24 +653,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
             
             [featureLayer setFrame:faceRect];
             
-            switch (orientation) {
-                case UIDeviceOrientationPortrait:
-                    [featureLayer setAffineTransform:CGAffineTransformMakeRotation(DegreesToRadians(0.))];
-                    break;
-                case UIDeviceOrientationPortraitUpsideDown:
-                    [featureLayer setAffineTransform:CGAffineTransformMakeRotation(DegreesToRadians(180.))];
-                    break;
-                case UIDeviceOrientationLandscapeLeft:
-                    [featureLayer setAffineTransform:CGAffineTransformMakeRotation(DegreesToRadians(90.))];
-                    break;
-                case UIDeviceOrientationLandscapeRight:
-                    [featureLayer setAffineTransform:CGAffineTransformMakeRotation(DegreesToRadians(-90.))];
-                    break;
-                case UIDeviceOrientationFaceUp:
-                case UIDeviceOrientationFaceDown:
-                default:
-                    break; // leave the layer in its last known orientation
-            }
+            [featureLayer setAffineTransform:CGAffineTransformMakeRotation([self rotation])];
         }
 		currentFeature++;
 		
@@ -703,6 +712,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 	CMFormatDescriptionRef fdesc = CMSampleBufferGetFormatDescription(sampleBuffer);
 	CGRect clap = CMVideoFormatDescriptionGetCleanAperture(fdesc, false /*originIsTopLeft*/);
 	
+    /*
     if (([features count] == [self.userDefaults doubleForKey:@"faces"]) && self.autoPhoto.on) {
         self.faceFrameCount++;
         
@@ -714,9 +724,10 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     } else {
         self.faceFrameCount = 0;
     }
+    */
     
 	dispatch_async(dispatch_get_main_queue(), ^(void) {
-		[self drawFaceBoxesForFeatures:features forVideoBox:clap orientation:curDeviceOrientation];
+		[self drawFaceBoxesForFeatures:features forVideoBox:clap];
 	});
 }
 
@@ -724,16 +735,22 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 #pragma mark - Camera actions
 - (void)startCountdown
 {
+    if (self.cancelPicture)
+    {
+        [self resetCamera];
+        return;
+    }
+    
     if (!self.isTakingPhoto)
     {
+        self.isTakingPhoto = YES;
+        
         [self.view bringSubviewToFront:self.countdownLabel];
         
         self.count = 3;
         self.takePhotoButton.enabled = NO;
         
         [self showCountDown];
-        
-        self.isTakingPhoto = YES;
     }
 }
 
@@ -791,17 +808,22 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     
 	[self.stillImageOutput captureStillImageAsynchronouslyFromConnection:stillImageConnection
                                                        completionHandler:^(CMSampleBufferRef imageDataSampleBuffer, NSError *error) {
-                                                           if (error) {
+                                                           if ((error) || ( ! imageDataSampleBuffer ))
+                                                           {
                                                                displayErrorOnMainQueue(error, @"Take picture failed");
-                                                           } else if ( ! imageDataSampleBuffer ) {
-                                                               displayErrorOnMainQueue(nil, @"Take picture failed: received null sample buffer");
-                                                           } else {
+                                                           }
+                                                           else
+                                                           {
                                                                NSData *jpegData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
                                                                NSDictionary* attachments = (__bridge_transfer NSDictionary*) CMCopyDictionaryOfAttachments(kCFAllocatorDefault, imageDataSampleBuffer, kCMAttachmentMode_ShouldPropagate);
+
                                                                writeJPEGDataToCameraRoll(jpegData, attachments);
                                                                
                                                                self.lastSelfie = [UIImage imageWithData:jpegData];
-                                                               self.thumbView.image = [UIImage generatePhotoThumbnail:self.lastSelfie ratio:50.0f];
+                                                               dispatch_async(dispatch_get_main_queue(), ^(void) {
+                                                                   self.thumbView.image = [UIImage generatePhotoThumbnail:self.lastSelfie
+                                                                                                                    ratio:self.thumbView.frame.size.width];
+                                                                });
                                                            }
                                                            
                                                            dispatch_async(dispatch_get_main_queue(), ^(void) {
@@ -919,9 +941,10 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 {
     [self.userDefaults synchronize];
     
-    if ([self.userDefaults doubleForKey:@"faces"] < 1)
+    if (![self.userDefaults doubleForKey:@"faces"])
     {
         [self.userDefaults setDouble:1 forKey:@"faces"];
+        [self.userDefaults setDouble:1 forKey:@"smile"];
         [self.userDefaults synchronize];
     }
 }
@@ -994,6 +1017,8 @@ void writeJPEGDataToCameraRoll(NSData* data, NSDictionary* metadata)
 		if (error) {
 			displayErrorOnMainQueue(error, @"Save to camera roll failed");
 		}
+        
+        
 	}];
 }
 
