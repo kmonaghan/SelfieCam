@@ -223,6 +223,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     
     self.thumbView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 50, 50)];
     self.thumbView.translatesAutoresizingMaskIntoConstraints = NO;
+    self.thumbView.image = [UIImage imageNamed:@"default.png"];
     
     [self.controlView addSubview:self.thumbView];
     
@@ -234,7 +235,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     
     [self.controlView addSubview:self.sharePhotoOnTwitter];
     
-    self.sharePhotoOnFacebook = [UIButton buttonWithType:UIButtonTypeSystem];
+    self.sharePhotoOnFacebook = [UIButton buttonWithType:UIButtonTypeCustom];
     [self.sharePhotoOnFacebook setImage:[UIImage imageNamed:@"facebook.png"] forState:UIControlStateNormal];
     [self.sharePhotoOnFacebook addTarget:self action:@selector(shareOnFacebook) forControlEvents:UIControlEventTouchUpInside];
     self.sharePhotoOnFacebook.frame = CGRectMake(0, 0, 40.0f, 40.0f);
@@ -242,36 +243,21 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     self.sharePhotoOnFacebook.translatesAutoresizingMaskIntoConstraints = NO;
     
     [self.controlView addSubview:self.sharePhotoOnFacebook];
-    
-    [self.controlView addConstraint:[NSLayoutConstraint constraintWithItem:self.sharePhotoOnTwitter
-                                                                 attribute:NSLayoutAttributeCenterY
-                                                                 relatedBy:NSLayoutRelationEqual
-                                                                    toItem:self.controlView
-                                                                 attribute:NSLayoutAttributeCenterY
-                                                                multiplier:1.0f
-                                                                  constant:0.0f]];
-    [self.controlView addConstraint:[NSLayoutConstraint constraintWithItem:self.sharePhotoOnFacebook
-                                                                 attribute:NSLayoutAttributeCenterY
-                                                                 relatedBy:NSLayoutRelationEqual
-                                                                    toItem:self.controlView
-                                                                 attribute:NSLayoutAttributeCenterY
-                                                                multiplier:1.0f
-                                                                  constant:0.0f]];
-    /*
-    [self.controlView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-[_sharePhotoOnFacebook]-|"
+
+    [self.controlView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_sharePhotoOnTwitter][_sharePhotoOnFacebook]"
                                                                         options:0
                                                                         metrics:nil
-                                                                          views:NSDictionaryOfVariableBindings(_sharePhotoOnFacebook)]];
+                                                                          views:NSDictionaryOfVariableBindings(_sharePhotoOnTwitter, _sharePhotoOnFacebook)]];
     
-    [self.controlView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"[_thumbView][_sharePhotoOnTwitter]"
+    [self.controlView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"[_thumbView]-[_sharePhotoOnTwitter]"
                                                                         options:0
                                                                         metrics:nil
                                                                           views:NSDictionaryOfVariableBindings(_thumbView, _sharePhotoOnTwitter)]];
-     */
-    [self.controlView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"[_thumbView]-[_sharePhotoOnTwitter]-[_sharePhotoOnFacebook]"
+    
+    [self.controlView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"[_thumbView]-[_sharePhotoOnFacebook]"
                                                                         options:0
                                                                         metrics:nil
-                                                                          views:NSDictionaryOfVariableBindings(_thumbView, _sharePhotoOnTwitter, _sharePhotoOnFacebook)]];
+                                                                          views:NSDictionaryOfVariableBindings(_thumbView, _sharePhotoOnFacebook)]];
     
     self.autoPhoto = [[UISwitch alloc] init];
     self.autoPhoto.translatesAutoresizingMaskIntoConstraints = NO;
