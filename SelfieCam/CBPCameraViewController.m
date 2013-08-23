@@ -8,7 +8,6 @@
 
 #import "UIImage+Thumbnail.h"
 
-#import <AssertMacros.h>
 #import <CoreImage/CoreImage.h>
 #import <ImageIO/ImageIO.h>
 #import <AssertMacros.h>
@@ -45,6 +44,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 @property (strong, nonatomic) UIButton *switchCamerasButton;
 @property (strong, nonatomic) UIButton *sharePhotoOnTwitter;
 @property (strong, nonatomic) UIButton *sharePhotoOnFacebook;
+@property (strong, nonatomic) UIButton *share;
 
 @property (assign, nonatomic) CGFloat topOffset;
 @property (assign, nonatomic) CGFloat bottomOffset;
@@ -93,6 +93,8 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     [self setupAVCapture];
 	NSDictionary *detectorOptions = @{CIDetectorAccuracy : CIDetectorAccuracyLow, CIDetectorTracking : @YES};
 	self.faceDetector = [CIDetector detectorOfType:CIDetectorTypeFace context:nil options:detectorOptions];
+    
+    [self lastPhoto];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -213,67 +215,89 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     [self.controlView addSubview:controlBackgroundView];
     
     [self.controlView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"|[controlBackgroundView]|"
-                                                                        options:0
-                                                                        metrics:nil
-                                                                          views:NSDictionaryOfVariableBindings(controlBackgroundView)]];
+                                                                             options:0
+                                                                             metrics:nil
+                                                                               views:NSDictionaryOfVariableBindings(controlBackgroundView)]];
     [self.controlView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[controlBackgroundView]|"
-                                                                        options:0
-                                                                        metrics:nil
-                                                                          views:NSDictionaryOfVariableBindings(controlBackgroundView)]];
+                                                                             options:0
+                                                                             metrics:nil
+                                                                               views:NSDictionaryOfVariableBindings(controlBackgroundView)]];
     
-    self.thumbView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 50, 50)];
+    self.thumbView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 50.0f, 50.f)];
     self.thumbView.translatesAutoresizingMaskIntoConstraints = NO;
-    self.thumbView.image = [UIImage imageNamed:@"default.png"];
+    self.thumbView.image = [UIImage imageNamed:@"default_thumb.png"];
     
     [self.controlView addSubview:self.thumbView];
+    /*
+     self.sharePhotoOnTwitter = [UIButton buttonWithType:UIButtonTypeCustom];
+     [self.sharePhotoOnTwitter setImage:[UIImage imageNamed:@"twitter.png"] forState:UIControlStateNormal];
+     [self.sharePhotoOnTwitter addTarget:self action:@selector(shareOnTwitter) forControlEvents:UIControlEventTouchUpInside];
+     self.sharePhotoOnTwitter.frame = CGRectMake(0, 0, 40.0f, 40.0f);
+     self.sharePhotoOnTwitter.translatesAutoresizingMaskIntoConstraints = NO;
+     
+     [self.controlView addSubview:self.sharePhotoOnTwitter];
+     
+     self.sharePhotoOnFacebook = [UIButton buttonWithType:UIButtonTypeCustom];
+     [self.sharePhotoOnFacebook setImage:[UIImage imageNamed:@"facebook.png"] forState:UIControlStateNormal];
+     [self.sharePhotoOnFacebook addTarget:self action:@selector(shareOnFacebook) forControlEvents:UIControlEventTouchUpInside];
+     self.sharePhotoOnFacebook.frame = CGRectMake(0, 0, 40.0f, 40.0f);
+     
+     self.sharePhotoOnFacebook.translatesAutoresizingMaskIntoConstraints = NO;
+     
+     [self.controlView addSubview:self.sharePhotoOnFacebook];
+     
+     [self.controlView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_sharePhotoOnTwitter][_sharePhotoOnFacebook]"
+     options:0
+     metrics:nil
+     views:NSDictionaryOfVariableBindings(_sharePhotoOnTwitter, _sharePhotoOnFacebook)]];
+     
+     [self.controlView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"[_thumbView]-[_sharePhotoOnTwitter]"
+     options:0
+     metrics:nil
+     views:NSDictionaryOfVariableBindings(_thumbView, _sharePhotoOnTwitter)]];
+     
+     [self.controlView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"[_thumbView]-[_sharePhotoOnFacebook]"
+     options:0
+     metrics:nil
+     views:NSDictionaryOfVariableBindings(_thumbView, _sharePhotoOnFacebook)]];
+     */
     
-    self.sharePhotoOnTwitter = [UIButton buttonWithType:UIButtonTypeCustom];
-    [self.sharePhotoOnTwitter setImage:[UIImage imageNamed:@"twitter.png"] forState:UIControlStateNormal];
-    [self.sharePhotoOnTwitter addTarget:self action:@selector(shareOnTwitter) forControlEvents:UIControlEventTouchUpInside];
-    self.sharePhotoOnTwitter.frame = CGRectMake(0, 0, 40.0f, 40.0f);
-    self.sharePhotoOnTwitter.translatesAutoresizingMaskIntoConstraints = NO;
+    self.share = [UIButton buttonWithType:UIButtonTypeCustom];
+    [self.share setImage:[UIImage imageNamed:@"211-action-grey.png"] forState:UIControlStateNormal];
+    [self.share addTarget:self action:@selector(shareImage) forControlEvents:UIControlEventTouchUpInside];
+    self.share.frame = CGRectMake(0, 0, 44.0f, 44.0f);
+    self.share.translatesAutoresizingMaskIntoConstraints = NO;
+    self.share.hidden = YES;
+    [self.controlView addSubview:self.share];
     
-    [self.controlView addSubview:self.sharePhotoOnTwitter];
+    [self.controlView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"[_thumbView]-[_share]"
+                                                                             options:0
+                                                                             metrics:nil
+                                                                               views:NSDictionaryOfVariableBindings(_thumbView, _share)]];
     
-    self.sharePhotoOnFacebook = [UIButton buttonWithType:UIButtonTypeCustom];
-    [self.sharePhotoOnFacebook setImage:[UIImage imageNamed:@"facebook.png"] forState:UIControlStateNormal];
-    [self.sharePhotoOnFacebook addTarget:self action:@selector(shareOnFacebook) forControlEvents:UIControlEventTouchUpInside];
-    self.sharePhotoOnFacebook.frame = CGRectMake(0, 0, 40.0f, 40.0f);
-
-    self.sharePhotoOnFacebook.translatesAutoresizingMaskIntoConstraints = NO;
-    
-    [self.controlView addSubview:self.sharePhotoOnFacebook];
-
-    [self.controlView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_sharePhotoOnTwitter][_sharePhotoOnFacebook]"
-                                                                        options:0
-                                                                        metrics:nil
-                                                                          views:NSDictionaryOfVariableBindings(_sharePhotoOnTwitter, _sharePhotoOnFacebook)]];
-    
-    [self.controlView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"[_thumbView]-[_sharePhotoOnTwitter]"
-                                                                        options:0
-                                                                        metrics:nil
-                                                                          views:NSDictionaryOfVariableBindings(_thumbView, _sharePhotoOnTwitter)]];
-    
-    [self.controlView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"[_thumbView]-[_sharePhotoOnFacebook]"
-                                                                        options:0
-                                                                        metrics:nil
-                                                                          views:NSDictionaryOfVariableBindings(_thumbView, _sharePhotoOnFacebook)]];
+    [self.controlView addConstraint:[NSLayoutConstraint constraintWithItem:self.share
+                                                                 attribute:NSLayoutAttributeCenterY
+                                                                 relatedBy:NSLayoutRelationEqual
+                                                                    toItem:self.controlView
+                                                                 attribute:NSLayoutAttributeCenterY
+                                                                multiplier:1.0f
+                                                                  constant:0.0f]];
     
     self.autoPhoto = [[UISwitch alloc] init];
     self.autoPhoto.translatesAutoresizingMaskIntoConstraints = NO;
     
     [self.controlView addSubview:self.autoPhoto];
     /*
-    takePhotoButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    takePhotoButton.translatesAutoresizingMaskIntoConstraints = NO;
-    [takePhotoButton setTitle:NSLocalizedString(@"Photo", nil) forState:UIControlStateNormal];
-    [takePhotoButton addTarget:self
-                        action:@selector(startCountdown)
-              forControlEvents:UIControlEventTouchUpInside];
-    [takePhotoButton sizeToFit];
-    
-    [self.controlView addSubview:takePhotoButton];
-    */
+     takePhotoButton = [UIButton buttonWithType:UIButtonTypeCustom];
+     takePhotoButton.translatesAutoresizingMaskIntoConstraints = NO;
+     [takePhotoButton setTitle:NSLocalizedString(@"Photo", nil) forState:UIControlStateNormal];
+     [takePhotoButton addTarget:self
+     action:@selector(startCountdown)
+     forControlEvents:UIControlEventTouchUpInside];
+     [takePhotoButton sizeToFit];
+     
+     [self.controlView addSubview:takePhotoButton];
+     */
     self.settingsButton = [UIButton buttonWithType:UIButtonTypeCustom];
     self.settingsButton.translatesAutoresizingMaskIntoConstraints = NO;
     [self.settingsButton addTarget:self action:@selector(showSettings) forControlEvents:UIControlEventTouchUpInside];
@@ -327,7 +351,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
                                                                                              views:NSDictionaryOfVariableBindings(_settingsButton)]];
     
     [self.controlView addConstraints:verticalbuttonConstraints];
-
+    
     
     [view addSubview:self.controlView];
     
@@ -343,10 +367,10 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
                                                                           options:0
                                                                           metrics:nil
                                                                             views:NSDictionaryOfVariableBindings(_controlView)]];
-
+    
     [view addConstraints:portrait];
     
-
+    
 }
 
 - (BOOL)shouldAutorotate
@@ -378,7 +402,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
         case UIDeviceOrientationUnknown:
         default:
             rotation = 0;
-
+            
     }
     
     return rotation;
@@ -393,8 +417,9 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
                           delay:0
                         options:UIViewAnimationOptionBeginFromCurrentState animations:^{
                             self.thumbView.transform = transform;
-                            self.sharePhotoOnTwitter.transform = transform;
-                            self.sharePhotoOnFacebook.transform = transform;
+                            //self.sharePhotoOnTwitter.transform = transform;
+                            //self.sharePhotoOnFacebook.transform = transform;
+                            self.share.transform = transform;
                             self.autoPhoto.transform = transform;
                             self.settingsButton.transform = transform;
                             self.switchCamerasButton.transform = transform;
@@ -699,18 +724,18 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 	CGRect clap = CMVideoFormatDescriptionGetCleanAperture(fdesc, false /*originIsTopLeft*/);
 	
     /*
-    if (([features count] == [self.userDefaults doubleForKey:@"faces"]) && self.autoPhoto.on) {
-        self.faceFrameCount++;
-        
-        if (self.faceFrameCount > TOTALFACE_FRAMES) {
-            [self startCountdown];
-            
-            self.faceFrameCount = 0;
-        }
-    } else {
-        self.faceFrameCount = 0;
-    }
-    */
+     if (([features count] == [self.userDefaults doubleForKey:@"faces"]) && self.autoPhoto.on) {
+     self.faceFrameCount++;
+     
+     if (self.faceFrameCount > TOTALFACE_FRAMES) {
+     [self startCountdown];
+     
+     self.faceFrameCount = 0;
+     }
+     } else {
+     self.faceFrameCount = 0;
+     }
+     */
     
 	dispatch_async(dispatch_get_main_queue(), ^(void) {
 		[self drawFaceBoxesForFeatures:features forVideoBox:clap];
@@ -802,14 +827,16 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
                                                            {
                                                                NSData *jpegData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
                                                                NSDictionary* attachments = (__bridge_transfer NSDictionary*) CMCopyDictionaryOfAttachments(kCFAllocatorDefault, imageDataSampleBuffer, kCMAttachmentMode_ShouldPropagate);
-
+                                                               
                                                                writeJPEGDataToCameraRoll(jpegData, attachments);
                                                                
                                                                self.lastSelfie = [UIImage imageWithData:jpegData];
+                                                               
                                                                dispatch_async(dispatch_get_main_queue(), ^(void) {
+                                                                   self.share.hidden = NO;
                                                                    self.thumbView.image = [UIImage generatePhotoThumbnail:self.lastSelfie
                                                                                                                     ratio:self.thumbView.frame.size.width];
-                                                                });
+                                                               });
                                                            }
                                                            
                                                            dispatch_async(dispatch_get_main_queue(), ^(void) {
@@ -844,7 +871,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
                          animations:^{ self.flashView.alpha = 0; }
                          completion:nil];
     });
-
+    
     [self resetCamera];
 }
 
@@ -860,55 +887,44 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 }
 
 #pragma mark -
-- (void)shareOnTwitter
+-(void)lastPhoto
 {
-    if ([SLComposeViewController isAvailableForServiceType:SLServiceTypeTwitter])
+    NSString *mediaurl = [self.userDefaults objectForKey:@"last_photo"];
+    
+    if (!mediaurl)
     {
-        SLComposeViewController *tweetSheet = [SLComposeViewController
-                                               composeViewControllerForServiceType:SLServiceTypeTwitter];
-        NSString *defaultText = ([self.userDefaults doubleForKey:@"faces"] == 1) ? @"Look at my beautiful smile! #selfiecam" : @"Look at our beautiful smiles! #selfiecam" ;
-        [tweetSheet setInitialText:NSLocalizedString(defaultText, nil)];
-        
-        [tweetSheet addURL: [NSURL URLWithString:@""]];
-        [tweetSheet addImage:self.lastSelfie];
-        [self presentViewController:tweetSheet animated:YES completion:nil];
+        return;
     }
-    else
-    {
-        UIAlertView *alertView = [[UIAlertView alloc]
-                                  initWithTitle:NSLocalizedString(@"No Facebook Twitter", nil)
-                                  message:NSLocalizedString(@"You must set up at least one account in Settings > Twitter before you can share via Facebook", nil)
-                                  delegate:self
-                                  cancelButtonTitle:@"OK"
-                                  otherButtonTitles:nil];
-        [alertView show];
-    }
+    
+    ;
+    ALAssetsLibrary* assetslibrary = [[ALAssetsLibrary alloc] init];
+    
+    [assetslibrary assetForURL:[NSURL URLWithString:mediaurl]
+                   resultBlock:^(ALAsset *myasset)
+     {
+         self.thumbView.image = [UIImage generatePhotoThumbnail:[UIImage imageWithCGImage:[myasset thumbnail]]
+                                                          ratio:self.thumbView.frame.size.width];
+         
+         ALAssetRepresentation *representation = [myasset defaultRepresentation];
+         self.lastSelfie = [UIImage imageWithCGImage:[representation fullScreenImage]];
+     }
+                  failureBlock:^(NSError *myerror)
+     {
+         DLog(@"booya, cant get image - %@", [myerror localizedDescription]);
+     }];
+    
 }
 
-- (void)shareOnFacebook
+- (void)shareImage
 {
-    if ([SLComposeViewController isAvailableForServiceType:SLServiceTypeFacebook])
-    {
-        SLComposeViewController *facebookSheet = [SLComposeViewController
-                                                  composeViewControllerForServiceType:SLServiceTypeFacebook];
-        
-        NSString *defaultText = ([self.userDefaults doubleForKey:@"faces"] == 1) ? @"Look at my beautiful smile! #selfiecam" : @"Look at our beautiful smiles! #selfiecam" ;
-        [facebookSheet setInitialText:NSLocalizedString(defaultText, nil)];
-        [facebookSheet addImage:self.lastSelfie];
-        [facebookSheet addURL: [NSURL URLWithString:@""]];
-        
-        [self presentViewController:facebookSheet animated:YES completion:nil];
-    }
-    else
-    {
-        UIAlertView *alertView = [[UIAlertView alloc]
-                                  initWithTitle:NSLocalizedString(@"No Facebook Account", nil)
-                                  message:NSLocalizedString(@"You must set an account in Settings > Facebook before you can share via Facebook", nil)
-                                  delegate:self
-                                  cancelButtonTitle:@"OK"
-                                  otherButtonTitles:nil];
-        [alertView show];
-    }
+    NSString *defaultText = NSLocalizedString(([self.userDefaults doubleForKey:@"faces"] == 1) ? @"Look at my beautiful smile! #selfiecam" : @"Look at our beautiful smiles! #selfiecam", nil) ;
+    
+    NSArray *activityItems = [NSArray arrayWithObjects:defaultText, self.lastSelfie, nil];
+    
+    UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:activityItems applicationActivities:nil];
+    activityViewController.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
+    
+    [self presentViewController:activityViewController animated:YES completion:nil];
 }
 
 - (void)showSettings
@@ -1003,8 +1019,11 @@ void writeJPEGDataToCameraRoll(NSData* data, NSDictionary* metadata)
 		if (error) {
 			displayErrorOnMainQueue(error, @"Save to camera roll failed");
 		}
-        
-        
+        else
+        {
+            [[NSUserDefaults standardUserDefaults] setObject:[assetURL absoluteString] forKey:@"last_photo"];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+        }
 	}];
 }
 
