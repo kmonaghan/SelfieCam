@@ -11,6 +11,7 @@
 
 @interface CBPSettingsViewController ()
 @property (strong, nonatomic) UIStepper *changeNumberOfFaces;
+@property (strong, nonatomic) UIStepper *photoTimer;
 @property (strong, nonatomic) UISwitch *smileActivation;
 @property (strong, nonatomic) UISwitch *winkActivation;
 @property (strong, nonatomic) UISwitch *showFaceBoxes;
@@ -29,30 +30,42 @@
         // Custom initialization
         self.title = NSLocalizedString(@"Settings", nil);
         
-        self.userDefaults = [NSUserDefaults standardUserDefaults];
-        
-        self.changeNumberOfFaces = [UIStepper new];
-        self.changeNumberOfFaces.minimumValue = 1;
-        self.changeNumberOfFaces.maximumValue = 5;
-        self.changeNumberOfFaces.stepValue = [self.userDefaults doubleForKey:@"faces"];
-        [self.changeNumberOfFaces addTarget:self action:@selector(numberOfFacesChanged) forControlEvents:UIControlEventValueChanged];
-        
-        self.smileActivation = [UISwitch new];
-        self.smileActivation.on = [self.userDefaults boolForKey:@"smile"];
-        
-        self.winkActivation = [UISwitch new];
-        self.winkActivation.on = [self.userDefaults boolForKey:@"wink"];
-        
-        self.showFaceBoxes = [UISwitch new];
-        self.showFaceBoxes.on = [self.userDefaults boolForKey:@"boxes"];
-        
-        self.facebookShare = [UISwitch new];
-        self.facebookShare.on = [self.userDefaults boolForKey:@"facebook"];
-        
-        self.twitterShare = [UISwitch new];
-        self.twitterShare.on = [self.userDefaults boolForKey:@"twitter"];
     }
     return self;
+}
+
+- (void)loadView
+{
+    [super loadView];
+    
+    self.userDefaults = [NSUserDefaults standardUserDefaults];
+    
+    self.changeNumberOfFaces = [UIStepper new];
+    self.changeNumberOfFaces.minimumValue = 1;
+    self.changeNumberOfFaces.maximumValue = 5;
+    self.changeNumberOfFaces.value = [self.userDefaults doubleForKey:@"faces"];
+    [self.changeNumberOfFaces addTarget:self action:@selector(numberOfFacesChanged) forControlEvents:UIControlEventValueChanged];
+    
+    self.photoTimer = [UIStepper new];
+    self.photoTimer.minimumValue = 0;
+    self.photoTimer.maximumValue = 5;
+    self.photoTimer.value = [self.userDefaults doubleForKey:@"photo_timer"];
+    [self.photoTimer addTarget:self action:@selector(photoTimerChanged) forControlEvents:UIControlEventValueChanged];
+    
+    self.smileActivation = [UISwitch new];
+    self.smileActivation.on = [self.userDefaults boolForKey:@"smile"];
+    
+    self.winkActivation = [UISwitch new];
+    self.winkActivation.on = [self.userDefaults boolForKey:@"wink"];
+    
+    self.showFaceBoxes = [UISwitch new];
+    self.showFaceBoxes.on = [self.userDefaults boolForKey:@"boxes"];
+    
+    self.facebookShare = [UISwitch new];
+    self.facebookShare.on = [self.userDefaults boolForKey:@"facebook"];
+    
+    self.twitterShare = [UISwitch new];
+    self.twitterShare.on = [self.userDefaults boolForKey:@"twitter"];
 }
 
 - (void)viewDidLoad
@@ -67,6 +80,7 @@
 - (void)done
 {
     [self.userDefaults setDouble:self.changeNumberOfFaces.value forKey:@"faces"];
+    [self.userDefaults setDouble:self.photoTimer.value forKey:@"photo_timer"];
     [self.userDefaults setBool:self.smileActivation.on forKey:@"smile"];
     [self.userDefaults setBool:self.winkActivation.on forKey:@"wink"];
     [self.userDefaults setBool:self.showFaceBoxes.on forKey:@"boxes"];
@@ -87,6 +101,12 @@
     [self presentViewController:nav animated:YES completion:nil];
 }
 
+#pragma mark -
+- (void)photoTimerChanged
+{
+    [self.tableView reloadData];
+}
+
 - (void)numberOfFacesChanged
 {
     [self.tableView reloadData];
@@ -96,7 +116,7 @@
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-    return 3;
+    return 2;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -105,12 +125,9 @@
     
     switch (section) {
         case 0:
-            rows = 4;
+            rows = 5;
             break;
         case 1:
-            rows = 2;
-            break;
-        case 2:
             rows = 1;
             break;
     }
@@ -125,6 +142,8 @@
     if(cell == nil)
     {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
+        cell.textLabel.minimumScaleFactor = 0.75f;
+        cell.textLabel.adjustsFontSizeToFitWidth = YES;
     }
     
     if (indexPath.section == 0)
@@ -139,14 +158,25 @@
                 cell.accessoryView = self.changeNumberOfFaces;
                 break;
             case 1:
+                if (self.photoTimer.value == 1)
+                {
+                    cell.textLabel.text = NSLocalizedString(@"Take photo after 1 second", nil);
+                }
+                else
+                {
+                    cell.textLabel.text = [NSString stringWithFormat:NSLocalizedString(@"Take photo after %.f seconds", nil), self.photoTimer.value];
+                }
+                cell.accessoryView = self.photoTimer;
+                break;
+            case 2:
                 cell.textLabel.text = NSLocalizedString(@"Take photo when you smile", nil);
                 cell.accessoryView = self.smileActivation;
                 break;
-            case 2:
+            case 3:
                 cell.textLabel.text =  NSLocalizedString(@"Take photo when you wink", nil);
                 cell.accessoryView = self.winkActivation;
                 break;
-            case 3:
+            case 4:
                 cell.textLabel.text =  NSLocalizedString(@"Show boxes around faces", nil);
                 cell.accessoryView = self.showFaceBoxes;
                 break;
@@ -154,23 +184,6 @@
                 break;
         }
     } else if (indexPath.section == 1) {
-        cell.accessoryType = UITableViewCellAccessoryNone;
-        cell.accessoryView = nil;
-        cell.selectionStyle = UITableViewCellSelectionStyleNone;
-        
-        switch (indexPath.row) {
-            case 0:
-                cell.textLabel.text = NSLocalizedString(@"Share to Facebook", nil);
-                cell.accessoryView = self.facebookShare;
-                break;
-            case 1:
-                cell.textLabel.text =  NSLocalizedString(@"Share on Twitter", nil);
-                cell.accessoryView = self.twitterShare;
-                break;
-            default:
-                break;
-        }
-    } else if (indexPath.section == 2) {
         cell.selectionStyle = UITableViewCellSelectionStyleGray;
         cell.accessoryType = UITableViewCellAccessoryNone;
         
@@ -191,7 +204,7 @@
 #pragma mark - UITableViewDelegate
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if ((indexPath.section == 2) && (indexPath.row == 0))
+    if ((indexPath.section == 1) && (indexPath.row == 0))
     {
         [self about];
     }
