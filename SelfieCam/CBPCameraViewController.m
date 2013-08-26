@@ -39,11 +39,8 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 
 @property (strong, nonatomic) UISwitch *autoPhoto;
 
-@property (strong, nonatomic) UIButton *takePhotoButton;
 @property (strong, nonatomic) UIButton *settingsButton;
 @property (strong, nonatomic) UIButton *switchCamerasButton;
-@property (strong, nonatomic) UIButton *sharePhotoOnTwitter;
-@property (strong, nonatomic) UIButton *sharePhotoOnFacebook;
 @property (strong, nonatomic) UIButton *share;
 
 @property (assign, nonatomic) CGFloat topOffset;
@@ -714,7 +711,6 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
         [self.view bringSubviewToFront:self.countdownLabel];
         
         self.count = [self.userDefaults doubleForKey:@"photo_timer"];
-        self.takePhotoButton.enabled = NO;
         
         [self showCountDown];
     }
@@ -835,7 +831,6 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     self.cancelPicture = NO;
     self.isTakingPhoto = NO;
     self.detectedFeature = NO;
-    self.takePhotoButton.enabled = YES;
     self.faceFrameCount = 0;
     
     [self.autoPhoto setOn:NO animated:YES];
@@ -857,10 +852,14 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     [assetslibrary assetForURL:[NSURL URLWithString:mediaurl]
                    resultBlock:^(ALAsset *myasset)
      {
-         self.thumbView.image = [UIImage generatePhotoThumbnail:[UIImage imageWithCGImage:[myasset thumbnail]]
+         ALAssetRepresentation *representation = [myasset defaultRepresentation];
+         
+         self.thumbView.image = [UIImage generatePhotoThumbnail:[UIImage imageWithCGImage:[myasset thumbnail]
+                                                                                    scale:representation.scale
+                                                                              orientation:representation.orientation]
                                                           ratio:self.thumbView.frame.size.width];
          
-         ALAssetRepresentation *representation = [myasset defaultRepresentation];
+         
          self.lastSelfie = [UIImage imageWithCGImage:[representation fullScreenImage]];
      }
                   failureBlock:^(NSError *error)
