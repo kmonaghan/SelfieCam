@@ -18,15 +18,6 @@
 
 @implementation CBPAboutViewController
 
-- (id)initWithStyle:(UITableViewStyle)style
-{
-    self = [super initWithStyle:style];
-    if (self) {
-        // Custom initialization
-    }
-    return self;
-}
-
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -60,7 +51,6 @@
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-    // Return the number of sections.
     return 3;
 }
 
@@ -85,7 +75,7 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    static NSString *CellIdentifier = @"Cell";
+    static NSString *CellIdentifier = @"AboutCell";
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:CellIdentifier];
@@ -148,11 +138,7 @@
                 case 0:
                 {
                     cell.textLabel.text = @"Version";
-                    NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
-                    
-                    NSString *majorVersion = [infoDictionary objectForKey:@"CFBundleShortVersionString"];
-                    NSString *minorVersion = [infoDictionary objectForKey:@"CFBundleVersion"];
-                    cell.detailTextLabel.text = [NSString stringWithFormat:@"%@ (%@)", majorVersion, minorVersion];
+                    cell.detailTextLabel.text = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
                 }
                     break;
                 default:
