@@ -39,11 +39,8 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 
 @property (strong, nonatomic) UISwitch *autoPhoto;
 
-@property (strong, nonatomic) UIButton *takePhotoButton;
 @property (strong, nonatomic) UIButton *settingsButton;
 @property (strong, nonatomic) UIButton *switchCamerasButton;
-@property (strong, nonatomic) UIButton *sharePhotoOnTwitter;
-@property (strong, nonatomic) UIButton *sharePhotoOnFacebook;
 @property (strong, nonatomic) UIButton *share;
 
 @property (assign, nonatomic) CGFloat topOffset;
@@ -228,39 +225,6 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     self.thumbView.image = [UIImage imageNamed:@"default_thumb.png"];
     
     [self.controlView addSubview:self.thumbView];
-    /*
-     self.sharePhotoOnTwitter = [UIButton buttonWithType:UIButtonTypeCustom];
-     [self.sharePhotoOnTwitter setImage:[UIImage imageNamed:@"twitter.png"] forState:UIControlStateNormal];
-     [self.sharePhotoOnTwitter addTarget:self action:@selector(shareOnTwitter) forControlEvents:UIControlEventTouchUpInside];
-     self.sharePhotoOnTwitter.frame = CGRectMake(0, 0, 40.0f, 40.0f);
-     self.sharePhotoOnTwitter.translatesAutoresizingMaskIntoConstraints = NO;
-     
-     [self.controlView addSubview:self.sharePhotoOnTwitter];
-     
-     self.sharePhotoOnFacebook = [UIButton buttonWithType:UIButtonTypeCustom];
-     [self.sharePhotoOnFacebook setImage:[UIImage imageNamed:@"facebook.png"] forState:UIControlStateNormal];
-     [self.sharePhotoOnFacebook addTarget:self action:@selector(shareOnFacebook) forControlEvents:UIControlEventTouchUpInside];
-     self.sharePhotoOnFacebook.frame = CGRectMake(0, 0, 40.0f, 40.0f);
-     
-     self.sharePhotoOnFacebook.translatesAutoresizingMaskIntoConstraints = NO;
-     
-     [self.controlView addSubview:self.sharePhotoOnFacebook];
-     
-     [self.controlView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_sharePhotoOnTwitter][_sharePhotoOnFacebook]"
-     options:0
-     metrics:nil
-     views:NSDictionaryOfVariableBindings(_sharePhotoOnTwitter, _sharePhotoOnFacebook)]];
-     
-     [self.controlView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"[_thumbView]-[_sharePhotoOnTwitter]"
-     options:0
-     metrics:nil
-     views:NSDictionaryOfVariableBindings(_thumbView, _sharePhotoOnTwitter)]];
-     
-     [self.controlView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"[_thumbView]-[_sharePhotoOnFacebook]"
-     options:0
-     metrics:nil
-     views:NSDictionaryOfVariableBindings(_thumbView, _sharePhotoOnFacebook)]];
-     */
     
     self.share = [UIButton buttonWithType:UIButtonTypeCustom];
     [self.share setImage:[UIImage imageNamed:@"211-action-grey.png"] forState:UIControlStateNormal];
@@ -287,17 +251,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     self.autoPhoto.translatesAutoresizingMaskIntoConstraints = NO;
     
     [self.controlView addSubview:self.autoPhoto];
-    /*
-     takePhotoButton = [UIButton buttonWithType:UIButtonTypeCustom];
-     takePhotoButton.translatesAutoresizingMaskIntoConstraints = NO;
-     [takePhotoButton setTitle:NSLocalizedString(@"Photo", nil) forState:UIControlStateNormal];
-     [takePhotoButton addTarget:self
-     action:@selector(startCountdown)
-     forControlEvents:UIControlEventTouchUpInside];
-     [takePhotoButton sizeToFit];
-     
-     [self.controlView addSubview:takePhotoButton];
-     */
+
     self.settingsButton = [UIButton buttonWithType:UIButtonTypeCustom];
     self.settingsButton.translatesAutoresizingMaskIntoConstraints = NO;
     [self.settingsButton addTarget:self action:@selector(showSettings) forControlEvents:UIControlEventTouchUpInside];
@@ -759,7 +713,6 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
         [self.view bringSubviewToFront:self.countdownLabel];
         
         self.count = 3;
-        self.takePhotoButton.enabled = NO;
         
         [self showCountDown];
     }
@@ -880,7 +833,6 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     self.cancelPicture = NO;
     self.isTakingPhoto = NO;
     self.detectedFeature = NO;
-    self.takePhotoButton.enabled = YES;
     self.faceFrameCount = 0;
     
     [self.autoPhoto setOn:NO animated:YES];
@@ -902,10 +854,14 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     [assetslibrary assetForURL:[NSURL URLWithString:mediaurl]
                    resultBlock:^(ALAsset *myasset)
      {
-         self.thumbView.image = [UIImage generatePhotoThumbnail:[UIImage imageWithCGImage:[myasset thumbnail]]
+         ALAssetRepresentation *representation = [myasset defaultRepresentation];
+         
+         self.thumbView.image = [UIImage generatePhotoThumbnail:[UIImage imageWithCGImage:[myasset thumbnail]
+                                                                                    scale:representation.scale
+                                                                              orientation:representation.orientation]
                                                           ratio:self.thumbView.frame.size.width];
          
-         ALAssetRepresentation *representation = [myasset defaultRepresentation];
+         
          self.lastSelfie = [UIImage imageWithCGImage:[representation fullScreenImage]];
      }
                   failureBlock:^(NSError *myerror)
