@@ -6,7 +6,7 @@
 //  Copyright (c) 2013 Karl Monaghan. All rights reserved.
 //
 
-#import "UIImage+Thumbnail.h"
+#import "NYXImagesKit.h"
 
 #import <CoreImage/CoreImage.h>
 #import <ImageIO/ImageIO.h>
@@ -251,7 +251,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     self.autoPhoto.translatesAutoresizingMaskIntoConstraints = NO;
     
     [self.controlView addSubview:self.autoPhoto];
-
+    
     self.settingsButton = [UIButton buttonWithType:UIButtonTypeCustom];
     self.settingsButton.translatesAutoresizingMaskIntoConstraints = NO;
     [self.settingsButton addTarget:self action:@selector(showSettings) forControlEvents:UIControlEventTouchUpInside];
@@ -575,13 +575,13 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
             {
                 self.detectedFeature = YES;
                 
-                [self updateCountdownLabel:NSLocalizedString(@"Smile!", nil) forDuration:1.0f onCompletion:^(){[self startCountdown];}];
+                [self updateCountdownLabel:NSLocalizedString(@"Smile!", nil) forDuration:0.5f onCompletion:^(){[self startCountdown];}];
             }
             if ((ff.rightEyeClosed || ff.leftEyeClosed) && [self.userDefaults boolForKey:@"wink"])
             {
                 self.detectedFeature = YES;
                 
-                [self updateCountdownLabel:NSLocalizedString(@"Wink!", nil) forDuration:1.0f onCompletion:^(){[self startCountdown];}];
+                [self updateCountdownLabel:NSLocalizedString(@"Wink!", nil) forDuration:0.5f onCompletion:^(){[self startCountdown];}];
             }
         }
         
@@ -675,19 +675,6 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 	CMFormatDescriptionRef fdesc = CMSampleBufferGetFormatDescription(sampleBuffer);
 	CGRect clap = CMVideoFormatDescriptionGetCleanAperture(fdesc, false /*originIsTopLeft*/);
 	
-    /*
-     if (([features count] == [self.userDefaults doubleForKey:@"faces"]) && self.autoPhoto.on) {
-     self.faceFrameCount++;
-     
-     if (self.faceFrameCount > TOTALFACE_FRAMES) {
-     [self startCountdown];
-     
-     self.faceFrameCount = 0;
-     }
-     } else {
-     self.faceFrameCount = 0;
-     }
-     */
     
 	dispatch_async(dispatch_get_main_queue(), ^(void) {
 		[self drawFaceBoxesForFeatures:features forVideoBox:clap];
@@ -783,11 +770,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
                                                                
                                                                self.lastSelfie = [UIImage imageWithData:jpegData];
                                                                
-                                                               dispatch_async(dispatch_get_main_queue(), ^(void) {
-                                                                   self.share.hidden = NO;
-                                                                   self.thumbView.image = [UIImage generatePhotoThumbnail:self.lastSelfie
-                                                                                                                    ratio:self.thumbView.frame.size.width];
-                                                               });
+                                                               [self displayLastSelfieThumb]
                                                            }
                                                            
                                                            dispatch_async(dispatch_get_main_queue(), ^(void) {
@@ -837,7 +820,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 }
 
 #pragma mark -
--(void)lastPhoto
+- (void)lastPhoto
 {
     NSString *mediaurl = [self.userDefaults objectForKey:@"last_photo"];
     
@@ -854,13 +837,10 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
      {
          ALAssetRepresentation *representation = [myasset defaultRepresentation];
          
-         self.thumbView.image = [UIImage generatePhotoThumbnail:[UIImage imageWithCGImage:[myasset thumbnail]
-                                                                                    scale:representation.scale
-                                                                              orientation:representation.orientation]
-                                                          ratio:self.thumbView.frame.size.width];
-         
          
          self.lastSelfie = [UIImage imageWithCGImage:[representation fullScreenImage]];
+         
+         [self displayLastSelfieThumb];
      }
                   failureBlock:^(NSError *error)
      {
@@ -869,6 +849,37 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     
 }
 
+- (void)displayLastSelfieThumb
+{
+    dispatch_async(dispatch_get_main_queue(), ^(void) {
+        self.share.hidden = NO;
+        
+        UIImage *thumbImage = [self.lastSelfie scaleToCoverSize:CGSizeMake(50.0f, 50.0f)];
+        
+        switch (self.lastSelfie.imageOrientation) {
+                
+            case UIImageOrientationDown:
+                break;
+            case UIImageOrientationLeft:
+                break;
+            case UIImageOrientationRight:
+                break;
+            case UIImageOrientationLeftMirrored:
+                [thumbImage rotateImagePixelsInRadians:M_PI_2];
+                break;
+            case UIImageOrientationRightMirrored:
+                break;
+            case UIImageOrientationUp:
+            case UIImageOrientationUpMirrored:
+            case UIImageOrientationDownMirrored:
+            default:
+                [thumbImage rotateImagePixelsInRadians:-M_PI_2];
+                break;
+        }
+        
+        self.thumbView.image = thumbImage;
+    });
+}
 - (void)shareImage
 {
     NSString *defaultText = NSLocalizedString(([self.userDefaults doubleForKey:@"faces"] == 1) ? @"Look at my beautiful smile! #selfiecam" : @"Look at our beautiful smiles! #selfiecam", nil) ;
