@@ -64,6 +64,8 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 @property (strong, nonatomic) NSUserDefaults *userDefaults;
 
 @property (strong, nonatomic) UIImage *lastSelfie;
+@property (strong, nonatomic) ASMediaFocusManager *mediaFocusManager;
+
 @end
 
 @implementation CBPCameraViewController
@@ -93,6 +95,10 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 	self.faceDetector = [CIDetector detectorOfType:CIDetectorTypeFace context:nil options:detectorOptions];
     
     [self lastPhoto];
+    
+    self.mediaFocusManager = [[ASMediaFocusManager alloc] init];
+    self.mediaFocusManager.delegate = self;
+    [self.mediaFocusManager installOnView:self.thumbView];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -863,19 +869,34 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
         switch (self.lastSelfie.imageOrientation) {
                 
             case UIImageOrientationDown:
+                DLog(@"UIImageOrientationDown");
                 break;
             case UIImageOrientationLeft:
+                DLog(@"UIImageOrientationLeft");
                 break;
             case UIImageOrientationRight:
+                DLog(@"UIImageOrientationRight");
                 break;
             case UIImageOrientationLeftMirrored:
+                DLog(@"UIImageOrientationLeftMirrored");
                 [thumbImage rotateImagePixelsInRadians:M_PI_2];
                 break;
             case UIImageOrientationRightMirrored:
+                DLog(@"UIImageOrientationRightMirrored");
                 break;
             case UIImageOrientationUp:
+                DLog(@"UIImageOrientationUp");
+                [thumbImage rotateImagePixelsInRadians:-M_PI_2];
+                break;
+                break;
             case UIImageOrientationUpMirrored:
+                DLog(@"UIImageOrientationUpMirrored");
+                [thumbImage rotateImagePixelsInRadians:-M_PI_2];
+                break;
             case UIImageOrientationDownMirrored:
+                DLog(@"UIImageOrientationDownMirrored");
+               // [thumbImage rotateImagePixelsInRadians:M_PI_2];
+                break;
             default:
                 [thumbImage rotateImagePixelsInRadians:-M_PI_2];
                 break;
@@ -920,6 +941,41 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
         
         [self.userDefaults synchronize];
     }
+}
+
+#pragma mark - ASMediasFocusDelegate
+- (UIImage *)mediaFocusManager:(ASMediaFocusManager *)mediaFocusManager imageForView:(UIView *)view
+{
+    return ((UIImageView *)view).image;
+}
+
+// Returns the final focused frame for this media view. This frame is usually a full screen frame.
+- (CGRect)mediaFocusManager:(ASMediaFocusManager *)mediaFocusManager finalFrameforView:(UIView *)view
+{
+    return self.view.bounds;
+}
+
+// Returns the view controller in which the focus controller is going to be added.
+// This can be any view controller, full screen or not.
+- (UIViewController *)parentViewControllerForMediaFocusManager:(ASMediaFocusManager *)mediaFocusManager
+{
+    return self;
+}
+
+- (NSURL *)mediaFocusManager:(ASMediaFocusManager *)mediaFocusManager mediaURLForView:(UIView *)view;
+{
+    return nil;
+}
+
+- (UIImage *)mediaFocusManager:(ASMediaFocusManager *)mediaFocusManager fullImageForView:(UIView *)view;
+{
+    return self.lastSelfie;
+}
+
+// Returns the title for this media view. Return nil if you don't want any title to appear.
+- (NSString *)mediaFocusManager:(ASMediaFocusManager *)mediaFocusManager titleForView:(UIView *)view
+{
+    return nil;
 }
 
 @end

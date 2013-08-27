@@ -9,6 +9,8 @@
 #import <UIKit/UIKit.h>
 #import <AVFoundation/AVFoundation.h>
 
-@interface CBPCameraViewController : UIViewController <AVCaptureVideoDataOutputSampleBufferDelegate>
+#import "ASMediaFocusManager.h"
+
+@interface CBPCameraViewController : UIViewController <AVCaptureVideoDataOutputSampleBufferDelegate, ASMediasFocusDelegate>
 
 @end
