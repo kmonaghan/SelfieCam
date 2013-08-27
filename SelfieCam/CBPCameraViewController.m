@@ -33,6 +33,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 @property (strong, nonatomic) UIView *cameraView;
 @property (strong, nonatomic) UIView *flashView;
 @property (strong, nonatomic) UIView *controlView;
+@property (strong, nonatomic) UIView *controlBackgroundView;
 @property (strong, nonatomic) UIImageView *thumbView;
 
 @property (strong, nonatomic) UILabel *countdownLabel;
@@ -149,19 +150,6 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     
     [view addSubview:self.switchCamerasButton];
     
-    NSMutableArray *portraitButton = @[].mutableCopy;
-    [portraitButton addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"[_switchCamerasButton]-|"
-                                                                                options:0
-                                                                                metrics:nil
-                                                                                  views:NSDictionaryOfVariableBindings(_switchCamerasButton)]];
-    
-    [portraitButton addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(5)-[_switchCamerasButton]"
-                                                                                options:0
-                                                                                metrics:nil
-                                                                                  views:NSDictionaryOfVariableBindings(_switchCamerasButton)]];
-    
-    [view addConstraints:portraitButton];
-    
     self.countdownLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     self.countdownLabel.font = [UIFont boldSystemFontOfSize:200.0f];
     self.countdownLabel.textColor = [UIColor whiteColor];
@@ -204,21 +192,12 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     self.controlView = [[UIView alloc] initWithFrame:CGRectZero];
     self.controlView.translatesAutoresizingMaskIntoConstraints = NO;
     
-    UIView *controlBackgroundView = [[UIView alloc] initWithFrame:CGRectZero];
-    controlBackgroundView.backgroundColor = [UIColor whiteColor];
-    controlBackgroundView.alpha = 0.5f;
-    controlBackgroundView.translatesAutoresizingMaskIntoConstraints = NO;
+    self.controlBackgroundView = [[UIView alloc] initWithFrame:CGRectZero];
+    self.controlBackgroundView.backgroundColor = [UIColor whiteColor];
+    self.controlBackgroundView.alpha = 0.5f;
+    self.controlBackgroundView.translatesAutoresizingMaskIntoConstraints = NO;
     
-    [self.controlView addSubview:controlBackgroundView];
-    
-    [self.controlView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"|[controlBackgroundView]|"
-                                                                             options:0
-                                                                             metrics:nil
-                                                                               views:NSDictionaryOfVariableBindings(controlBackgroundView)]];
-    [self.controlView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[controlBackgroundView]|"
-                                                                             options:0
-                                                                             metrics:nil
-                                                                               views:NSDictionaryOfVariableBindings(controlBackgroundView)]];
+    [self.controlView addSubview:self.controlBackgroundView];
     
     self.thumbView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 50.0f, 50.f)];
     self.thumbView.translatesAutoresizingMaskIntoConstraints = NO;
@@ -234,19 +213,6 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     self.share.hidden = YES;
     [self.controlView addSubview:self.share];
     
-    [self.controlView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"[_thumbView]-[_share]"
-                                                                             options:0
-                                                                             metrics:nil
-                                                                               views:NSDictionaryOfVariableBindings(_thumbView, _share)]];
-    
-    [self.controlView addConstraint:[NSLayoutConstraint constraintWithItem:self.share
-                                                                 attribute:NSLayoutAttributeCenterY
-                                                                 relatedBy:NSLayoutRelationEqual
-                                                                    toItem:self.controlView
-                                                                 attribute:NSLayoutAttributeCenterY
-                                                                multiplier:1.0f
-                                                                  constant:0.0f]];
-    
     self.autoPhoto = [[UISwitch alloc] init];
     self.autoPhoto.translatesAutoresizingMaskIntoConstraints = NO;
     
@@ -260,6 +226,51 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     
     [self.controlView addSubview:self.settingsButton];
     
+    
+    [view addSubview:self.controlView];
+    
+    
+    self.view = view;
+}
+
+- (void)updateViewConstraints
+{
+    [super updateViewConstraints];
+    
+    NSMutableArray *portraitButton = @[].mutableCopy;
+    [portraitButton addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"[_switchCamerasButton]-|"
+                                                                                options:0
+                                                                                metrics:nil
+                                                                                  views:NSDictionaryOfVariableBindings(_switchCamerasButton)]];
+    
+    [portraitButton addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(5)-[_switchCamerasButton]"
+                                                                                options:0
+                                                                                metrics:nil
+                                                                                  views:NSDictionaryOfVariableBindings(_switchCamerasButton)]];
+    
+    [self.view addConstraints:portraitButton];
+    
+    [self.controlView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"|[_controlBackgroundView]|"
+                                                                             options:0
+                                                                             metrics:nil
+                                                                               views:NSDictionaryOfVariableBindings(_controlBackgroundView)]];
+    [self.controlView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_controlBackgroundView]|"
+                                                                             options:0
+                                                                             metrics:nil
+                                                                               views:NSDictionaryOfVariableBindings(_controlBackgroundView)]];
+    
+    [self.controlView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"[_thumbView]-[_share]"
+                                                                             options:0
+                                                                             metrics:nil
+                                                                               views:NSDictionaryOfVariableBindings(_thumbView, _share)]];
+    
+    [self.controlView addConstraint:[NSLayoutConstraint constraintWithItem:self.share
+                                                                 attribute:NSLayoutAttributeCenterY
+                                                                 relatedBy:NSLayoutRelationEqual
+                                                                    toItem:self.controlView
+                                                                 attribute:NSLayoutAttributeCenterY
+                                                                multiplier:1.0f
+                                                                  constant:0.0f]];
     
     NSMutableArray *verticalbuttonConstraints = @[].mutableCopy;
     
@@ -306,12 +317,6 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     
     [self.controlView addConstraints:verticalbuttonConstraints];
     
-    
-    [view addSubview:self.controlView];
-    
-    
-    self.view = view;
-    
     NSMutableArray *portrait = [NSLayoutConstraint constraintsWithVisualFormat:@"|[_controlView]|"
                                                                        options:0
                                                                        metrics:nil
@@ -322,8 +327,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
                                                                           metrics:nil
                                                                             views:NSDictionaryOfVariableBindings(_controlView)]];
     
-    [view addConstraints:portrait];
-    
+    [self.view addConstraints:portrait];
     
 }
 
@@ -770,7 +774,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
                                                                
                                                                self.lastSelfie = [UIImage imageWithData:jpegData];
                                                                
-                                                               [self displayLastSelfieThumb]
+                                                               [self displayLastSelfieThumb];
                                                            }
                                                            
                                                            dispatch_async(dispatch_get_main_queue(), ^(void) {
