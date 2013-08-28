@@ -220,6 +220,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     [self.controlView addSubview:self.share];
     
     self.autoPhoto = [[UISwitch alloc] init];
+    [self.autoPhoto addTarget:self action:@selector(updateCoreImageDetection) forControlEvents:UIControlEventValueChanged];
     self.autoPhoto.translatesAutoresizingMaskIntoConstraints = NO;
     
     [self.controlView addSubview:self.autoPhoto];
@@ -350,10 +351,9 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     
     switch (orientation) {
         case UIDeviceOrientationPortrait:
-            rotation = 0;
-            break;
+            //break;
         case UIDeviceOrientationPortraitUpsideDown:
-            rotation = M_PI;
+            rotation = 0;
             break;
         case UIDeviceOrientationLandscapeLeft:
             rotation = M_PI_2;
@@ -436,7 +436,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 	
 	[self.session addOutput:self.videoDataOutput];
 	
-	[self updateCoreImageDetection:nil];
+	[self updateCoreImageDetection];
 	
 	// this will allow us to sync freezing the preview when the image is being captured
 	[self.stillImageOutput addObserver:self
@@ -466,21 +466,19 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 	self.session = nil;
 }
 
-- (IBAction) updateCoreImageDetection:(UISwitch *)sender {
+- (void) updateCoreImageDetection {
 	if ( !self.videoDataOutput )
 		return;
-	
-    BOOL detectFaces = YES;
     
 	// enable/disable the AVCaptureVideoDataOutput to control the flow of AVCaptureVideoDataOutputSampleBufferDelegate calls
-	[[self.videoDataOutput connectionWithMediaType:AVMediaTypeVideo] setEnabled:detectFaces];
+	[[self.videoDataOutput connectionWithMediaType:AVMediaTypeVideo] setEnabled:self.autoPhoto.on];
 	
 	// update graphics associated with previously detected faces
 	[CATransaction begin];
 	[CATransaction setValue:(id)kCFBooleanTrue forKey:kCATransactionDisableActions];
 	[CATransaction commit];
 	
-	if ( ! detectFaces ) {
+	if ( ! self.autoPhoto.on ) {
 		// dispatch to the end of queue in case a delegate call was already pending before we stopped the output
 		dispatch_async(dispatch_get_main_queue(), ^(void) { [self resizeCoreImageFaceLayerCache:0]; });
 	}
@@ -511,7 +509,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 	} else {
 		// succeeded, set input and update connection states
 		[self.session addInput:input];
-		[self updateCoreImageDetection:nil];
+		[self updateCoreImageDetection];
 	}
 	[self.session commitConfiguration];
 }
@@ -690,7 +688,6 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 		[self drawFaceBoxesForFeatures:features forVideoBox:clap];
 	});
 }
-
 
 #pragma mark - Camera actions
 - (void)startCountdown
