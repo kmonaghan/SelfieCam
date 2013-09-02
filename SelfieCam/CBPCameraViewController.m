@@ -964,7 +964,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     return nil;
 }
 
-- (UIImage *)mediaFocusManager:(ASMediaFocusManager *)mediaFocusManager fullImageForView:(UIView *)view;
+- (UIImage *)mediaFocusManager:(ASMediaFocusManager *)mediaFocusManager fullImageForView:(UIView *)view
 {
     return self.lastSelfie;
 }
