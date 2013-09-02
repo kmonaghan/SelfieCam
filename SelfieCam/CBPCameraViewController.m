@@ -466,7 +466,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 	self.session = nil;
 }
 
-- (void) updateCoreImageDetection {
+- (void)updateCoreImageDetection {
 	if ( !self.videoDataOutput )
 		return;
     
@@ -484,7 +484,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 	}
 }
 
-- (void) updateCameraSelection
+- (void)updateCameraSelection
 {
 	// Changing the camera device will reset connection state, so we call the
 	// update*Detection functions to resync them.  When making multiple
@@ -558,7 +558,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 
 // called asynchronously as the capture output is capturing sample buffers, this method asks the face detector (if on)
 // to detect features and for each draw the red square in a layer and set appropriate orientation
-- (void)drawFaceBoxesForFeatures:(NSArray *)features forVideoBox:(CGRect)clap
+- (void)detectFaceFeatures:(NSArray *)features forVideoBox:(CGRect)clap
 {
     [self resizeCoreImageFaceLayerCache:[features count]];
     
@@ -579,13 +579,13 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 	for ( CIFaceFeature *ff in features ) {
         if ((&CIDetectorEyeBlink != NULL) && !self.detectedFeature && self.autoPhoto.on)
         {
-            if (ff.hasSmile && [self.userDefaults boolForKey:@"smile"])
+            if (ff.hasSmile && [self.userDefaults boolForKey:@"smile"] && ([features count] >= [self.userDefaults doubleForKey:@"faces"]))
             {
                 self.detectedFeature = YES;
                 
                 [self updateCountdownLabel:NSLocalizedString(@"Smile!", nil) forDuration:0.5f onCompletion:^(){[self startCountdown];}];
             }
-            if ((ff.rightEyeClosed || ff.leftEyeClosed) && [self.userDefaults boolForKey:@"wink"])
+            if ((ff.rightEyeClosed || ff.leftEyeClosed) && [self.userDefaults boolForKey:@"wink"] && ([features count] >= [self.userDefaults doubleForKey:@"faces"]))
             {
                 self.detectedFeature = YES;
                 
@@ -683,10 +683,9 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 	CMFormatDescriptionRef fdesc = CMSampleBufferGetFormatDescription(sampleBuffer);
 	CGRect clap = CMVideoFormatDescriptionGetCleanAperture(fdesc, false /*originIsTopLeft*/);
 	
-    
-	dispatch_async(dispatch_get_main_queue(), ^(void) {
-		[self drawFaceBoxesForFeatures:features forVideoBox:clap];
-	});
+    dispatch_async(dispatch_get_main_queue(), ^(void) {
+        [self detectFaceFeatures:features forVideoBox:clap];
+    });
 }
 
 #pragma mark - Camera actions
@@ -723,7 +722,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
         [self updateCountdownLabel:[NSString stringWithFormat:@"%.f", self.count] forDuration:1.0f onCompletion:^(){[self showCountDown];}];
         self.count--;
     } else {
-        [self takePhoto];
+        [self updateCountdownLabel:NSLocalizedString(@"Photo!", nil) forDuration:0.3f onCompletion:^(){[self takePhoto];}];
     }
 }
 
