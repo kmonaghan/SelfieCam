@@ -1,3 +1,6 @@
 [submodule "SelfieCam/Vendor/NYXImagesKit"]
 	path = SelfieCam/Vendor/NYXImagesKit
 	url = https://github.com/Nyx0uf/NYXImagesKit
+[submodule "SelfieCam/Vendor/ASMediaFocusManager"]
+	path = SelfieCam/Vendor/ASMediaFocusManager
+	url = https://github.com/kmonaghan/ASMediaFocusManager.git

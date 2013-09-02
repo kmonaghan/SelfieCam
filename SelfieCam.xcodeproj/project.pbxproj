@@ -9,6 +9,10 @@
 /* Begin PBXBuildFile section */
 		3428EF4617C56762008D7093 /* default_thumb.png in Resources */ = {isa = PBXBuildFile; fileRef = 3428EF4017C56762008D7093 /* default_thumb.png */; };
 		3428EF4717C56762008D7093 /* default_thumb@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 3428EF4117C56762008D7093 /* default_thumb@2x.png */; };
+		343516E117D5133300E6A597 /* ASImageScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 343516DB17D5133300E6A597 /* ASImageScrollView.m */; };
+		343516E217D5133300E6A597 /* ASMediaFocusController.m in Sources */ = {isa = PBXBuildFile; fileRef = 343516DD17D5133300E6A597 /* ASMediaFocusController.m */; };
+		343516E317D5133300E6A597 /* ASMediaFocusController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 343516DE17D5133300E6A597 /* ASMediaFocusController.xib */; };
+		343516E417D5133300E6A597 /* ASMediaFocusManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 343516E017D5133300E6A597 /* ASMediaFocusManager.m */; };
 		3463DB8D17BFF1A900FC7F26 /* Reveal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3463DB8C17BFF1A900FC7F26 /* Reveal.framework */; };
 		349FD30617AE96800030703E /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 349FD30517AE96800030703E /* CFNetwork.framework */; };
 		34A4CDFC17C164E600C5ECA1 /* CBPAboutViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 34A4CDFA17C15EDD00C5ECA1 /* CBPAboutViewController.m */; };
@@ -71,6 +75,13 @@
 /* Begin PBXFileReference section */
 		3428EF4017C56762008D7093 /* default_thumb.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = default_thumb.png; sourceTree = "<group>"; };
 		3428EF4117C56762008D7093 /* default_thumb@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "default_thumb@2x.png"; sourceTree = "<group>"; };
+		343516DA17D5133300E6A597 /* ASImageScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASImageScrollView.h; sourceTree = "<group>"; };
+		343516DB17D5133300E6A597 /* ASImageScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASImageScrollView.m; sourceTree = "<group>"; };
+		343516DC17D5133300E6A597 /* ASMediaFocusController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASMediaFocusController.h; sourceTree = "<group>"; };
+		343516DD17D5133300E6A597 /* ASMediaFocusController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASMediaFocusController.m; sourceTree = "<group>"; };
+		343516DE17D5133300E6A597 /* ASMediaFocusController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ASMediaFocusController.xib; sourceTree = "<group>"; };
+		343516DF17D5133300E6A597 /* ASMediaFocusManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASMediaFocusManager.h; sourceTree = "<group>"; };
+		343516E017D5133300E6A597 /* ASMediaFocusManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASMediaFocusManager.m; sourceTree = "<group>"; };
 		3463DB8C17BFF1A900FC7F26 /* Reveal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Reveal.framework; path = "../../../../Applications/Reveal.app/Contents/SharedSupport/iOS-Libraries/Reveal.framework"; sourceTree = "<group>"; };
 		349FD30517AE96800030703E /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		34A4CDFA17C15EDD00C5ECA1 /* CBPAboutViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CBPAboutViewController.m; sourceTree = "<group>"; };
@@ -191,9 +202,25 @@
 			path = images;
 			sourceTree = "<group>";
 		};
+		343516D917D5133300E6A597 /* ASMediaFocusManager */ = {
+			isa = PBXGroup;
+			children = (
+				343516DA17D5133300E6A597 /* ASImageScrollView.h */,
+				343516DB17D5133300E6A597 /* ASImageScrollView.m */,
+				343516DC17D5133300E6A597 /* ASMediaFocusController.h */,
+				343516DD17D5133300E6A597 /* ASMediaFocusController.m */,
+				343516DE17D5133300E6A597 /* ASMediaFocusController.xib */,
+				343516DF17D5133300E6A597 /* ASMediaFocusManager.h */,
+				343516E017D5133300E6A597 /* ASMediaFocusManager.m */,
+			);
+			name = ASMediaFocusManager;
+			path = Vendor/ASMediaFocusManager/ASMediaFocusManager;
+			sourceTree = "<group>";
+		};
 		F545EF1417CCF06800C41BA5 /* Vendor */ = {
 			isa = PBXGroup;
 			children = (
+				343516D917D5133300E6A597 /* ASMediaFocusManager */,
 				F545EF1517CCF09100C41BA5 /* NYXImagesKit */,
 			);
 			name = Vendor;
@@ -443,6 +470,7 @@
 				3428EF4717C56762008D7093 /* default_thumb@2x.png in Resources */,
 				F579F9C817C7B74E0023CECE /* 211-action-grey.png in Resources */,
 				F5F5258117ABF84600BFF158 /* Default@2x.png in Resources */,
+				343516E317D5133300E6A597 /* ASMediaFocusController.xib in Resources */,
 				F5F5258317ABF84600BFF158 /* Default-568h@2x.png in Resources */,
 				F579F9CB17C7B74E0023CECE /* 212-action2-grey@2x.png in Resources */,
 				F579F9CA17C7B74E0023CECE /* 212-action2-grey.png in Resources */,
@@ -481,7 +509,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				343516E217D5133300E6A597 /* ASMediaFocusController.m in Sources */,
 				F545EF4317CCF09100C41BA5 /* UIView+Screenshot.m in Sources */,
+				343516E117D5133300E6A597 /* ASImageScrollView.m in Sources */,
 				F545EF3F17CCF09100C41BA5 /* UIImage+Resizing.m in Sources */,
 				F545EF4017CCF09100C41BA5 /* UIImage+Rotating.m in Sources */,
 				34A4CDFC17C164E600C5ECA1 /* CBPAboutViewController.m in Sources */,
@@ -498,6 +528,7 @@
 				F545EF3A17CCF09100C41BA5 /* UIImage+Blurring.m in Sources */,
 				F5D5D4FB17C2685800A22A7A /* CBPSettingsViewController.m in Sources */,
 				F545EF3E17CCF09100C41BA5 /* UIImage+Reflection.m in Sources */,
+				343516E417D5133300E6A597 /* ASMediaFocusManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
