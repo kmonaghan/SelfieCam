@@ -569,7 +569,8 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     BOOL isMirrored = self.previewLayer.connection.isVideoMirrored;
     
 	for ( CIFaceFeature *ff in features )
-    {        
+    {
+        DLog(@"ff bounds: %@", NSStringFromCGRect(ff.bounds));
         DLog(@"ff leftEyePosition: %@", NSStringFromCGPoint(ff.leftEyePosition));
         DLog(@"ff rightEyePosition: %@", NSStringFromCGPoint(ff.rightEyePosition));
         DLog(@"ff mouthPosition: %@", NSStringFromCGPoint(ff.mouthPosition));
