@@ -568,8 +568,17 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 	NSInteger currentFeature = 0;
     BOOL isMirrored = self.previewLayer.connection.isVideoMirrored;
     
-	for ( CIFaceFeature *ff in features ) {
-        if ((&CIDetectorEyeBlink != NULL) && !self.detectedFeature && self.autoPhoto.on)
+	for ( CIFaceFeature *ff in features )
+    {        
+        DLog(@"ff leftEyePosition: %@", NSStringFromCGPoint(ff.leftEyePosition));
+        DLog(@"ff rightEyePosition: %@", NSStringFromCGPoint(ff.rightEyePosition));
+        DLog(@"ff mouthPosition: %@", NSStringFromCGPoint(ff.mouthPosition));
+        DLog(@"ff leftEyeClosed: %@", (ff.leftEyeClosed) ? @"Yes" : @"No" );
+        DLog(@"ff rightEyeClosed: %@", (ff.rightEyeClosed) ? @"Yes" : @"No");
+        DLog(@"ff hasSmile: %@", (ff.hasSmile) ? @"Yes" : @"No" );
+        DLog(@"ff tracking ID: %d", ff.trackingID );
+        
+        if (!self.detectedFeature && self.autoPhoto.on)
         {
             if (ff.hasSmile && [self.userDefaults boolForKey:@"smile"] && ([features count] >= [self.userDefaults doubleForKey:@"faces"]))
             {
