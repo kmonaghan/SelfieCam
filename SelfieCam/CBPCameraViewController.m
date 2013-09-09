@@ -74,62 +74,6 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 	[self teardownAVCapture];
 }
 
-- (void)viewDidLoad
-{
-    [super viewDidLoad];
-	// Do any additional setup after loading the view, typically from a nib.
-    self.useFrontCamera = NO;
-    
-    self.isTakingPhoto = NO;
-    
-    self.autoPhoto.on = NO;
-    
-    self.cancelPicture = NO;
-    
-    self.userDefaults = [NSUserDefaults standardUserDefaults];
-    
-    [self loadSettings];
-    
-    [self setupAVCapture];
-	NSDictionary *detectorOptions = @{CIDetectorAccuracy : CIDetectorAccuracyLow, CIDetectorTracking : @YES};
-	self.faceDetector = [CIDetector detectorOfType:CIDetectorTypeFace context:nil options:detectorOptions];
-    
-    [self lastPhoto];
-    
-    self.mediaFocusManager = [[ASMediaFocusManager alloc] init];
-    self.mediaFocusManager.delegate = self;
-    [self.mediaFocusManager installOnView:self.thumbView];
-}
-
-- (void)viewWillAppear:(BOOL)animated
-{
-    [super viewWillAppear:animated];
-    
-    self.cancelPicture = NO;
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(orientationChanged:)
-                                                 name:UIDeviceOrientationDidChangeNotification
-                                               object:nil];
-}
-
-- (void)viewWillDisappear:(BOOL)animated
-{
-    [super viewWillDisappear:animated];
-    
-    self.cancelPicture = YES;
-    
-    [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:UIDeviceOrientationDidChangeNotification
-                                                  object:nil];
-}
-
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
 - (void)loadView
 {
     UIView *view = [[UIView alloc] initWithFrame:[UIScreen mainScreen].bounds];
@@ -338,6 +282,54 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     
 }
 
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+	// Do any additional setup after loading the view, typically from a nib.
+    self.useFrontCamera = NO;
+    
+    self.isTakingPhoto = NO;
+    
+    self.autoPhoto.on = NO;
+    
+    self.cancelPicture = NO;
+    
+    self.userDefaults = [NSUserDefaults standardUserDefaults];
+    
+    [self loadSettings];
+    
+    [self setupAVCapture];
+    
+    [self lastPhoto];
+    
+    self.mediaFocusManager = [ASMediaFocusManager new];
+    self.mediaFocusManager.delegate = self;
+    [self.mediaFocusManager installOnView:self.thumbView];
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    
+    self.cancelPicture = NO;
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(orientationChanged:)
+                                                 name:UIDeviceOrientationDidChangeNotification
+                                               object:nil];
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+    
+    self.cancelPicture = YES;
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:UIDeviceOrientationDidChangeNotification
+                                                  object:nil];
+}
+
 - (BOOL)shouldAutorotate
 {
     return NO;
@@ -416,7 +408,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     
 	self.ciFaceLayers = [NSMutableArray arrayWithCapacity:10];
 	
-	NSDictionary *detectorOptions = @{ CIDetectorAccuracy : CIDetectorAccuracyLow, CIDetectorTracking : @(YES) };
+	NSDictionary *detectorOptions = @{ CIDetectorAccuracy : CIDetectorAccuracyHigh, CIDetectorTracking : @(YES) };
 	self.faceDetector = [CIDetector detectorOfType:CIDetectorTypeFace context:nil options:detectorOptions];
 	
 	self.videoDataOutput = [AVCaptureVideoDataOutput new];
