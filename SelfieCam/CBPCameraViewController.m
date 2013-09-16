@@ -369,6 +369,45 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     return rotation;
 }
 
+- (NSInteger)exifOrientation:(UIDeviceOrientation)curDeviceOrientation
+{
+    enum {
+		PHOTOS_EXIF_0ROW_TOP_0COL_LEFT			= 1, //   1  =  0th row is at the top, and 0th column is on the left (THE DEFAULT).
+		PHOTOS_EXIF_0ROW_TOP_0COL_RIGHT			= 2, //   2  =  0th row is at the top, and 0th column is on the right.
+		PHOTOS_EXIF_0ROW_BOTTOM_0COL_RIGHT      = 3, //   3  =  0th row is at the bottom, and 0th column is on the right.
+		PHOTOS_EXIF_0ROW_BOTTOM_0COL_LEFT       = 4, //   4  =  0th row is at the bottom, and 0th column is on the left.
+		PHOTOS_EXIF_0ROW_LEFT_0COL_TOP          = 5, //   5  =  0th row is on the left, and 0th column is the top.
+		PHOTOS_EXIF_0ROW_RIGHT_0COL_TOP         = 6, //   6  =  0th row is on the right, and 0th column is the top.
+		PHOTOS_EXIF_0ROW_RIGHT_0COL_BOTTOM      = 7, //   7  =  0th row is on the right, and 0th column is the bottom.
+		PHOTOS_EXIF_0ROW_LEFT_0COL_BOTTOM       = 8  //   8  =  0th row is on the left, and 0th column is the bottom.
+	};
+	
+	NSInteger exifOrientation;
+	switch (curDeviceOrientation) {
+		case UIDeviceOrientationPortraitUpsideDown:  // Device oriented vertically, home button on the top
+			exifOrientation = PHOTOS_EXIF_0ROW_LEFT_0COL_BOTTOM;
+			break;
+		case UIDeviceOrientationLandscapeLeft:       // Device oriented horizontally, home button on the right
+			if (self.useFrontCamera)
+				exifOrientation = PHOTOS_EXIF_0ROW_BOTTOM_0COL_RIGHT;
+			else
+				exifOrientation = PHOTOS_EXIF_0ROW_TOP_0COL_LEFT;
+			break;
+		case UIDeviceOrientationLandscapeRight:      // Device oriented horizontally, home button on the left
+			if (self.useFrontCamera)
+				exifOrientation = PHOTOS_EXIF_0ROW_TOP_0COL_LEFT;
+			else
+				exifOrientation = PHOTOS_EXIF_0ROW_BOTTOM_0COL_RIGHT;
+			break;
+		case UIDeviceOrientationPortrait:            // Device oriented vertically, home button on the bottom
+		default:
+			exifOrientation = PHOTOS_EXIF_0ROW_RIGHT_0COL_TOP;
+			break;
+	}
+    
+    return exifOrientation;
+}
+
 #pragma mark - Notifications
 // From http://stackoverflow.com/a/15967305/806442
 - (void)orientationChanged:(NSNotification *)notification
@@ -377,7 +416,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     [UIView animateWithDuration:0.3f
                           delay:0
                         options:UIViewAnimationOptionBeginFromCurrentState animations:^{
-                           // self.thumbView.transform = transform;
+                            self.thumbView.transform = transform;
                             self.share.transform = transform;
                             self.autoPhoto.transform = transform;
                             self.settingsButton.transform = transform;
@@ -649,40 +688,8 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 	CIImage *ciImage = [[CIImage alloc] initWithCVPixelBuffer:pixelBuffer options:attachments];
 	UIDeviceOrientation curDeviceOrientation = [UIDevice currentDevice].orientation;
 	
-	enum {
-		PHOTOS_EXIF_0ROW_TOP_0COL_LEFT			= 1, //   1  =  0th row is at the top, and 0th column is on the left (THE DEFAULT).
-		PHOTOS_EXIF_0ROW_TOP_0COL_RIGHT			= 2, //   2  =  0th row is at the top, and 0th column is on the right.
-		PHOTOS_EXIF_0ROW_BOTTOM_0COL_RIGHT      = 3, //   3  =  0th row is at the bottom, and 0th column is on the right.
-		PHOTOS_EXIF_0ROW_BOTTOM_0COL_LEFT       = 4, //   4  =  0th row is at the bottom, and 0th column is on the left.
-		PHOTOS_EXIF_0ROW_LEFT_0COL_TOP          = 5, //   5  =  0th row is on the left, and 0th column is the top.
-		PHOTOS_EXIF_0ROW_RIGHT_0COL_TOP         = 6, //   6  =  0th row is on the right, and 0th column is the top.
-		PHOTOS_EXIF_0ROW_RIGHT_0COL_BOTTOM      = 7, //   7  =  0th row is on the right, and 0th column is the bottom.
-		PHOTOS_EXIF_0ROW_LEFT_0COL_BOTTOM       = 8  //   8  =  0th row is on the left, and 0th column is the bottom.
-	};
-	
-	int exifOrientation;
-	switch (curDeviceOrientation) {
-		case UIDeviceOrientationPortraitUpsideDown:  // Device oriented vertically, home button on the top
-			exifOrientation = PHOTOS_EXIF_0ROW_LEFT_0COL_BOTTOM;
-			break;
-		case UIDeviceOrientationLandscapeLeft:       // Device oriented horizontally, home button on the right
-			if (self.useFrontCamera)
-				exifOrientation = PHOTOS_EXIF_0ROW_BOTTOM_0COL_RIGHT;
-			else
-				exifOrientation = PHOTOS_EXIF_0ROW_TOP_0COL_LEFT;
-			break;
-		case UIDeviceOrientationLandscapeRight:      // Device oriented horizontally, home button on the left
-			if (self.useFrontCamera)
-				exifOrientation = PHOTOS_EXIF_0ROW_TOP_0COL_LEFT;
-			else
-				exifOrientation = PHOTOS_EXIF_0ROW_BOTTOM_0COL_RIGHT;
-			break;
-		case UIDeviceOrientationPortrait:            // Device oriented vertically, home button on the bottom
-		default:
-			exifOrientation = PHOTOS_EXIF_0ROW_RIGHT_0COL_TOP;
-			break;
-	}
-    
+
+    NSInteger exifOrientation = [self exifOrientation:curDeviceOrientation];
     
 	NSDictionary *imageOptions = @{CIDetectorImageOrientation: @(exifOrientation), CIDetectorSmile:@YES, CIDetectorEyeBlink:@YES};
     
@@ -796,29 +803,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 
                                                                NSDictionary* metadata = (__bridge_transfer NSDictionary*) CMCopyDictionaryOfAttachments(kCFAllocatorDefault, imageDataSampleBuffer, kCMAttachmentMode_ShouldPropagate);
                                                                
-                                                               NSInteger saveOrientation;
-                                                               
-                                                               switch(curDeviceOrientation) {
-                                                                   case UIDeviceOrientationPortrait:
-                                                                       DLog(@"UIDeviceOrientationPortrait");
-                                                                       saveOrientation = 6; // Right, top
-                                                                       break;
-                                                                   case UIDeviceOrientationLandscapeRight:
-                                                                       DLog(@"UIDeviceOrientationLandscapeRight");
-                                                                       saveOrientation = 3; // Bottom, right
-                                                                       break;
-                                                                   case UIDeviceOrientationPortraitUpsideDown:
-                                                                       DLog(@"UIDeviceOrientationPortraitUpsideDown");
-                                                                       saveOrientation = 8; // Left, bottom
-                                                                       break;
-                                                                   case UIDeviceOrientationFaceUp:
-                                                                   case UIDeviceOrientationFaceDown:
-                                                                   case UIDeviceOrientationUnknown:
-                                                                   case UIDeviceOrientationLandscapeLeft:
-                                                                       DLog(@"UIDeviceOrientationLandscapeLeft");
-                                                                       saveOrientation = 1; // Top, left
-                                                                       break;
-                                                               }
+                                                               NSInteger saveOrientation = [self exifOrientation:curDeviceOrientation];
                                                                
                                                                NSMutableDictionary *temp = [[NSMutableDictionary alloc] initWithDictionary:metadata];
                                                                [temp setObject:[NSNumber numberWithInt:saveOrientation] forKey:@"Orientation"];
