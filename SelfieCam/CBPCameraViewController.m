@@ -24,7 +24,7 @@ const CGFloat FACE_RECT_BORDER_WIDTH = 3;
 static char * const AVCaptureStillImageIsCapturingStillImageContext = "AVCaptureStillImageIsCapturingStillImageContext";
 static CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
 void writeJPEGDataToCameraRoll(NSData* data, NSDictionary* metadata);
-static AVCaptureVideoOrientation avOrientationForDeviceOrientation(UIDeviceOrientation deviceOrientation);
+
 CGRect videoPreviewBoxForGravity(NSString *gravity, CGSize frameSize, CGSize apertureSize);
 
 void displayErrorOnMainQueue(NSError *error, NSString *message);
@@ -66,6 +66,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 @property (strong, nonatomic) UIImage *lastSelfie;
 @property (strong, nonatomic) ASMediaFocusManager *mediaFocusManager;
 
+@property (strong, nonatomic) ALAssetsLibrary *library;
 @end
 
 @implementation CBPCameraViewController
@@ -156,7 +157,9 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     [self.controlView addSubview:self.thumbView];
     
     self.share = [UIButton buttonWithType:UIButtonTypeCustom];
-    [self.share setImage:[UIImage imageNamed:@"211-action-grey.png"] forState:UIControlStateNormal];
+    [self.share setImage:[UIImage imageNamed:@"702-share.png"] forState:UIControlStateNormal];
+    [self.share setImage:[UIImage imageNamed:@"702-share-selected.png"] forState:UIControlStateSelected];
+    
     [self.share addTarget:self action:@selector(shareImage) forControlEvents:UIControlEventTouchUpInside];
     self.share.frame = CGRectMake(0, 0, 44.0f, 44.0f);
     self.share.translatesAutoresizingMaskIntoConstraints = NO;
@@ -305,6 +308,8 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     self.mediaFocusManager = [ASMediaFocusManager new];
     self.mediaFocusManager.delegate = self;
     [self.mediaFocusManager installOnView:self.thumbView];
+    
+    self.library = [ALAssetsLibrary new];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -338,7 +343,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 #pragma mark -
 - (double)rotation
 {
-    UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
+    UIDeviceOrientation orientation = [UIDevice currentDevice].orientation;
     double rotation;
     
     switch (orientation) {
@@ -372,7 +377,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     [UIView animateWithDuration:0.3f
                           delay:0
                         options:UIViewAnimationOptionBeginFromCurrentState animations:^{
-                            self.thumbView.transform = transform;
+                           // self.thumbView.transform = transform;
                             self.share.transform = transform;
                             self.autoPhoto.transform = transform;
                             self.settingsButton.transform = transform;
@@ -570,6 +575,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     
 	for ( CIFaceFeature *ff in features )
     {
+        /*
         DLog(@"ff bounds: %@", NSStringFromCGRect(ff.bounds));
         DLog(@"ff leftEyePosition: %@", NSStringFromCGPoint(ff.leftEyePosition));
         DLog(@"ff rightEyePosition: %@", NSStringFromCGPoint(ff.rightEyePosition));
@@ -578,7 +584,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
         DLog(@"ff rightEyeClosed: %@", (ff.rightEyeClosed) ? @"Yes" : @"No");
         DLog(@"ff hasSmile: %@", (ff.hasSmile) ? @"Yes" : @"No" );
         DLog(@"ff tracking ID: %d", ff.trackingID );
-        
+        */
         if (!self.detectedFeature && self.autoPhoto.on)
         {
             if (ff.hasSmile && [self.userDefaults boolForKey:@"smile"] && ([features count] >= [self.userDefaults doubleForKey:@"faces"]))
@@ -641,7 +647,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 	CVPixelBufferRef pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
 	NSDictionary* attachments = (__bridge_transfer NSDictionary*)CMCopyDictionaryOfAttachments(kCFAllocatorDefault, sampleBuffer, kCMAttachmentMode_ShouldPropagate);
 	CIImage *ciImage = [[CIImage alloc] initWithCVPixelBuffer:pixelBuffer options:attachments];
-	UIDeviceOrientation curDeviceOrientation = [[UIDevice currentDevice] orientation];
+	UIDeviceOrientation curDeviceOrientation = [UIDevice currentDevice].orientation;
 	
 	enum {
 		PHOTOS_EXIF_0ROW_TOP_0COL_LEFT			= 1, //   1  =  0th row is at the top, and 0th column is on the left (THE DEFAULT).
@@ -754,8 +760,22 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     
 	// Find out the current orientation and tell the still image output.
 	AVCaptureConnection *stillImageConnection = [self.stillImageOutput connectionWithMediaType:AVMediaTypeVideo];
-	UIDeviceOrientation curDeviceOrientation = [[UIDevice currentDevice] orientation];
-	AVCaptureVideoOrientation avcaptureOrientation = avOrientationForDeviceOrientation(curDeviceOrientation);
+	UIDeviceOrientation curDeviceOrientation = [UIDevice currentDevice].orientation;
+    
+    AVCaptureVideoOrientation avcaptureOrientation = AVCaptureVideoOrientationPortrait;
+	if (curDeviceOrientation == UIDeviceOrientationLandscapeLeft)
+    {
+		avcaptureOrientation = AVCaptureVideoOrientationLandscapeRight;
+	}
+    else if ( curDeviceOrientation == UIDeviceOrientationLandscapeRight)
+    {
+		avcaptureOrientation = AVCaptureVideoOrientationLandscapeLeft;
+    }
+    else if ( curDeviceOrientation == UIDeviceOrientationPortraitUpsideDown)
+    {
+		avcaptureOrientation = AVCaptureVideoOrientationPortraitUpsideDown;
+    }
+    
 	[stillImageConnection setVideoOrientation:avcaptureOrientation];
 	[stillImageConnection setVideoScaleAndCropFactor:1];
 	[stillImageConnection setAutomaticallyAdjustsVideoMirroring:NO];
@@ -771,10 +791,48 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
                                                            }
                                                            else
                                                            {
-                                                               NSData *jpegData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
-                                                               NSDictionary* attachments = (__bridge_transfer NSDictionary*) CMCopyDictionaryOfAttachments(kCFAllocatorDefault, imageDataSampleBuffer, kCMAttachmentMode_ShouldPropagate);
                                                                
-                                                               writeJPEGDataToCameraRoll(jpegData, attachments);
+                                                               NSData *jpegData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
+
+                                                               NSDictionary* metadata = (__bridge_transfer NSDictionary*) CMCopyDictionaryOfAttachments(kCFAllocatorDefault, imageDataSampleBuffer, kCMAttachmentMode_ShouldPropagate);
+                                                               
+                                                               NSInteger saveOrientation;
+                                                               
+                                                               switch(curDeviceOrientation) {
+                                                                   case UIDeviceOrientationPortrait:
+                                                                       DLog(@"UIDeviceOrientationPortrait");
+                                                                       saveOrientation = 6; // Right, top
+                                                                       break;
+                                                                   case UIDeviceOrientationLandscapeRight:
+                                                                       DLog(@"UIDeviceOrientationLandscapeRight");
+                                                                       saveOrientation = 3; // Bottom, right
+                                                                       break;
+                                                                   case UIDeviceOrientationPortraitUpsideDown:
+                                                                       DLog(@"UIDeviceOrientationPortraitUpsideDown");
+                                                                       saveOrientation = 8; // Left, bottom
+                                                                       break;
+                                                                   case UIDeviceOrientationFaceUp:
+                                                                   case UIDeviceOrientationFaceDown:
+                                                                   case UIDeviceOrientationUnknown:
+                                                                   case UIDeviceOrientationLandscapeLeft:
+                                                                       DLog(@"UIDeviceOrientationLandscapeLeft");
+                                                                       saveOrientation = 1; // Top, left
+                                                                       break;
+                                                               }
+                                                               
+                                                               NSMutableDictionary *temp = [[NSMutableDictionary alloc] initWithDictionary:metadata];
+                                                               [temp setObject:[NSNumber numberWithInt:saveOrientation] forKey:@"Orientation"];
+                                                               
+                                                               [self.library writeImageDataToSavedPhotosAlbum:jpegData metadata:temp completionBlock:^(NSURL *assetURL, NSError *error) {
+                                                                   if (error) {
+                                                                       displayErrorOnMainQueue(error, @"Save to camera roll failed");
+                                                                   }
+                                                                   else
+                                                                   {
+                                                                       [[NSUserDefaults standardUserDefaults] setObject:[assetURL absoluteString] forKey:@"last_photo"];
+                                                                       [[NSUserDefaults standardUserDefaults] synchronize];
+                                                                   }
+                                                               }];
                                                                
                                                                self.lastSelfie = [UIImage imageWithData:jpegData];
                                                                
@@ -786,6 +844,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
                                                            });
                                                        }];
 }
+
 
 // this will freeze the preview when a still image is captured, we will unfreeze it when the graphics code is finished processing the image
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
@@ -864,39 +923,39 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
         
         UIImage *thumbImage = [self.lastSelfie scaleToCoverSize:CGSizeMake(50.0f, 50.0f)];
         
+        
         switch (self.lastSelfie.imageOrientation) {
-                
             case UIImageOrientationDown:
                 DLog(@"UIImageOrientationDown");
+                //thumbImage = [thumbImage rotateImagePixelsInRadians:-M_PI];
                 break;
             case UIImageOrientationLeft:
                 DLog(@"UIImageOrientationLeft");
                 break;
             case UIImageOrientationRight:
                 DLog(@"UIImageOrientationRight");
+                //thumbImage = [thumbImage rotateImagePixelsInRadians:-M_PI];
                 break;
             case UIImageOrientationLeftMirrored:
                 DLog(@"UIImageOrientationLeftMirrored");
-                [thumbImage rotateImagePixelsInRadians:M_PI_2];
+                //thumbImage = [thumbImage rotateImagePixelsInRadians:M_PI];
                 break;
             case UIImageOrientationRightMirrored:
                 DLog(@"UIImageOrientationRightMirrored");
                 break;
             case UIImageOrientationUp:
                 DLog(@"UIImageOrientationUp");
-                [thumbImage rotateImagePixelsInRadians:-M_PI_2];
-                break;
+                //thumbImage = [thumbImage rotateImagePixelsInRadians:-M_PI];
                 break;
             case UIImageOrientationUpMirrored:
                 DLog(@"UIImageOrientationUpMirrored");
-                [thumbImage rotateImagePixelsInRadians:-M_PI_2];
+                //thumbImage = [thumbImage rotateImagePixelsInRadians:-M_PI];
                 break;
             case UIImageOrientationDownMirrored:
                 DLog(@"UIImageOrientationDownMirrored");
-               // [thumbImage rotateImagePixelsInRadians:M_PI_2];
+                //thumbImage = [thumbImage rotateImagePixelsInRadians:M_PI];
                 break;
             default:
-                [thumbImage rotateImagePixelsInRadians:-M_PI_2];
                 break;
         }
         
@@ -1034,31 +1093,4 @@ void displayErrorOnMainQueue(NSError *error, NSString *message)
 		[alert addButtonWithTitle:@"Dismiss"];
 		[alert show];
 	});
-}
-
-// writes the image to the asset library
-void writeJPEGDataToCameraRoll(NSData* data, NSDictionary* metadata)
-{
-	ALAssetsLibrary *library = [ALAssetsLibrary new];
-	[library writeImageDataToSavedPhotosAlbum:data metadata:metadata completionBlock:^(NSURL *assetURL, NSError *error) {
-		if (error) {
-			displayErrorOnMainQueue(error, @"Save to camera roll failed");
-		}
-        else
-        {
-            [[NSUserDefaults standardUserDefaults] setObject:[assetURL absoluteString] forKey:@"last_photo"];
-            [[NSUserDefaults standardUserDefaults] synchronize];
-        }
-	}];
-}
-
-// converts UIDeviceOrientation to AVCaptureVideoOrientation
-static AVCaptureVideoOrientation avOrientationForDeviceOrientation(UIDeviceOrientation deviceOrientation)
-{
-	AVCaptureVideoOrientation result = AVCaptureVideoOrientationPortrait;
-	if ( deviceOrientation == UIDeviceOrientationLandscapeLeft )
-		result = AVCaptureVideoOrientationLandscapeRight;
-	else if ( deviceOrientation == UIDeviceOrientationLandscapeRight )
-		result = AVCaptureVideoOrientationLandscapeLeft;
-	return result;
 }
