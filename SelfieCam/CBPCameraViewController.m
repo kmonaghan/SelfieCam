@@ -29,11 +29,24 @@ CGRect videoPreviewBoxForGravity(NSString *gravity, CGSize frameSize, CGSize ape
 
 void displayErrorOnMainQueue(NSError *error, NSString *message);
 
+
+typedef NS_ENUM(NSInteger, CBPPhotoExif) {
+    PHOTOS_EXIF_0ROW_TOP_0COL_LEFT			= 1, //   1  =  0th row is at the top, and 0th column is on the left (THE DEFAULT).
+    PHOTOS_EXIF_0ROW_TOP_0COL_RIGHT			= 2, //   2  =  0th row is at the top, and 0th column is on the right.
+    PHOTOS_EXIF_0ROW_BOTTOM_0COL_RIGHT      = 3, //   3  =  0th row is at the bottom, and 0th column is on the right.
+    PHOTOS_EXIF_0ROW_BOTTOM_0COL_LEFT       = 4, //   4  =  0th row is at the bottom, and 0th column is on the left.
+    PHOTOS_EXIF_0ROW_LEFT_0COL_TOP          = 5, //   5  =  0th row is on the left, and 0th column is the top.
+    PHOTOS_EXIF_0ROW_RIGHT_0COL_TOP         = 6, //   6  =  0th row is on the right, and 0th column is the top.
+    PHOTOS_EXIF_0ROW_RIGHT_0COL_BOTTOM      = 7, //   7  =  0th row is on the right, and 0th column is the bottom.
+    PHOTOS_EXIF_0ROW_LEFT_0COL_BOTTOM       = 8  //   8  =  0th row is on the left, and 0th column is the bottom.
+};
+
 @interface CBPCameraViewController ()
 @property (strong, nonatomic) UIView *cameraView;
 @property (strong, nonatomic) UIView *flashView;
 @property (strong, nonatomic) UIView *controlView;
 @property (strong, nonatomic) UIView *controlBackgroundView;
+@property (strong, nonatomic) UIView *thumbViewContainer;
 @property (strong, nonatomic) UIImageView *thumbView;
 
 @property (strong, nonatomic) UILabel *countdownLabel;
@@ -94,10 +107,11 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     [view addSubview:self.cameraView];
     
     self.switchCamerasButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    [self.switchCamerasButton setTitle:NSLocalizedString(@"Switch", nil) forState:UIControlStateNormal];
+    [self.switchCamerasButton setImage:[UIImage imageNamed:@"switch-camera.png"] forState:UIControlStateNormal];
     [self.switchCamerasButton addTarget:self action:@selector(updateCameraSelection) forControlEvents:UIControlEventTouchUpInside];
-    [self.switchCamerasButton sizeToFit];
+    self.switchCamerasButton.frame = CGRectMake(0, 0, 44.0f, 44.0f);
     self.switchCamerasButton.translatesAutoresizingMaskIntoConstraints = NO;
+    self.switchCamerasButton.accessibilityLabel = NSLocalizedString(@"Switch between the front and rear cameras");
     
     [view addSubview:self.switchCamerasButton];
     
@@ -150,11 +164,16 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     
     [self.controlView addSubview:self.controlBackgroundView];
     
+    self.thumbViewContainer = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 50.0f, 50.f)];
+    self.thumbViewContainer.translatesAutoresizingMaskIntoConstraints = NO;
+    
     self.thumbView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 50.0f, 50.f)];
     self.thumbView.translatesAutoresizingMaskIntoConstraints = NO;
     self.thumbView.image = [UIImage imageNamed:@"default_thumb.png"];
     
-    [self.controlView addSubview:self.thumbView];
+    [self.thumbViewContainer addSubview:self.thumbView];
+    
+    [self.controlView addSubview:self.thumbViewContainer];
     
     self.share = [UIButton buttonWithType:UIButtonTypeCustom];
     [self.share setImage:[UIImage imageNamed:@"702-share.png"] forState:UIControlStateNormal];
@@ -164,25 +183,29 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     self.share.frame = CGRectMake(0, 0, 44.0f, 44.0f);
     self.share.translatesAutoresizingMaskIntoConstraints = NO;
     self.share.hidden = YES;
+    self.share.accessibilityLabel = NSLocalizedString(@"Share your beautiful smile", @"Accessiblity label for sharing button");
+    
     [self.controlView addSubview:self.share];
     
     self.autoPhoto = [[UISwitch alloc] init];
     [self.autoPhoto addTarget:self action:@selector(updateCoreImageDetection) forControlEvents:UIControlEventValueChanged];
     self.autoPhoto.translatesAutoresizingMaskIntoConstraints = NO;
+    self.autoPhoto.accessibilityLabel = NSLocalizedString(@"Start taking photos of your beautiful smile", @"Accessiblity label for ");
     
     [self.controlView addSubview:self.autoPhoto];
     
     self.settingsButton = [UIButton buttonWithType:UIButtonTypeCustom];
     self.settingsButton.translatesAutoresizingMaskIntoConstraints = NO;
     [self.settingsButton addTarget:self action:@selector(showSettings) forControlEvents:UIControlEventTouchUpInside];
-    [self.settingsButton setTitle:NSLocalizedString(@"Settings", nil) forState:UIControlStateNormal];
-    [self.settingsButton sizeToFit];
-    
+    //[self.settingsButton setTitle:NSLocalizedString(@"Settings", nil) forState:UIControlStateNormal];
+    //[self.settingsButton sizeToFit];
+    [self.settingsButton setImage:[UIImage imageNamed:@"740-gear.png"] forState:UIControlStateNormal];
+    [self.settingsButton setImage:[UIImage imageNamed:@"740-gear-selected.png"] forState:UIControlStateSelected];
+    self.settingsButton.frame = CGRectMake(0, 0, 44.0f, 44.0f);
+    self.settingsButton.accessibilityLabel = NSLocalizedString(@"Change the app settings", @"Accessibility label for settings button");
     [self.controlView addSubview:self.settingsButton];
     
-    
     [view addSubview:self.controlView];
-    
     
     self.view = view;
 }
@@ -213,10 +236,10 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
                                                                              metrics:nil
                                                                                views:NSDictionaryOfVariableBindings(_controlBackgroundView)]];
     
-    [self.controlView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"[_thumbView]-[_share]"
+    [self.controlView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"[_thumbViewContainer(50)]-(15)-[_share]"
                                                                              options:0
                                                                              metrics:nil
-                                                                               views:NSDictionaryOfVariableBindings(_thumbView, _share)]];
+                                                                               views:NSDictionaryOfVariableBindings(_thumbViewContainer, _share)]];
     
     [self.controlView addConstraint:[NSLayoutConstraint constraintWithItem:self.share
                                                                  attribute:NSLayoutAttributeCenterY
@@ -228,7 +251,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
     
     NSMutableArray *verticalbuttonConstraints = @[].mutableCopy;
     
-    [verticalbuttonConstraints addObject:[NSLayoutConstraint constraintWithItem:self.thumbView
+    [verticalbuttonConstraints addObject:[NSLayoutConstraint constraintWithItem:self.thumbViewContainer
                                                                       attribute:NSLayoutAttributeCenterY
                                                                       relatedBy:NSLayoutRelationEqual
                                                                          toItem:self.controlView
@@ -236,10 +259,15 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
                                                                      multiplier:1.0f
                                                                        constant:0.0f]];
     
-    [verticalbuttonConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"|-[_thumbView]"
+    [verticalbuttonConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"|-[_thumbViewContainer(50)]"
                                                                                            options:0
                                                                                            metrics:nil
-                                                                                             views:NSDictionaryOfVariableBindings(_thumbView)]];
+                                                                                             views:NSDictionaryOfVariableBindings(_thumbViewContainer)]];
+
+    [verticalbuttonConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_thumbViewContainer(50)]"
+                                                                                           options:0
+                                                                                           metrics:nil
+                                                                                             views:NSDictionaryOfVariableBindings(_thumbViewContainer)]];
     
     [verticalbuttonConstraints addObject:[NSLayoutConstraint constraintWithItem:self.autoPhoto
                                                                       attribute:NSLayoutAttributeCenterX
@@ -371,18 +399,7 @@ void displayErrorOnMainQueue(NSError *error, NSString *message);
 
 - (NSInteger)exifOrientation:(UIDeviceOrientation)curDeviceOrientation
 {
-    enum {
-		PHOTOS_EXIF_0ROW_TOP_0COL_LEFT			= 1, //   1  =  0th row is at the top, and 0th column is on the left (THE DEFAULT).
-		PHOTOS_EXIF_0ROW_TOP_0COL_RIGHT			= 2, //   2  =  0th row is at the top, and 0th column is on the right.
-		PHOTOS_EXIF_0ROW_BOTTOM_0COL_RIGHT      = 3, //   3  =  0th row is at the bottom, and 0th column is on the right.
-		PHOTOS_EXIF_0ROW_BOTTOM_0COL_LEFT       = 4, //   4  =  0th row is at the bottom, and 0th column is on the left.
-		PHOTOS_EXIF_0ROW_LEFT_0COL_TOP          = 5, //   5  =  0th row is on the left, and 0th column is the top.
-		PHOTOS_EXIF_0ROW_RIGHT_0COL_TOP         = 6, //   6  =  0th row is on the right, and 0th column is the top.
-		PHOTOS_EXIF_0ROW_RIGHT_0COL_BOTTOM      = 7, //   7  =  0th row is on the right, and 0th column is the bottom.
-		PHOTOS_EXIF_0ROW_LEFT_0COL_BOTTOM       = 8  //   8  =  0th row is on the left, and 0th column is the bottom.
-	};
-	
-	NSInteger exifOrientation;
+	CBPPhotoExif exifOrientation;
 	switch (curDeviceOrientation) {
 		case UIDeviceOrientationPortraitUpsideDown:  // Device oriented vertically, home button on the top
 			exifOrientation = PHOTOS_EXIF_0ROW_LEFT_0COL_BOTTOM;

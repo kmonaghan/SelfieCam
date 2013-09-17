@@ -14,6 +14,12 @@
 		343516E317D5133300E6A597 /* ASMediaFocusController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 343516DE17D5133300E6A597 /* ASMediaFocusController.xib */; };
 		343516E417D5133300E6A597 /* ASMediaFocusManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 343516E017D5133300E6A597 /* ASMediaFocusManager.m */; };
 		3463DB8D17BFF1A900FC7F26 /* Reveal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3463DB8C17BFF1A900FC7F26 /* Reveal.framework */; };
+		34814B0317E834D2004E7A3E /* 740-gear.png in Resources */ = {isa = PBXBuildFile; fileRef = 34814B0117E834D2004E7A3E /* 740-gear.png */; };
+		34814B0417E834D2004E7A3E /* 740-gear@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 34814B0217E834D2004E7A3E /* 740-gear@2x.png */; };
+		34814B0717E83549004E7A3E /* 740-gear-selected.png in Resources */ = {isa = PBXBuildFile; fileRef = 34814B0517E83549004E7A3E /* 740-gear-selected.png */; };
+		34814B0817E83549004E7A3E /* 740-gear-selected@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 34814B0617E83549004E7A3E /* 740-gear-selected@2x.png */; };
+		34814B0B17E8390C004E7A3E /* switch-camera@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 34814B0917E8390C004E7A3E /* switch-camera@2x.png */; };
+		34814B0C17E8390C004E7A3E /* switch-camera.png in Resources */ = {isa = PBXBuildFile; fileRef = 34814B0A17E8390C004E7A3E /* switch-camera.png */; };
 		349FD30617AE96800030703E /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 349FD30517AE96800030703E /* CFNetwork.framework */; };
 		34A4CDFC17C164E600C5ECA1 /* CBPAboutViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 34A4CDFA17C15EDD00C5ECA1 /* CBPAboutViewController.m */; };
 		34A4CDFE17C165A200C5ECA1 /* Social.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34A4CDFD17C165A200C5ECA1 /* Social.framework */; };
@@ -83,6 +89,12 @@
 		343516DF17D5133300E6A597 /* ASMediaFocusManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASMediaFocusManager.h; sourceTree = "<group>"; };
 		343516E017D5133300E6A597 /* ASMediaFocusManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASMediaFocusManager.m; sourceTree = "<group>"; };
 		3463DB8C17BFF1A900FC7F26 /* Reveal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Reveal.framework; path = "../../../../Applications/Reveal.app/Contents/SharedSupport/iOS-Libraries/Reveal.framework"; sourceTree = "<group>"; };
+		34814B0117E834D2004E7A3E /* 740-gear.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "740-gear.png"; sourceTree = "<group>"; };
+		34814B0217E834D2004E7A3E /* 740-gear@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "740-gear@2x.png"; sourceTree = "<group>"; };
+		34814B0517E83549004E7A3E /* 740-gear-selected.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "740-gear-selected.png"; sourceTree = "<group>"; };
+		34814B0617E83549004E7A3E /* 740-gear-selected@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "740-gear-selected@2x.png"; sourceTree = "<group>"; };
+		34814B0917E8390C004E7A3E /* switch-camera@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "switch-camera@2x.png"; sourceTree = "<group>"; };
+		34814B0A17E8390C004E7A3E /* switch-camera.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "switch-camera.png"; sourceTree = "<group>"; };
 		349FD30517AE96800030703E /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		34A4CDFA17C15EDD00C5ECA1 /* CBPAboutViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CBPAboutViewController.m; sourceTree = "<group>"; };
 		34A4CDFB17C15EDD00C5ECA1 /* CBPAboutViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBPAboutViewController.h; sourceTree = "<group>"; };
@@ -192,10 +204,16 @@
 		3428EF3F17C56762008D7093 /* images */ = {
 			isa = PBXGroup;
 			children = (
+				34814B0917E8390C004E7A3E /* switch-camera@2x.png */,
+				34814B0A17E8390C004E7A3E /* switch-camera.png */,
 				F51F26E017E7488D0065AFFC /* 702-share.png */,
 				F51F26E117E7488D0065AFFC /* 702-share@2x.png */,
 				F51F26E417E74B850065AFFC /* 702-share-selected.png */,
 				F51F26E517E74B850065AFFC /* 702-share-selected@2x.png */,
+				34814B0117E834D2004E7A3E /* 740-gear.png */,
+				34814B0217E834D2004E7A3E /* 740-gear@2x.png */,
+				34814B0517E83549004E7A3E /* 740-gear-selected.png */,
+				34814B0617E83549004E7A3E /* 740-gear-selected@2x.png */,
 				3428EF4017C56762008D7093 /* default_thumb.png */,
 				3428EF4117C56762008D7093 /* default_thumb@2x.png */,
 			);
@@ -463,7 +481,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				34814B0C17E8390C004E7A3E /* switch-camera.png in Resources */,
+				34814B0B17E8390C004E7A3E /* switch-camera@2x.png in Resources */,
+				34814B0317E834D2004E7A3E /* 740-gear.png in Resources */,
 				F5F5257717ABF84600BFF158 /* InfoPlist.strings in Resources */,
+				34814B0817E83549004E7A3E /* 740-gear-selected@2x.png in Resources */,
 				F545EF4817CCF09100C41BA5 /* readme.md in Resources */,
 				F5F5257F17ABF84600BFF158 /* Default.png in Resources */,
 				3428EF4717C56762008D7093 /* default_thumb@2x.png in Resources */,
@@ -471,10 +493,12 @@
 				F51F26E317E7488D0065AFFC /* 702-share@2x.png in Resources */,
 				F51F26E217E7488D0065AFFC /* 702-share.png in Resources */,
 				F5F5258117ABF84600BFF158 /* Default@2x.png in Resources */,
+				34814B0717E83549004E7A3E /* 740-gear-selected.png in Resources */,
 				343516E317D5133300E6A597 /* ASMediaFocusController.xib in Resources */,
 				F5F5258317ABF84600BFF158 /* Default-568h@2x.png in Resources */,
 				F51F26E617E74B850065AFFC /* 702-share-selected.png in Resources */,
 				3428EF4617C56762008D7093 /* default_thumb.png in Resources */,
+				34814B0417E834D2004E7A3E /* 740-gear@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
