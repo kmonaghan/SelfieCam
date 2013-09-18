@@ -90,7 +90,7 @@
     [self.userDefaults setBool:self.facebookShare.on forKey:@"facebook"];
     [self.userDefaults setBool:self.twitterShare.on forKey:@"twitter"];
     
-    if (self.showHelp)
+    if (self.showHelp.on)
     {
         [self.userDefaults setBool:NO forKey:@"showed_auto_photo"];
         [self.userDefaults setBool:NO forKey:@"showed_share"];
