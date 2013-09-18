@@ -21,6 +21,17 @@
 		34814B0B17E8390C004E7A3E /* switch-camera@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 34814B0917E8390C004E7A3E /* switch-camera@2x.png */; };
 		34814B0C17E8390C004E7A3E /* switch-camera.png in Resources */ = {isa = PBXBuildFile; fileRef = 34814B0A17E8390C004E7A3E /* switch-camera.png */; };
 		34814B1017E98391004E7A3E /* CMPopTipView.m in Sources */ = {isa = PBXBuildFile; fileRef = 34814B0F17E98391004E7A3E /* CMPopTipView.m */; };
+		34814B1417E98B25004E7A3E /* CBPWebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 34814B1217E98B25004E7A3E /* CBPWebViewController.m */; };
+		34814B1517E98B25004E7A3E /* CBPWebViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 34814B1317E98B25004E7A3E /* CBPWebViewController.xib */; };
+		34814B1717E98B32004E7A3E /* libraries.html in Resources */ = {isa = PBXBuildFile; fileRef = 34814B1617E98B32004E7A3E /* libraries.html */; };
+		34814B1E17E98D34004E7A3E /* 39-back.png in Resources */ = {isa = PBXBuildFile; fileRef = 34814B1817E98D34004E7A3E /* 39-back.png */; };
+		34814B1F17E98D34004E7A3E /* 39-back@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 34814B1917E98D34004E7A3E /* 39-back@2x.png */; };
+		34814B2017E98D34004E7A3E /* 40-forward.png in Resources */ = {isa = PBXBuildFile; fileRef = 34814B1A17E98D34004E7A3E /* 40-forward.png */; };
+		34814B2117E98D34004E7A3E /* 40-forward@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 34814B1B17E98D34004E7A3E /* 40-forward@2x.png */; };
+		34814B2217E98D34004E7A3E /* 46-no.png in Resources */ = {isa = PBXBuildFile; fileRef = 34814B1C17E98D34004E7A3E /* 46-no.png */; };
+		34814B2317E98D34004E7A3E /* 46-no@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 34814B1D17E98D34004E7A3E /* 46-no@2x.png */; };
+		34814B2617E9DA22004E7A3E /* reload.png in Resources */ = {isa = PBXBuildFile; fileRef = 34814B2417E9DA22004E7A3E /* reload.png */; };
+		34814B2717E9DA22004E7A3E /* reload@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 34814B2517E9DA22004E7A3E /* reload@2x.png */; };
 		349FD30617AE96800030703E /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 349FD30517AE96800030703E /* CFNetwork.framework */; };
 		34A4CDFC17C164E600C5ECA1 /* CBPAboutViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 34A4CDFA17C15EDD00C5ECA1 /* CBPAboutViewController.m */; };
 		34A4CDFE17C165A200C5ECA1 /* Social.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34A4CDFD17C165A200C5ECA1 /* Social.framework */; };
@@ -98,6 +109,18 @@
 		34814B0A17E8390C004E7A3E /* switch-camera.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "switch-camera.png"; sourceTree = "<group>"; };
 		34814B0E17E98391004E7A3E /* CMPopTipView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CMPopTipView.h; sourceTree = "<group>"; };
 		34814B0F17E98391004E7A3E /* CMPopTipView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CMPopTipView.m; sourceTree = "<group>"; };
+		34814B1117E98B25004E7A3E /* CBPWebViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBPWebViewController.h; sourceTree = "<group>"; };
+		34814B1217E98B25004E7A3E /* CBPWebViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CBPWebViewController.m; sourceTree = "<group>"; };
+		34814B1317E98B25004E7A3E /* CBPWebViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CBPWebViewController.xib; sourceTree = "<group>"; };
+		34814B1617E98B32004E7A3E /* libraries.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = libraries.html; sourceTree = "<group>"; };
+		34814B1817E98D34004E7A3E /* 39-back.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "39-back.png"; sourceTree = "<group>"; };
+		34814B1917E98D34004E7A3E /* 39-back@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "39-back@2x.png"; sourceTree = "<group>"; };
+		34814B1A17E98D34004E7A3E /* 40-forward.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "40-forward.png"; sourceTree = "<group>"; };
+		34814B1B17E98D34004E7A3E /* 40-forward@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "40-forward@2x.png"; sourceTree = "<group>"; };
+		34814B1C17E98D34004E7A3E /* 46-no.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "46-no.png"; sourceTree = "<group>"; };
+		34814B1D17E98D34004E7A3E /* 46-no@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "46-no@2x.png"; sourceTree = "<group>"; };
+		34814B2417E9DA22004E7A3E /* reload.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = reload.png; sourceTree = "<group>"; };
+		34814B2517E9DA22004E7A3E /* reload@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "reload@2x.png"; sourceTree = "<group>"; };
 		349FD30517AE96800030703E /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		34A4CDFA17C15EDD00C5ECA1 /* CBPAboutViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CBPAboutViewController.m; sourceTree = "<group>"; };
 		34A4CDFB17C15EDD00C5ECA1 /* CBPAboutViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBPAboutViewController.h; sourceTree = "<group>"; };
@@ -207,18 +230,26 @@
 		3428EF3F17C56762008D7093 /* images */ = {
 			isa = PBXGroup;
 			children = (
-				34814B0917E8390C004E7A3E /* switch-camera@2x.png */,
-				34814B0A17E8390C004E7A3E /* switch-camera.png */,
-				F51F26E017E7488D0065AFFC /* 702-share.png */,
-				F51F26E117E7488D0065AFFC /* 702-share@2x.png */,
+				34814B1817E98D34004E7A3E /* 39-back.png */,
+				34814B1917E98D34004E7A3E /* 39-back@2x.png */,
+				34814B1A17E98D34004E7A3E /* 40-forward.png */,
+				34814B1B17E98D34004E7A3E /* 40-forward@2x.png */,
+				34814B1C17E98D34004E7A3E /* 46-no.png */,
+				34814B1D17E98D34004E7A3E /* 46-no@2x.png */,
 				F51F26E417E74B850065AFFC /* 702-share-selected.png */,
 				F51F26E517E74B850065AFFC /* 702-share-selected@2x.png */,
-				34814B0117E834D2004E7A3E /* 740-gear.png */,
-				34814B0217E834D2004E7A3E /* 740-gear@2x.png */,
+				F51F26E017E7488D0065AFFC /* 702-share.png */,
+				F51F26E117E7488D0065AFFC /* 702-share@2x.png */,
 				34814B0517E83549004E7A3E /* 740-gear-selected.png */,
 				34814B0617E83549004E7A3E /* 740-gear-selected@2x.png */,
+				34814B0117E834D2004E7A3E /* 740-gear.png */,
+				34814B0217E834D2004E7A3E /* 740-gear@2x.png */,
 				3428EF4017C56762008D7093 /* default_thumb.png */,
 				3428EF4117C56762008D7093 /* default_thumb@2x.png */,
+				34814B2417E9DA22004E7A3E /* reload.png */,
+				34814B2517E9DA22004E7A3E /* reload@2x.png */,
+				34814B0A17E8390C004E7A3E /* switch-camera.png */,
+				34814B0917E8390C004E7A3E /* switch-camera@2x.png */,
 			);
 			path = images;
 			sourceTree = "<group>";
@@ -321,10 +352,13 @@
 			children = (
 				34A4CDFB17C15EDD00C5ECA1 /* CBPAboutViewController.h */,
 				34A4CDFA17C15EDD00C5ECA1 /* CBPAboutViewController.m */,
-				F5D5D4F917C2685800A22A7A /* CBPSettingsViewController.h */,
-				F5D5D4FA17C2685800A22A7A /* CBPSettingsViewController.m */,
 				F5F5258417ABF84600BFF158 /* CBPCameraViewController.h */,
 				F5F5258517ABF84600BFF158 /* CBPCameraViewController.m */,
+				F5D5D4F917C2685800A22A7A /* CBPSettingsViewController.h */,
+				F5D5D4FA17C2685800A22A7A /* CBPSettingsViewController.m */,
+				34814B1117E98B25004E7A3E /* CBPWebViewController.h */,
+				34814B1217E98B25004E7A3E /* CBPWebViewController.m */,
+				34814B1317E98B25004E7A3E /* CBPWebViewController.xib */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -387,6 +421,7 @@
 		F5F5257317ABF84600BFF158 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				34814B1617E98B32004E7A3E /* libraries.html */,
 				3428EF3F17C56762008D7093 /* images */,
 				F5F5257417ABF84600BFF158 /* SelfieCam-Info.plist */,
 				F5F5257517ABF84600BFF158 /* InfoPlist.strings */,
@@ -499,16 +534,26 @@
 				34814B0B17E8390C004E7A3E /* switch-camera@2x.png in Resources */,
 				34814B0317E834D2004E7A3E /* 740-gear.png in Resources */,
 				F5F5257717ABF84600BFF158 /* InfoPlist.strings in Resources */,
+				34814B2117E98D34004E7A3E /* 40-forward@2x.png in Resources */,
+				34814B2717E9DA22004E7A3E /* reload@2x.png in Resources */,
 				34814B0817E83549004E7A3E /* 740-gear-selected@2x.png in Resources */,
+				34814B1517E98B25004E7A3E /* CBPWebViewController.xib in Resources */,
 				F545EF4817CCF09100C41BA5 /* readme.md in Resources */,
 				F5F5257F17ABF84600BFF158 /* Default.png in Resources */,
+				34814B2017E98D34004E7A3E /* 40-forward.png in Resources */,
 				3428EF4717C56762008D7093 /* default_thumb@2x.png in Resources */,
 				F51F26E717E74B850065AFFC /* 702-share-selected@2x.png in Resources */,
+				34814B1717E98B32004E7A3E /* libraries.html in Resources */,
+				34814B1E17E98D34004E7A3E /* 39-back.png in Resources */,
 				F51F26E317E7488D0065AFFC /* 702-share@2x.png in Resources */,
+				34814B2317E98D34004E7A3E /* 46-no@2x.png in Resources */,
+				34814B2217E98D34004E7A3E /* 46-no.png in Resources */,
 				F51F26E217E7488D0065AFFC /* 702-share.png in Resources */,
 				F5F5258117ABF84600BFF158 /* Default@2x.png in Resources */,
+				34814B2617E9DA22004E7A3E /* reload.png in Resources */,
 				34814B0717E83549004E7A3E /* 740-gear-selected.png in Resources */,
 				343516E317D5133300E6A597 /* ASMediaFocusController.xib in Resources */,
+				34814B1F17E98D34004E7A3E /* 39-back@2x.png in Resources */,
 				F5F5258317ABF84600BFF158 /* Default-568h@2x.png in Resources */,
 				F51F26E617E74B850065AFFC /* 702-share-selected.png in Resources */,
 				3428EF4617C56762008D7093 /* default_thumb.png in Resources */,
@@ -556,6 +601,7 @@
 				34814B1017E98391004E7A3E /* CMPopTipView.m in Sources */,
 				F545EF4517CCF09100C41BA5 /* NYXImagesHelper.m in Sources */,
 				F545EF4417CCF09100C41BA5 /* NYXProgressiveImageView.m in Sources */,
+				34814B1417E98B25004E7A3E /* CBPWebViewController.m in Sources */,
 				F5F5257917ABF84600BFF158 /* main.m in Sources */,
 				F545EF3C17CCF09100C41BA5 /* UIImage+Filtering.m in Sources */,
 				F5F5257D17ABF84600BFF158 /* CBPAppDelegate.m in Sources */,

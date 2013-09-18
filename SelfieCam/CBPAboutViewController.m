@@ -9,8 +9,9 @@
 #import <Social/Social.h>
 
 #import "CBPAboutViewController.h"
+#import "CBPWebViewController.h"
 
-#define kAppId  @"380880441"
+#define kAppId  @"710446375"
 
 @interface CBPAboutViewController ()
 @property (strong, nonatomic) NSString *appName;
@@ -61,7 +62,7 @@
             return 3;
             break;
         case 1:
-            return 2;
+            return 3;
             break;
         case 2:
             return 1;
@@ -127,6 +128,11 @@
                     cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
                 }
                     break;
+                case 2:
+                {
+                    cell.textLabel.text = NSLocalizedString(@"3rd party libraries", nil);
+                    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+                }
                 default:
                     break;
             }
@@ -200,6 +206,12 @@
                     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"http://karlmonaghan.com/about"]];
                 }
                     break;
+                case 2:
+                {
+                    CBPWebViewController *libraries = [[CBPWebViewController alloc] initWithWebURL:[NSURLRequest requestWithURL:[NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"libraries" ofType:@"html"] isDirectory:NO]]];
+                    
+                    [self.navigationController pushViewController:libraries animated:YES];
+                }
                 default:
                     break;
             }
