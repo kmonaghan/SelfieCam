@@ -82,6 +82,11 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
 @property (strong, nonatomic) NSMutableDictionary *winkCounter;
 
 @property (strong, nonatomic) CMPopTipView *roundRectButtonPopTipView;
+
+@property (strong, nonatomic) UIImageView *smile1;
+@property (strong, nonatomic) UIImageView *smile2;
+@property (strong, nonatomic) UIImageView *smile3;
+
 @end
 
 @implementation CBPCameraViewController
@@ -108,7 +113,7 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
     
     [view addSubview:self.cameraView];
     
-    self.switchCamerasButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    self.switchCamerasButton = [UIButton buttonWithType:UIButtonTypeCustom];
     [self.switchCamerasButton setImage:[UIImage imageNamed:@"switch-camera.png"] forState:UIControlStateNormal];
     [self.switchCamerasButton addTarget:self action:@selector(updateCameraSelection) forControlEvents:UIControlEventTouchUpInside];
     self.switchCamerasButton.frame = CGRectMake(0, 0, 44.0f, 44.0f);
@@ -146,15 +151,6 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
     self.flashView.translatesAutoresizingMaskIntoConstraints = NO;
     
     [view addSubview:self.flashView];
-    
-    [view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"|[_flashView]|"
-                                                                 options:0
-                                                                 metrics:nil
-                                                                   views:NSDictionaryOfVariableBindings(_flashView)]];
-    [view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_flashView]|"
-                                                                 options:0
-                                                                 metrics:nil
-                                                                   views:NSDictionaryOfVariableBindings(_flashView)]];
     
     self.controlView = [[UIView alloc] initWithFrame:CGRectZero];
     self.controlView.translatesAutoresizingMaskIntoConstraints = NO;
@@ -210,12 +206,33 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
     
     [view addSubview:self.controlView];
     
+    self.smile1 = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"870-smile-grey.png"]];
+    self.smile1.translatesAutoresizingMaskIntoConstraints = NO;
+    [view addSubview:self.smile1];
+    
+    self.smile2 = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"870-smile-grey.png"]];
+    self.smile2.translatesAutoresizingMaskIntoConstraints = NO;
+    [view addSubview:self.smile2];
+    
+    self.smile3 = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"870-smile-grey.png"]];
+    self.smile3.translatesAutoresizingMaskIntoConstraints = NO;
+    [view addSubview:self.smile3];
+    
     self.view = view;
 }
 
 - (void)updateViewConstraints
 {
     [super updateViewConstraints];
+    
+    [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"|[_flashView]|"
+                                                                      options:0
+                                                                      metrics:nil
+                                                                        views:NSDictionaryOfVariableBindings(_flashView)]];
+    [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_flashView]|"
+                                                                      options:0
+                                                                      metrics:nil
+                                                                        views:NSDictionaryOfVariableBindings(_flashView)]];
     
     NSMutableArray *portraitButton = @[].mutableCopy;
     [portraitButton addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"[_switchCamerasButton]-|"
@@ -229,6 +246,26 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
                                                                                   views:NSDictionaryOfVariableBindings(_switchCamerasButton)]];
     
     [self.view addConstraints:portraitButton];
+    
+    [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(5)-[_smile1]"
+                                                                      options:0
+                                                                      metrics:nil
+                                                                        views:NSDictionaryOfVariableBindings(_smile1)]];
+    
+    [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(5)-[_smile2]"
+                                                                      options:0
+                                                                      metrics:nil
+                                                                        views:NSDictionaryOfVariableBindings(_smile2)]];
+    
+    [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(5)-[_smile3]"
+                                                                      options:0
+                                                                      metrics:nil
+                                                                        views:NSDictionaryOfVariableBindings(_smile3)]];
+    
+    [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"|-[_smile1]-[_smile2]-[_smile3]"
+                                                                      options:0
+                                                                      metrics:nil
+                                                                        views:NSDictionaryOfVariableBindings(_smile1, _smile2, _smile3)]];
     
     [self.controlView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"|[_controlBackgroundView]|"
                                                                              options:0
@@ -266,7 +303,7 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
                                                                                            options:0
                                                                                            metrics:nil
                                                                                              views:NSDictionaryOfVariableBindings(_thumbViewContainer)]];
-
+    
     [verticalbuttonConstraints addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_thumbViewContainer(50)]"
                                                                                            options:0
                                                                                            metrics:nil
@@ -658,15 +695,15 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
 	for ( CIFaceFeature *ff in features )
     {
         /*
-        DLog(@"ff bounds: %@", NSStringFromCGRect(ff.bounds));
-        DLog(@"ff leftEyePosition: %@", NSStringFromCGPoint(ff.leftEyePosition));
-        DLog(@"ff rightEyePosition: %@", NSStringFromCGPoint(ff.rightEyePosition));
-        DLog(@"ff mouthPosition: %@", NSStringFromCGPoint(ff.mouthPosition));
-        DLog(@"ff leftEyeClosed: %@", (ff.leftEyeClosed) ? @"Yes" : @"No" );
-        DLog(@"ff rightEyeClosed: %@", (ff.rightEyeClosed) ? @"Yes" : @"No");
-        DLog(@"ff hasSmile: %@", (ff.hasSmile) ? @"Yes" : @"No" );
-        DLog(@"ff tracking ID: %d", ff.trackingID );
-        */
+         DLog(@"ff bounds: %@", NSStringFromCGRect(ff.bounds));
+         DLog(@"ff leftEyePosition: %@", NSStringFromCGPoint(ff.leftEyePosition));
+         DLog(@"ff rightEyePosition: %@", NSStringFromCGPoint(ff.rightEyePosition));
+         DLog(@"ff mouthPosition: %@", NSStringFromCGPoint(ff.mouthPosition));
+         DLog(@"ff leftEyeClosed: %@", (ff.leftEyeClosed) ? @"Yes" : @"No" );
+         DLog(@"ff rightEyeClosed: %@", (ff.rightEyeClosed) ? @"Yes" : @"No");
+         DLog(@"ff hasSmile: %@", (ff.hasSmile) ? @"Yes" : @"No" );
+         DLog(@"ff tracking ID: %d", ff.trackingID );
+         */
         
         BOOL smileDetected = NO;
         BOOL winkDetected = NO;
@@ -676,9 +713,9 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
             if (ff.hasSmile)// && [self.userDefaults boolForKey:@"smile"] && ([features count] >= [self.userDefaults doubleForKey:@"faces"]))
             {
                 /*
-                self.detectedFeature = YES;
-                
-                [self updateCountdownLabel:NSLocalizedString(@"Smile!", nil) forDuration:0.5f onCompletion:^(){[self startCountdown];}];
+                 self.detectedFeature = YES;
+                 
+                 [self updateCountdownLabel:NSLocalizedString(@"Smile!", nil) forDuration:0.5f onCompletion:^(){[self startCountdown];}];
                  */
                 
                 smileDetected = YES;
@@ -687,9 +724,9 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
             if ((ff.rightEyeClosed || ff.leftEyeClosed)) // && [self.userDefaults boolForKey:@"wink"] && ([features count] >= [self.userDefaults doubleForKey:@"faces"]))
             {
                 /*
-                self.detectedFeature = YES;
-                
-                [self updateCountdownLabel:NSLocalizedString(@"Wink!", nil) forDuration:0.5f onCompletion:^(){[self startCountdown];}];
+                 self.detectedFeature = YES;
+                 
+                 [self updateCountdownLabel:NSLocalizedString(@"Wink!", nil) forDuration:0.5f onCompletion:^(){[self startCountdown];}];
                  */
                 winkDetected = YES;
             }
@@ -705,6 +742,8 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
                     {
                         smiles = [self.smileCounter[tracker] intValue];
                         smiles++;
+                        
+                        [self updateSmiles:smiles];
                     }
                     
                     if ((smiles == 3) && ([features count] >= [self.userDefaults doubleForKey:@"faces"]))
@@ -721,6 +760,8 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
                 else
                 {
                     self.smileCounter[tracker] = [NSNumber numberWithInt:0];
+                    
+                    [self updateSmiles:0];
                 }
             }
             
@@ -733,6 +774,8 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
                     {
                         winks = [self.smileCounter[tracker] intValue];
                         winks++;
+                        
+                        [self updateSmiles:winks];
                     }
                     
                     if ((winks == 3) && ([features count] >= [self.userDefaults doubleForKey:@"faces"]))
@@ -749,6 +792,8 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
                 else
                 {
                     self.smileCounter[tracker] = [NSNumber numberWithInt:0];
+                    
+                    [self updateSmiles:0];
                 }
             }
             
@@ -802,7 +847,7 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
 	CIImage *ciImage = [[CIImage alloc] initWithCVPixelBuffer:pixelBuffer options:attachments];
 	UIDeviceOrientation curDeviceOrientation = [UIDevice currentDevice].orientation;
 	
-
+    
     NSInteger exifOrientation = [self exifOrientation:curDeviceOrientation];
     
 	NSDictionary *imageOptions = @{CIDetectorImageOrientation: @(exifOrientation), CIDetectorSmile:@YES, CIDetectorEyeBlink:@YES};
@@ -1002,6 +1047,8 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
     [self.winkCounter removeAllObjects];
     
     [self.autoPhoto setOn:NO animated:YES];
+    
+    [self updateSmiles:0];
 }
 
 #pragma mark -
@@ -1153,12 +1200,21 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
     return nil;
 }
 
-#pragma mark CMPopTipViewDelegate methods
+#pragma mark - CMPopTipViewDelegate methods
 - (void)popTipViewWasDismissedByUser:(CMPopTipView *)popTipView {
     // User can tap CMPopTipView to dismiss it
     self.roundRectButtonPopTipView = nil;
 }
 
+#pragma mark -
+- (void)updateSmiles:(NSInteger)count
+{
+    dispatch_async(dispatch_get_main_queue(), ^(void) {
+        self.smile1.image = (count >= 1) ? [UIImage imageNamed:@"870-smile.png"] : [UIImage imageNamed:@"870-smile-grey.png"];
+        self.smile2.image = (count >= 2) ? [UIImage imageNamed:@"870-smile.png"] : [UIImage imageNamed:@"870-smile-grey.png"];
+        self.smile3.image = (count >= 3) ? [UIImage imageNamed:@"870-smile.png"] : [UIImage imageNamed:@"870-smile-grey.png"];
+    });
+}
 @end
 
 // Finds where the video box is positioned within the preview layer based on the video size and gravity
