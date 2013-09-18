@@ -4,3 +4,6 @@
 [submodule "SelfieCam/Vendor/ASMediaFocusManager"]
 	path = SelfieCam/Vendor/ASMediaFocusManager
 	url = https://github.com/kmonaghan/ASMediaFocusManager.git
+[submodule "SelfieCam/Vendor/CMPopTipView"]
+	path = SelfieCam/Vendor/CMPopTipView
+	url = https://github.com/chrismiles/CMPopTipView/

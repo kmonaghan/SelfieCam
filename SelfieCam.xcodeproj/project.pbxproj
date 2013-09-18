@@ -20,6 +20,7 @@
 		34814B0817E83549004E7A3E /* 740-gear-selected@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 34814B0617E83549004E7A3E /* 740-gear-selected@2x.png */; };
 		34814B0B17E8390C004E7A3E /* switch-camera@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 34814B0917E8390C004E7A3E /* switch-camera@2x.png */; };
 		34814B0C17E8390C004E7A3E /* switch-camera.png in Resources */ = {isa = PBXBuildFile; fileRef = 34814B0A17E8390C004E7A3E /* switch-camera.png */; };
+		34814B1017E98391004E7A3E /* CMPopTipView.m in Sources */ = {isa = PBXBuildFile; fileRef = 34814B0F17E98391004E7A3E /* CMPopTipView.m */; };
 		349FD30617AE96800030703E /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 349FD30517AE96800030703E /* CFNetwork.framework */; };
 		34A4CDFC17C164E600C5ECA1 /* CBPAboutViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 34A4CDFA17C15EDD00C5ECA1 /* CBPAboutViewController.m */; };
 		34A4CDFE17C165A200C5ECA1 /* Social.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34A4CDFD17C165A200C5ECA1 /* Social.framework */; };
@@ -95,6 +96,8 @@
 		34814B0617E83549004E7A3E /* 740-gear-selected@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "740-gear-selected@2x.png"; sourceTree = "<group>"; };
 		34814B0917E8390C004E7A3E /* switch-camera@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "switch-camera@2x.png"; sourceTree = "<group>"; };
 		34814B0A17E8390C004E7A3E /* switch-camera.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "switch-camera.png"; sourceTree = "<group>"; };
+		34814B0E17E98391004E7A3E /* CMPopTipView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CMPopTipView.h; sourceTree = "<group>"; };
+		34814B0F17E98391004E7A3E /* CMPopTipView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CMPopTipView.m; sourceTree = "<group>"; };
 		349FD30517AE96800030703E /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		34A4CDFA17C15EDD00C5ECA1 /* CBPAboutViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CBPAboutViewController.m; sourceTree = "<group>"; };
 		34A4CDFB17C15EDD00C5ECA1 /* CBPAboutViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBPAboutViewController.h; sourceTree = "<group>"; };
@@ -235,10 +238,21 @@
 			path = Vendor/ASMediaFocusManager/ASMediaFocusManager;
 			sourceTree = "<group>";
 		};
+		34814B0D17E98391004E7A3E /* CMPopTipView */ = {
+			isa = PBXGroup;
+			children = (
+				34814B0E17E98391004E7A3E /* CMPopTipView.h */,
+				34814B0F17E98391004E7A3E /* CMPopTipView.m */,
+			);
+			name = CMPopTipView;
+			path = Vendor/CMPopTipView/CMPopTipView;
+			sourceTree = "<group>";
+		};
 		F545EF1417CCF06800C41BA5 /* Vendor */ = {
 			isa = PBXGroup;
 			children = (
 				343516D917D5133300E6A597 /* ASMediaFocusManager */,
+				34814B0D17E98391004E7A3E /* CMPopTipView */,
 				F545EF1517CCF09100C41BA5 /* NYXImagesKit */,
 			);
 			name = Vendor;
@@ -539,6 +553,7 @@
 				F545EF3F17CCF09100C41BA5 /* UIImage+Resizing.m in Sources */,
 				F545EF4017CCF09100C41BA5 /* UIImage+Rotating.m in Sources */,
 				34A4CDFC17C164E600C5ECA1 /* CBPAboutViewController.m in Sources */,
+				34814B1017E98391004E7A3E /* CMPopTipView.m in Sources */,
 				F545EF4517CCF09100C41BA5 /* NYXImagesHelper.m in Sources */,
 				F545EF4417CCF09100C41BA5 /* NYXProgressiveImageView.m in Sources */,
 				F5F5257917ABF84600BFF158 /* main.m in Sources */,

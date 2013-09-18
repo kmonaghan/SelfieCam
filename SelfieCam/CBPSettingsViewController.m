@@ -17,6 +17,7 @@
 @property (strong, nonatomic) UISwitch *showFaceBoxes;
 @property (strong, nonatomic) UISwitch *facebookShare;
 @property (strong, nonatomic) UISwitch *twitterShare;
+@property (strong, nonatomic) UISwitch *showHelp;
 
 @property (strong, nonatomic) NSUserDefaults *userDefaults;
 @end
@@ -66,6 +67,8 @@
     
     self.twitterShare = [UISwitch new];
     self.twitterShare.on = [self.userDefaults boolForKey:@"twitter"];
+    
+    self.showHelp = [UISwitch new];
 }
 
 - (void)viewDidLoad
@@ -86,6 +89,12 @@
     [self.userDefaults setBool:self.showFaceBoxes.on forKey:@"boxes"];
     [self.userDefaults setBool:self.facebookShare.on forKey:@"facebook"];
     [self.userDefaults setBool:self.twitterShare.on forKey:@"twitter"];
+    
+    if (self.showHelp)
+    {
+        [self.userDefaults setBool:NO forKey:@"showed_auto_photo"];
+        [self.userDefaults setBool:NO forKey:@"showed_share"];
+    }
     
     [self.userDefaults synchronize];
     
@@ -125,7 +134,7 @@
     
     switch (section) {
         case 0:
-            rows = 5;
+            rows = 6;
             break;
         case 1:
             rows = 1;
@@ -179,6 +188,10 @@
             case 4:
                 cell.textLabel.text =  NSLocalizedString(@"Show boxes around faces", nil);
                 cell.accessoryView = self.showFaceBoxes;
+                break;
+            case 5:
+                cell.textLabel.text =  NSLocalizedString(@"Show help", nil);
+                cell.accessoryView = self.showHelp;
                 break;
             default:
                 break;

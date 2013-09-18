@@ -10,7 +10,8 @@
 #import <AVFoundation/AVFoundation.h>
 
 #import "ASMediaFocusManager.h"
+#import "CMPopTipView.h"
 
-@interface CBPCameraViewController : UIViewController <AVCaptureVideoDataOutputSampleBufferDelegate, ASMediasFocusDelegate>
+@interface CBPCameraViewController : UIViewController <AVCaptureVideoDataOutputSampleBufferDelegate, ASMediasFocusDelegate, CMPopTipViewDelegate>
 
 @end

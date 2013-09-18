@@ -5,14 +5,13 @@
 //  Created by Karl Monaghan on 02/08/2013.
 //  Copyright (c) 2013 Karl Monaghan. All rights reserved.
 //
-
-#import "NYXImagesKit.h"
-
 #import <CoreImage/CoreImage.h>
 #import <ImageIO/ImageIO.h>
 #import <AssertMacros.h>
 #import <AssetsLibrary/AssetsLibrary.h>
 #import <Social/Social.h>
+
+#import "NYXImagesKit.h"
 
 #import "CBPCameraViewController.h"
 #import "CBPSettingsViewController.h"
@@ -81,6 +80,8 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
 
 @property (strong, nonatomic) NSMutableDictionary *smileCounter;
 @property (strong, nonatomic) NSMutableDictionary *winkCounter;
+
+@property (strong, nonatomic) CMPopTipView *roundRectButtonPopTipView;
 @end
 
 @implementation CBPCameraViewController
@@ -343,6 +344,7 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
     
     self.smileCounter = @{}.mutableCopy;
     self.winkCounter = @{}.mutableCopy;
+    
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -355,6 +357,25 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
                                              selector:@selector(orientationChanged:)
                                                  name:UIDeviceOrientationDidChangeNotification
                                                object:nil];
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    
+    if (![self.userDefaults boolForKey:@"showed_auto_photo"])
+    {
+        self.roundRectButtonPopTipView = [[CMPopTipView alloc] initWithMessage:NSLocalizedString(@"Flip the switch to take a photo of your beautiful smile", nil)];
+        self.roundRectButtonPopTipView.delegate = self;
+        self.roundRectButtonPopTipView.backgroundColor = [UIColor lightGrayColor];
+        self.roundRectButtonPopTipView.textColor = [UIColor darkTextColor];
+        self.roundRectButtonPopTipView.dismissTapAnywhere = YES;
+        
+        [self.roundRectButtonPopTipView presentPointingAtView:self.autoPhoto inView:self.view animated:YES];
+        
+        [self.userDefaults setBool:YES forKey:@"showed_auto_photo"];
+        [self.userDefaults synchronize];
+    }
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -887,34 +908,11 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
                                                        completionHandler:^(CMSampleBufferRef imageDataSampleBuffer, NSError *error) {
                                                            if ((error) || ( ! imageDataSampleBuffer ))
                                                            {
-                                                               displayErrorOnMainQueue(error, @"Take picture failed");
+                                                               displayErrorOnMainQueue(error, NSLocalizedString(@"Oh oh, something went wrong taking your picture. Try again in a second. The world needs to see your smile!", ));
                                                            }
                                                            else
                                                            {
-                                                               
-                                                               NSData *jpegData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
-
-                                                               NSDictionary* metadata = (__bridge_transfer NSDictionary*) CMCopyDictionaryOfAttachments(kCFAllocatorDefault, imageDataSampleBuffer, kCMAttachmentMode_ShouldPropagate);
-                                                               
-                                                               NSInteger saveOrientation = [self exifOrientation:curDeviceOrientation];
-                                                               
-                                                               NSMutableDictionary *temp = [[NSMutableDictionary alloc] initWithDictionary:metadata];
-                                                               [temp setObject:[NSNumber numberWithInt:saveOrientation] forKey:@"Orientation"];
-                                                               
-                                                               [self.library writeImageDataToSavedPhotosAlbum:jpegData metadata:temp completionBlock:^(NSURL *assetURL, NSError *error) {
-                                                                   if (error) {
-                                                                       displayErrorOnMainQueue(error, @"Save to camera roll failed");
-                                                                   }
-                                                                   else
-                                                                   {
-                                                                       [[NSUserDefaults standardUserDefaults] setObject:[assetURL absoluteString] forKey:@"last_photo"];
-                                                                       [[NSUserDefaults standardUserDefaults] synchronize];
-                                                                   }
-                                                               }];
-                                                               
-                                                               self.lastSelfie = [UIImage imageWithData:jpegData];
-                                                               
-                                                               [self displayLastSelfieThumb];
+                                                               [self processImage:imageDataSampleBuffer withOrientation:curDeviceOrientation];
                                                            }
                                                            
                                                            dispatch_async(dispatch_get_main_queue(), ^(void) {
@@ -923,7 +921,46 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
                                                        }];
 }
 
-
+- (void)processImage:(CMSampleBufferRef)imageDataSampleBuffer withOrientation:(UIDeviceOrientation)curDeviceOrientation
+{
+    NSData *jpegData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
+    
+    NSDictionary* metadata = (__bridge_transfer NSDictionary*) CMCopyDictionaryOfAttachments(kCFAllocatorDefault, imageDataSampleBuffer, kCMAttachmentMode_ShouldPropagate);
+    
+    NSInteger saveOrientation = [self exifOrientation:curDeviceOrientation];
+    
+    NSMutableDictionary *temp = [[NSMutableDictionary alloc] initWithDictionary:metadata];
+    [temp setObject:[NSNumber numberWithInt:saveOrientation] forKey:@"Orientation"];
+    
+    [self.library writeImageDataToSavedPhotosAlbum:jpegData metadata:temp completionBlock:^(NSURL *assetURL, NSError *error) {
+        if (error) {
+            displayErrorOnMainQueue(error, NSLocalizedString(@"Saving your smile has failed. Great disappointment.", nil));
+        }
+        else
+        {
+            [[NSUserDefaults standardUserDefaults] setObject:[assetURL absoluteString] forKey:@"last_photo"];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+        }
+    }];
+    
+    self.lastSelfie = [UIImage imageWithData:jpegData];
+    
+    [self displayLastSelfieThumb];
+    
+    if (![self.userDefaults boolForKey:@"showed_share"])
+    {
+        self.roundRectButtonPopTipView = [[CMPopTipView alloc] initWithMessage:NSLocalizedString(@"Share your beautiful smile with the world", nil)];
+        self.roundRectButtonPopTipView.delegate = self;
+        self.roundRectButtonPopTipView.backgroundColor = [UIColor lightGrayColor];
+        self.roundRectButtonPopTipView.textColor = [UIColor darkTextColor];
+        self.roundRectButtonPopTipView.dismissTapAnywhere = YES;
+        
+        [self.roundRectButtonPopTipView presentPointingAtView:self.share inView:self.view animated:YES];
+        
+        [self.userDefaults setBool:YES forKey:@"showed_share"];
+        [self.userDefaults synchronize];
+    }
+}
 // this will freeze the preview when a still image is captured, we will unfreeze it when the graphics code is finished processing the image
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
@@ -1114,6 +1151,12 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
 - (NSString *)mediaFocusManager:(ASMediaFocusManager *)mediaFocusManager titleForView:(UIView *)view
 {
     return nil;
+}
+
+#pragma mark CMPopTipViewDelegate methods
+- (void)popTipViewWasDismissedByUser:(CMPopTipView *)popTipView {
+    // User can tap CMPopTipView to dismiss it
+    self.roundRectButtonPopTipView = nil;
 }
 
 @end
