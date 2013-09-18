@@ -17,8 +17,6 @@
 #import "CBPCameraViewController.h"
 #import "CBPSettingsViewController.h"
 
-#define TOTALFACE_FRAMES 15
-
 const CGFloat FACE_RECT_BORDER_WIDTH = 3;
 
 static char * const AVCaptureStillImageIsCapturingStillImageContext = "AVCaptureStillImageIsCapturingStillImageContext";
@@ -80,6 +78,9 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
 @property (strong, nonatomic) ASMediaFocusManager *mediaFocusManager;
 
 @property (strong, nonatomic) ALAssetsLibrary *library;
+
+@property (strong, nonatomic) NSMutableDictionary *smileCounter;
+@property (strong, nonatomic) NSMutableDictionary *winkCounter;
 @end
 
 @implementation CBPCameraViewController
@@ -111,7 +112,7 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
     [self.switchCamerasButton addTarget:self action:@selector(updateCameraSelection) forControlEvents:UIControlEventTouchUpInside];
     self.switchCamerasButton.frame = CGRectMake(0, 0, 44.0f, 44.0f);
     self.switchCamerasButton.translatesAutoresizingMaskIntoConstraints = NO;
-    self.switchCamerasButton.accessibilityLabel = NSLocalizedString(@"Switch between the front and rear cameras");
+    self.switchCamerasButton.accessibilityLabel = NSLocalizedString(@"Switch between the front and rear cameras", nil);
     
     [view addSubview:self.switchCamerasButton];
     
@@ -166,6 +167,7 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
     
     self.thumbViewContainer = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 50.0f, 50.f)];
     self.thumbViewContainer.translatesAutoresizingMaskIntoConstraints = NO;
+    self.thumbViewContainer.clipsToBounds = YES;
     
     self.thumbView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 50.0f, 50.f)];
     self.thumbView.translatesAutoresizingMaskIntoConstraints = NO;
@@ -236,7 +238,7 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
                                                                              metrics:nil
                                                                                views:NSDictionaryOfVariableBindings(_controlBackgroundView)]];
     
-    [self.controlView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"[_thumbViewContainer(50)]-(15)-[_share]"
+    [self.controlView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"[_thumbViewContainer(50)]-[_share]"
                                                                              options:0
                                                                              metrics:nil
                                                                                views:NSDictionaryOfVariableBindings(_thumbViewContainer, _share)]];
@@ -338,6 +340,9 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
     [self.mediaFocusManager installOnView:self.thumbView];
     
     self.library = [ALAssetsLibrary new];
+    
+    self.smileCounter = @{}.mutableCopy;
+    self.winkCounter = @{}.mutableCopy;
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -597,7 +602,7 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
 		// add required layers
 		CALayer *featureLayer = [CALayer new];
         
-		[featureLayer setBorderColor:[[UIColor redColor] CGColor]];
+		[featureLayer setBorderColor:[[UIColor greenColor] CGColor]];
 		[featureLayer setBorderWidth:FACE_RECT_BORDER_WIDTH];
 		[self.previewLayer addSublayer:featureLayer];
 		[self.ciFaceLayers addObject:featureLayer];
@@ -641,20 +646,91 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
         DLog(@"ff hasSmile: %@", (ff.hasSmile) ? @"Yes" : @"No" );
         DLog(@"ff tracking ID: %d", ff.trackingID );
         */
+        
+        BOOL smileDetected = NO;
+        BOOL winkDetected = NO;
+        
         if (!self.detectedFeature && self.autoPhoto.on)
         {
-            if (ff.hasSmile && [self.userDefaults boolForKey:@"smile"] && ([features count] >= [self.userDefaults doubleForKey:@"faces"]))
+            if (ff.hasSmile)// && [self.userDefaults boolForKey:@"smile"] && ([features count] >= [self.userDefaults doubleForKey:@"faces"]))
             {
+                /*
                 self.detectedFeature = YES;
                 
                 [self updateCountdownLabel:NSLocalizedString(@"Smile!", nil) forDuration:0.5f onCompletion:^(){[self startCountdown];}];
+                 */
+                
+                smileDetected = YES;
             }
-            if ((ff.rightEyeClosed || ff.leftEyeClosed) && [self.userDefaults boolForKey:@"wink"] && ([features count] >= [self.userDefaults doubleForKey:@"faces"]))
+            
+            if ((ff.rightEyeClosed || ff.leftEyeClosed)) // && [self.userDefaults boolForKey:@"wink"] && ([features count] >= [self.userDefaults doubleForKey:@"faces"]))
             {
+                /*
                 self.detectedFeature = YES;
                 
                 [self updateCountdownLabel:NSLocalizedString(@"Wink!", nil) forDuration:0.5f onCompletion:^(){[self startCountdown];}];
+                 */
+                winkDetected = YES;
             }
+            
+            NSString *tracker = [NSString stringWithFormat:@"%d", ff.trackingID];
+            
+            if ([self.userDefaults boolForKey:@"smile"])
+            {
+                if (smileDetected)
+                {
+                    int smiles = 0;
+                    if (self.smileCounter[tracker])
+                    {
+                        smiles = [self.smileCounter[tracker] intValue];
+                        smiles++;
+                    }
+                    
+                    if ((smiles == 3) && ([features count] >= [self.userDefaults doubleForKey:@"faces"]))
+                    {
+                        self.detectedFeature = YES;
+                        
+                        [self updateCountdownLabel:NSLocalizedString(@"Smile!", nil) forDuration:0.5f onCompletion:^(){[self startCountdown];}];
+                    }
+                    else
+                    {
+                        self.smileCounter[tracker] = [NSNumber numberWithInt:smiles];
+                    }
+                }
+                else
+                {
+                    self.smileCounter[tracker] = [NSNumber numberWithInt:0];
+                }
+            }
+            
+            if ([self.userDefaults boolForKey:@"wink"])
+            {
+                if (winkDetected)
+                {
+                    int winks = 0;
+                    if (self.smileCounter[tracker])
+                    {
+                        winks = [self.smileCounter[tracker] intValue];
+                        winks++;
+                    }
+                    
+                    if ((winks == 3) && ([features count] >= [self.userDefaults doubleForKey:@"faces"]))
+                    {
+                        self.detectedFeature = YES;
+                        
+                        [self updateCountdownLabel:NSLocalizedString(@"Wink!", nil) forDuration:0.5f onCompletion:^(){[self startCountdown];}];
+                    }
+                    else
+                    {
+                        self.smileCounter[tracker] = [NSNumber numberWithInt:winks];
+                    }
+                }
+                else
+                {
+                    self.smileCounter[tracker] = [NSNumber numberWithInt:0];
+                }
+            }
+            
         }
         
         if ([self.userDefaults boolForKey:@"boxes"])
@@ -884,6 +960,9 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
     self.isTakingPhoto = NO;
     self.detectedFeature = NO;
     self.faceFrameCount = 0;
+    
+    [self.smileCounter removeAllObjects];
+    [self.winkCounter removeAllObjects];
     
     [self.autoPhoto setOn:NO animated:YES];
 }
