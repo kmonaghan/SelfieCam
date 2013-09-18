@@ -924,6 +924,8 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
         return;
     }
     
+    AudioServicesPlayAlertSound(kSystemSoundID_Vibrate);
+    
 	// Find out the current orientation and tell the still image output.
 	AVCaptureConnection *stillImageConnection = [self.stillImageOutput connectionWithMediaType:AVMediaTypeVideo];
 	UIDeviceOrientation curDeviceOrientation = [UIDevice currentDevice].orientation;
