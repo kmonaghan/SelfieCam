@@ -94,6 +94,7 @@
     {
         [self.userDefaults setBool:NO forKey:@"showed_auto_photo"];
         [self.userDefaults setBool:NO forKey:@"showed_share"];
+        [self.userDefaults setBool:NO forKey:@"showed_smile_help"];
     }
     
     [self.userDefaults synchronize];

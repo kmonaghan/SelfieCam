@@ -643,7 +643,7 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
 			AVCaptureDeviceInput *input = [AVCaptureDeviceInput deviceInputWithDevice:d error:&error];
 			if (error) {
 				hadError = YES;
-				displayErrorOnMainQueue(error, @"Could not initialize for AVMediaTypeVideo");
+				displayErrorOnMainQueue(error, NSLocalizedString(@"Could not start up camera", nil));
 			} else if ( [self.session canAddInput:input] ) {
 				return input;
 			}
@@ -651,7 +651,9 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
 	}
 	if ( ! hadError ) {
 		// no errors, simply couldn't find a matching camera
-		displayErrorOnMainQueue(nil, @"No camera found for requested orientation");
+        NSString *error = [NSString stringWithFormat:@"You've no %@ to use", ((self.useFrontCamera) ? @"front" : @"rear")];
+        
+		displayErrorOnMainQueue(nil, NSLocalizedString(error, @"Tells the use they don't have a useable camera - options are 'front' and 'rear'"));
 	}
 	return nil;
 }
@@ -844,6 +846,21 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
 
 - (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection
 {
+    if (![self.userDefaults boolForKey:@"showed_smile_help"])
+    {
+        self.roundRectButtonPopTipView = [[CMPopTipView alloc] initWithMessage:NSLocalizedString(@"When all three faces light up, we've found your beautiful smile and will take a photo", nil)];
+        self.roundRectButtonPopTipView.delegate = self;
+        self.roundRectButtonPopTipView.backgroundColor = [UIColor lightGrayColor];
+        self.roundRectButtonPopTipView.textColor = [UIColor darkTextColor];
+        self.roundRectButtonPopTipView.dismissTapAnywhere = YES;
+        
+         dispatch_async(dispatch_get_main_queue(), ^(void) {
+             [self.roundRectButtonPopTipView presentPointingAtView:self.smile2 inView:self.view animated:YES];
+         });
+        [self.userDefaults setBool:YES forKey:@"showed_smile_help"];
+        [self.userDefaults synchronize];
+    }
+    
     // Got an image.
 	CVPixelBufferRef pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
 	NSDictionary* attachments = (__bridge_transfer NSDictionary*)CMCopyDictionaryOfAttachments(kCFAllocatorDefault, sampleBuffer, kCMAttachmentMode_ShouldPropagate);
