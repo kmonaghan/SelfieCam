@@ -489,7 +489,7 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
 }
 
 #pragma mark - Notifications
-// From http://stackoverflow.com/a/15967305/806442
+// Inspired by http://stackoverflow.com/a/15967305/806442
 - (void)orientationChanged:(NSNotification *)notification
 {
     CGAffineTransform transform = CGAffineTransformMakeRotation([self rotation]);
@@ -502,6 +502,9 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
                             self.settingsButton.transform = transform;
                             self.switchCamerasButton.transform = transform;
                             self.countdownLabel.transform = transform;
+                            self.smile1.transform = transform;
+                            self.smile2.transform = transform;
+                            self.smile3.transform = transform;
                         }
                      completion:nil];
 }
