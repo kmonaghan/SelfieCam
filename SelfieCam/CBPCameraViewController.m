@@ -10,6 +10,7 @@
 #import <AssertMacros.h>
 #import <AssetsLibrary/AssetsLibrary.h>
 #import <Social/Social.h>
+#import <QuartzCore/QuartzCore.h>
 
 #import "NYXImagesKit.h"
 
@@ -86,6 +87,8 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
 @property (strong, nonatomic) UIImageView *smile1;
 @property (strong, nonatomic) UIImageView *smile2;
 @property (strong, nonatomic) UIImageView *smile3;
+
+@property (strong, nonatomic) UIView *explaination;
 
 @end
 
@@ -190,6 +193,8 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
     [self.autoPhoto addTarget:self action:@selector(updateCoreImageDetection) forControlEvents:UIControlEventValueChanged];
     self.autoPhoto.translatesAutoresizingMaskIntoConstraints = NO;
     self.autoPhoto.accessibilityLabel = NSLocalizedString(@"Start taking photos of your beautiful smile", @"Accessiblity label for ");
+    self.autoPhoto.on = YES;
+    self.autoPhoto.hidden = YES;
     
     [self.controlView addSubview:self.autoPhoto];
     
@@ -217,6 +222,24 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
     self.smile3 = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"870-smile-grey.png"]];
     self.smile3.translatesAutoresizingMaskIntoConstraints = NO;
     [view addSubview:self.smile3];
+    
+    self.explaination = [[UIView alloc] initWithFrame:CGRectZero];
+    self.explaination.hidden = YES;
+    self.explaination.backgroundColor = [UIColor whiteColor];
+    self.explaination.layer.cornerRadius = 5.0f;
+    
+    UILabel *explainationLabel = [UILabel new];
+    explainationLabel.numberOfLines = 0;
+    explainationLabel.textAlignment = NSTextAlignmentCenter;
+    explainationLabel.text = NSLocalizedString(@"All you need to do to take a photo is show off your beautiful smile.\n\nWhy don't you try it now?", nil);
+    CGSize labelSize = [explainationLabel sizeThatFits:CGSizeMake(240.0f, MAXFLOAT)];
+    explainationLabel.frame = CGRectMake(15.0f, 15.0f, labelSize.width, labelSize.height);
+    
+    self.explaination.frame = CGRectMake(0, 0, labelSize.width + 30.0f, labelSize.height + 30.0f);
+    
+    [self.explaination addSubview:explainationLabel];
+    
+    [view addSubview:self.explaination];
     
     self.view = view;
 }
@@ -262,7 +285,15 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
                                                                       metrics:nil
                                                                         views:NSDictionaryOfVariableBindings(_smile3)]];
     
-    [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"|-[_smile1]-[_smile2]-[_smile3]"
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.smile2
+                                                          attribute:NSLayoutAttributeCenterX
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeCenterX
+                                                         multiplier:1.0f
+                                                           constant:0.0f]];
+    
+    [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"[_smile1]-[_smile2]-[_smile3]"
                                                                       options:0
                                                                       metrics:nil
                                                                         views:NSDictionaryOfVariableBindings(_smile1, _smile2, _smile3)]];
@@ -361,7 +392,7 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
     
     self.isTakingPhoto = NO;
     
-    self.autoPhoto.on = NO;
+    //self.autoPhoto.on = NO;
     
     self.cancelPicture = NO;
     
@@ -382,6 +413,13 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
     self.smileCounter = @{}.mutableCopy;
     self.winkCounter = @{}.mutableCopy;
     
+    if (![self.userDefaults boolForKey:@"first_help"])
+    {
+        self.explaination.center = self.view.center;
+        self.explaination.hidden = NO;
+        
+        [self.userDefaults setBool:YES forKey:@"first_help"];
+    }
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -394,25 +432,6 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
                                              selector:@selector(orientationChanged:)
                                                  name:UIDeviceOrientationDidChangeNotification
                                                object:nil];
-}
-
-- (void)viewDidAppear:(BOOL)animated
-{
-    [super viewDidAppear:animated];
-    
-    if (![self.userDefaults boolForKey:@"showed_auto_photo"])
-    {
-        self.roundRectButtonPopTipView = [[CMPopTipView alloc] initWithMessage:NSLocalizedString(@"Flip the switch to take a photo of your beautiful smile", nil)];
-        self.roundRectButtonPopTipView.delegate = self;
-        self.roundRectButtonPopTipView.backgroundColor = [UIColor lightGrayColor];
-        self.roundRectButtonPopTipView.textColor = [UIColor darkTextColor];
-        self.roundRectButtonPopTipView.dismissTapAnywhere = YES;
-        
-        [self.roundRectButtonPopTipView presentPointingAtView:self.autoPhoto inView:self.view animated:YES];
-        
-        [self.userDefaults setBool:YES forKey:@"showed_auto_photo"];
-        [self.userDefaults synchronize];
-    }
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -715,24 +734,13 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
         
         if (!self.detectedFeature && self.autoPhoto.on)
         {
-            if (ff.hasSmile)// && [self.userDefaults boolForKey:@"smile"] && ([features count] >= [self.userDefaults doubleForKey:@"faces"]))
+            if (ff.hasSmile)
             {
-                /*
-                 self.detectedFeature = YES;
-                 
-                 [self updateCountdownLabel:NSLocalizedString(@"Smile!", nil) forDuration:0.5f onCompletion:^(){[self startCountdown];}];
-                 */
-                
                 smileDetected = YES;
             }
             
-            if ((ff.rightEyeClosed || ff.leftEyeClosed)) // && [self.userDefaults boolForKey:@"wink"] && ([features count] >= [self.userDefaults doubleForKey:@"faces"]))
+            if ((ff.rightEyeClosed || ff.leftEyeClosed))
             {
-                /*
-                 self.detectedFeature = YES;
-                 
-                 [self updateCountdownLabel:NSLocalizedString(@"Wink!", nil) forDuration:0.5f onCompletion:^(){[self startCountdown];}];
-                 */
                 winkDetected = YES;
             }
             
@@ -753,6 +761,11 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
                     
                     if ((smiles == 3) && ([features count] >= [self.userDefaults doubleForKey:@"faces"]))
                     {
+                        if (!self.explaination.hidden)
+                        {
+                            self.explaination.hidden = YES;
+                        }
+                        
                         self.detectedFeature = YES;
                         
                         [self updateCountdownLabel:NSLocalizedString(@"Smile!", nil) forDuration:0.5f onCompletion:^(){[self startCountdown];}];
@@ -854,9 +867,9 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
         self.roundRectButtonPopTipView.textColor = [UIColor darkTextColor];
         self.roundRectButtonPopTipView.dismissTapAnywhere = YES;
         
-         dispatch_async(dispatch_get_main_queue(), ^(void) {
-             [self.roundRectButtonPopTipView presentPointingAtView:self.smile2 inView:self.view animated:YES];
-         });
+        dispatch_async(dispatch_get_main_queue(), ^(void) {
+            [self.roundRectButtonPopTipView presentPointingAtView:self.smile2 inView:self.view animated:YES];
+        });
         [self.userDefaults setBool:YES forKey:@"showed_smile_help"];
         [self.userDefaults synchronize];
     }
@@ -1068,7 +1081,7 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
     [self.smileCounter removeAllObjects];
     [self.winkCounter removeAllObjects];
     
-    [self.autoPhoto setOn:NO animated:YES];
+    //[self.autoPhoto setOn:NO animated:YES];
     
     [self updateSmiles:0];
 }
