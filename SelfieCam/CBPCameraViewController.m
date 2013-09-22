@@ -54,6 +54,7 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
 @property (strong, nonatomic) UIButton *settingsButton;
 @property (strong, nonatomic) UIButton *switchCamerasButton;
 @property (strong, nonatomic) UIButton *share;
+@property (strong, nonatomic) UIButton *flashButton;
 
 @property (assign, nonatomic) CGFloat topOffset;
 @property (assign, nonatomic) CGFloat bottomOffset;
@@ -90,6 +91,13 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
 
 @property (strong, nonatomic) UIView *explaination;
 
+@property (assign, nonatomic) AVCaptureFlashMode flashMode;
+@property (strong, nonatomic) UIView *flashOptionsView;
+@property (strong, nonatomic) UIButton *flashOnButton;
+@property (strong, nonatomic) UIButton *flashOffButton;
+@property (strong, nonatomic) UIButton *flashAutoButton;
+@property (strong, nonatomic) NSLayoutConstraint *flashOptionsViewContraint;
+
 @end
 
 @implementation CBPCameraViewController
@@ -98,6 +106,30 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
 	[self teardownAVCapture];
 }
 
+- (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+{
+    self = [super initWithNibName:nil bundle:nil];
+    
+    if (self)
+    {
+        self.useFrontCamera = NO;
+        
+        self.isTakingPhoto = NO;
+        
+        self.cancelPicture = NO;
+        
+        self.userDefaults = [NSUserDefaults standardUserDefaults];
+        
+        self.flashMode = AVCaptureFlashModeOn;
+        
+        if ([self.userDefaults integerForKey:@"flash_setting"])
+        {
+            self.flashMode = [self.userDefaults integerForKey:@"flash_setting"];
+        }
+    }
+    
+    return self;
+}
 - (void)loadView
 {
     UIView *view = [[UIView alloc] initWithFrame:[UIScreen mainScreen].bounds];
@@ -124,6 +156,45 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
     self.switchCamerasButton.accessibilityLabel = NSLocalizedString(@"Switch between the front and rear cameras", nil);
     
     [view addSubview:self.switchCamerasButton];
+    
+    self.flashButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [self.flashButton setImage:[UIImage imageNamed:@"856-lightning-bolt.png"] forState:UIControlStateNormal];
+    [self.flashButton setTitle:NSLocalizedString(@"  On", nil) forState:UIControlStateNormal];
+    [self.flashButton addTarget:self action:@selector(showFlashOptions) forControlEvents:UIControlEventTouchUpInside];
+    [self.flashButton sizeToFit];
+    self.flashButton.hidden = YES;
+    self.flashButton.translatesAutoresizingMaskIntoConstraints = NO;
+    self.flashButton.accessibilityLabel = NSLocalizedString(@"Switch flash mode", nil);
+
+    [view addSubview:self.flashButton];
+    
+    self.flashOptionsView = [[UIView alloc] initWithFrame:CGRectZero];
+    self.flashOptionsView.autoresizesSubviews = NO;
+    self.flashOptionsView.translatesAutoresizingMaskIntoConstraints = NO;
+    self.flashOptionsView.clipsToBounds = YES;
+    
+    self.flashOnButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 50.0f, 44.0f)];
+    [self.flashOnButton setTitle:NSLocalizedString(@"On", nil) forState:UIControlStateNormal];
+    [self.flashOnButton addTarget:self action:@selector(changeFlash:) forControlEvents:UIControlEventTouchUpInside];
+    self.flashOnButton.accessibilityLabel = NSLocalizedString(@"Switch the flash on", nil);
+
+    [self.flashOptionsView addSubview:self.flashOnButton];
+    
+    self.flashOffButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 44.0f, 50.0f, 44.0f)];
+    [self.flashOffButton setTitle:NSLocalizedString(@"Off", nil) forState:UIControlStateNormal];
+    [self.flashOffButton addTarget:self action:@selector(changeFlash:) forControlEvents:UIControlEventTouchUpInside];
+    self.flashOffButton.accessibilityLabel = NSLocalizedString(@"Switch the flash off", nil);
+
+    [self.flashOptionsView addSubview:self.flashOffButton];
+
+    self.flashAutoButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 88.0f, 50.0f, 44.0f)];
+    [self.flashAutoButton setTitle:NSLocalizedString(@"Auto", nil) forState:UIControlStateNormal];
+    [self.flashAutoButton addTarget:self action:@selector(changeFlash:) forControlEvents:UIControlEventTouchUpInside];
+    self.flashAutoButton.accessibilityLabel = NSLocalizedString(@"Switch flash to auto", nil);
+
+    [self.flashOptionsView addSubview:self.flashAutoButton];
+
+    [view addSubview:self.flashOptionsView];
     
     self.countdownLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     self.countdownLabel.font = [UIFont boldSystemFontOfSize:200.0f];
@@ -257,6 +328,36 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
                                                                       metrics:nil
                                                                         views:NSDictionaryOfVariableBindings(_flashView)]];
     
+    [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"|-[_flashButton]"
+                                                                      options:0
+                                                                      metrics:nil
+                                                                        views:NSDictionaryOfVariableBindings(_flashButton)]];
+    [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(5)-[_flashButton]"
+                                                                      options:0
+                                                                      metrics:nil
+                                                                        views:NSDictionaryOfVariableBindings(_flashButton)]];
+
+    [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"|-[_flashOptionsView(50)]"
+                                                                      options:0
+                                                                      metrics:nil
+                                                                        views:NSDictionaryOfVariableBindings(_flashOptionsView)]];
+    
+    [self.view addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[_flashButton][_flashOptionsView]"
+                                                                      options:0
+                                                                      metrics:nil
+                                                                        views:NSDictionaryOfVariableBindings(_flashButton, _flashOptionsView)]];
+    
+    
+    self.flashOptionsViewContraint = [NSLayoutConstraint constraintWithItem:self.flashOptionsView
+                                                                  attribute:NSLayoutAttributeHeight
+                                                                  relatedBy:NSLayoutRelationEqual
+                                                                     toItem:nil
+                                                                  attribute:NSLayoutAttributeNotAnAttribute
+                                                                 multiplier:1.0f
+                                                                   constant:0];
+    
+    [self.view addConstraint:self.flashOptionsViewContraint];
+    
     NSMutableArray *portraitButton = @[].mutableCopy;
     [portraitButton addObjectsFromArray:[NSLayoutConstraint constraintsWithVisualFormat:@"[_switchCamerasButton]-|"
                                                                                 options:0
@@ -388,15 +489,6 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
-    self.useFrontCamera = NO;
-    
-    self.isTakingPhoto = NO;
-    
-    //self.autoPhoto.on = NO;
-    
-    self.cancelPicture = NO;
-    
-    self.userDefaults = [NSUserDefaults standardUserDefaults];
     
     [self loadSettings];
     
@@ -640,6 +732,9 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
     self.useFrontCamera = !self.useFrontCamera;
     
 	AVCaptureDeviceInput* input = [self pickCamera];
+    
+    self.flashButton.hidden = self.useFrontCamera;
+    
 	if ( ! input ) {
 		// failed, restore old inputs
 		for (AVCaptureInput *oldInput in oldInputs)
@@ -649,10 +744,11 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
 		[self.session addInput:input];
 		[self updateCoreImageDetection];
 	}
+    
 	[self.session commitConfiguration];
 }
 
-- (AVCaptureDeviceInput*) pickCamera
+- (AVCaptureDeviceInput*)pickCamera
 {
 	AVCaptureDevicePosition desiredPosition = (self.useFrontCamera) ? AVCaptureDevicePositionFront : AVCaptureDevicePositionBack;
 	BOOL hadError = NO;
@@ -662,19 +758,52 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
 			AVCaptureDeviceInput *input = [AVCaptureDeviceInput deviceInputWithDevice:d error:&error];
 			if (error) {
 				hadError = YES;
+                DLog(@"Error: %@", error);
 				displayErrorOnMainQueue(error, NSLocalizedString(@"Could not start up camera", nil));
 			} else if ( [self.session canAddInput:input] ) {
+                if ([input.device hasFlash])
+                {
+                    [self setupFlash:input.device];
+                }
+                
 				return input;
 			}
 		}
 	}
-	if ( ! hadError ) {
+	if (!hadError) {
 		// no errors, simply couldn't find a matching camera
-        NSString *error = [NSString stringWithFormat:@"You've no %@ to use", ((self.useFrontCamera) ? @"front" : @"rear")];
+        NSString *error = [NSString stringWithFormat:@"You've no %@ camera to use", ((self.useFrontCamera) ? @"front" : @"rear")];
         
-		displayErrorOnMainQueue(nil, NSLocalizedString(error, @"Tells the use they don't have a useable camera - options are 'front' and 'rear'"));
+		displayErrorOnMainQueue(nil, NSLocalizedString(error, @"Tells the user they don't have a useable camera - options are 'front' and 'rear'"));
 	}
+    
 	return nil;
+}
+
+- (void)setupFlash:(AVCaptureDevice *)device
+{
+    [device lockForConfiguration:nil];
+    
+    [device setFlashMode:self.flashMode];
+    
+    [device unlockForConfiguration];
+    
+    switch (self.flashMode) {
+        case AVCaptureFlashModeOn:
+            [self.flashButton setTitle:NSLocalizedString(@" On", nil) forState:UIControlStateNormal];
+            break;
+        case AVCaptureFlashModeAuto:
+            [self.flashButton setTitle:NSLocalizedString(@" Auto", nil) forState:UIControlStateNormal];
+            break;
+        case AVCaptureFlashModeOff:
+            [self.flashButton setTitle:NSLocalizedString(@" Off", nil) forState:UIControlStateNormal];
+            break;
+        default:
+            break;
+    }
+    
+    [self.userDefaults setInteger:self.flashMode forKey:@"flash_setting"];
+    [self.userDefaults synchronize];
 }
 
 #pragma mark -
@@ -1081,12 +1210,90 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
     [self.smileCounter removeAllObjects];
     [self.winkCounter removeAllObjects];
     
-    //[self.autoPhoto setOn:NO animated:YES];
-    
     [self updateSmiles:0];
 }
 
 #pragma mark -
+- (void)showFlashOptions
+{
+    if (self.flashMode == AVCaptureFlashModeOn)
+    {
+        self.flashMode = AVCaptureFlashModeOff;
+    }
+    else if (self.flashMode == AVCaptureFlashModeOff)
+    {
+        self.flashMode = AVCaptureFlashModeAuto;
+    }
+    else if (self.flashMode == AVCaptureFlashModeAuto)
+    {
+        self.flashMode = AVCaptureFlashModeOn;
+    }
+    
+	for (AVCaptureDevice *d in [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo]) {
+		if ([d position] == AVCaptureDevicePositionBack) {
+			NSError *error = nil;
+			AVCaptureDeviceInput *input = [AVCaptureDeviceInput deviceInputWithDevice:d error:&error];
+			if (error) {
+                DLog(@"Error: %@", error);
+			} else  {
+                if ([input.device hasFlash])
+                {
+                    [self setupFlash:input.device];
+                }
+            }
+		}
+	}
+}
+
+/*
+{
+    [self.view removeConstraint:self.flashOptionsViewContraint];
+    
+    self.flashOptionsViewContraint.constant = (self.flashOptionsViewContraint.constant == 0) ? 132.0f : 0;
+    
+    [self.view addConstraint:self.flashOptionsViewContraint];
+    
+    [self.view setNeedsUpdateConstraints];
+
+    [UIView animateWithDuration:0.3f
+                     animations:^() {
+                         [self.view layoutIfNeeded];
+                     }];
+}
+
+- (void)changeFlash:(UIButton *)sender
+{
+    if (sender == self.flashOnButton)
+    {
+        self.flashMode = AVCaptureFlashModeOn;
+    }
+    else if (sender == self.flashOffButton)
+    {
+        self.flashMode = AVCaptureFlashModeOff;
+    }
+    else if (sender == self.flashAutoButton)
+    {
+        self.flashMode = AVCaptureFlashModeAuto;
+    }
+    
+    [self.view removeConstraint:self.flashOptionsViewContraint];
+    
+    self.flashOptionsViewContraint.constant = 0;
+    
+    [self.view addConstraint:self.flashOptionsViewContraint];
+    
+    [self.view setNeedsUpdateConstraints];
+    
+    [UIView animateWithDuration:0.3f
+                     animations:^() {
+                         [self.view layoutIfNeeded];
+                     }];
+ 
+    [self pickCamera];
+ 
+}
+*/
+
 - (void)lastPhoto
 {
     NSString *mediaurl = [self.userDefaults objectForKey:@"last_photo"];

@@ -13,6 +13,8 @@
 		343516E217D5133300E6A597 /* ASMediaFocusController.m in Sources */ = {isa = PBXBuildFile; fileRef = 343516DD17D5133300E6A597 /* ASMediaFocusController.m */; };
 		343516E317D5133300E6A597 /* ASMediaFocusController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 343516DE17D5133300E6A597 /* ASMediaFocusController.xib */; };
 		343516E417D5133300E6A597 /* ASMediaFocusManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 343516E017D5133300E6A597 /* ASMediaFocusManager.m */; };
+		3449328A17EE356D0040A16C /* 856-lightning-bolt.png in Resources */ = {isa = PBXBuildFile; fileRef = 3449328817EE356D0040A16C /* 856-lightning-bolt.png */; };
+		3449328B17EE356D0040A16C /* 856-lightning-bolt@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 3449328917EE356D0040A16C /* 856-lightning-bolt@2x.png */; };
 		3463DB8D17BFF1A900FC7F26 /* Reveal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3463DB8C17BFF1A900FC7F26 /* Reveal.framework */; };
 		34814B0317E834D2004E7A3E /* 740-gear.png in Resources */ = {isa = PBXBuildFile; fileRef = 34814B0117E834D2004E7A3E /* 740-gear.png */; };
 		34814B0417E834D2004E7A3E /* 740-gear@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 34814B0217E834D2004E7A3E /* 740-gear@2x.png */; };
@@ -105,6 +107,8 @@
 		343516DE17D5133300E6A597 /* ASMediaFocusController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ASMediaFocusController.xib; sourceTree = "<group>"; };
 		343516DF17D5133300E6A597 /* ASMediaFocusManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ASMediaFocusManager.h; sourceTree = "<group>"; };
 		343516E017D5133300E6A597 /* ASMediaFocusManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ASMediaFocusManager.m; sourceTree = "<group>"; };
+		3449328817EE356D0040A16C /* 856-lightning-bolt.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "856-lightning-bolt.png"; sourceTree = "<group>"; };
+		3449328917EE356D0040A16C /* 856-lightning-bolt@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "856-lightning-bolt@2x.png"; sourceTree = "<group>"; };
 		3463DB8C17BFF1A900FC7F26 /* Reveal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Reveal.framework; path = "../../../../Applications/Reveal.app/Contents/SharedSupport/iOS-Libraries/Reveal.framework"; sourceTree = "<group>"; };
 		34814B0117E834D2004E7A3E /* 740-gear.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "740-gear.png"; sourceTree = "<group>"; };
 		34814B0217E834D2004E7A3E /* 740-gear@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "740-gear@2x.png"; sourceTree = "<group>"; };
@@ -241,10 +245,6 @@
 		3428EF3F17C56762008D7093 /* images */ = {
 			isa = PBXGroup;
 			children = (
-				34814B2C17EA2000004E7A3E /* 870-smile-grey.png */,
-				34814B2D17EA2000004E7A3E /* 870-smile-grey@2x.png */,
-				34814B2817EA1FAB004E7A3E /* 870-smile.png */,
-				34814B2917EA1FAB004E7A3E /* 870-smile@2x.png */,
 				34814B1817E98D34004E7A3E /* 39-back.png */,
 				34814B1917E98D34004E7A3E /* 39-back@2x.png */,
 				34814B1A17E98D34004E7A3E /* 40-forward.png */,
@@ -259,6 +259,12 @@
 				34814B0617E83549004E7A3E /* 740-gear-selected@2x.png */,
 				34814B0117E834D2004E7A3E /* 740-gear.png */,
 				34814B0217E834D2004E7A3E /* 740-gear@2x.png */,
+				3449328817EE356D0040A16C /* 856-lightning-bolt.png */,
+				3449328917EE356D0040A16C /* 856-lightning-bolt@2x.png */,
+				34814B2C17EA2000004E7A3E /* 870-smile-grey.png */,
+				34814B2D17EA2000004E7A3E /* 870-smile-grey@2x.png */,
+				34814B2817EA1FAB004E7A3E /* 870-smile.png */,
+				34814B2917EA1FAB004E7A3E /* 870-smile@2x.png */,
 				3428EF4017C56762008D7093 /* default_thumb.png */,
 				3428EF4117C56762008D7093 /* default_thumb@2x.png */,
 				34814B2417E9DA22004E7A3E /* reload.png */,
@@ -558,6 +564,7 @@
 				F5F5257F17ABF84600BFF158 /* Default.png in Resources */,
 				34814B2017E98D34004E7A3E /* 40-forward.png in Resources */,
 				3428EF4717C56762008D7093 /* default_thumb@2x.png in Resources */,
+				3449328A17EE356D0040A16C /* 856-lightning-bolt.png in Resources */,
 				F51F26E717E74B850065AFFC /* 702-share-selected@2x.png in Resources */,
 				34814B1717E98B32004E7A3E /* libraries.html in Resources */,
 				34814B1E17E98D34004E7A3E /* 39-back.png in Resources */,
@@ -577,6 +584,7 @@
 				34814B2F17EA2000004E7A3E /* 870-smile-grey@2x.png in Resources */,
 				34814B2E17EA2000004E7A3E /* 870-smile-grey.png in Resources */,
 				3428EF4617C56762008D7093 /* default_thumb.png in Resources */,
+				3449328B17EE356D0040A16C /* 856-lightning-bolt@2x.png in Resources */,
 				34814B0417E834D2004E7A3E /* 740-gear@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -736,7 +744,8 @@
 		F5F525A217ABF84600BFF158 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer: Karl Monaghan (R8ZYF5593K)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\\\"$(SYSTEM_APPS_DIR)/Reveal.app/Contents/SharedSupport/iOS-Libraries\\\"",
@@ -748,6 +757,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -755,7 +765,8 @@
 		F5F525A317ABF84600BFF158 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_IDENTITY = "iPhone Developer: Karl Monaghan (R8ZYF5593K)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\\\"$(SYSTEM_APPS_DIR)/Reveal.app/Contents/SharedSupport/iOS-Libraries\\\"",
@@ -767,6 +778,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
