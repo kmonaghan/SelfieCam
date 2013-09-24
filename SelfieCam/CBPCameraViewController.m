@@ -59,7 +59,6 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
 @property (assign, nonatomic) CGFloat topOffset;
 @property (assign, nonatomic) CGFloat bottomOffset;
 @property (assign, nonatomic) double count;
-@property (assign, nonatomic) NSInteger faceFrameCount;
 @property (assign, nonatomic) BOOL isTakingPhoto;
 @property (assign, nonatomic) BOOL detectedFeature;
 @property (assign, nonatomic) BOOL useFrontCamera;
@@ -98,6 +97,8 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
 @property (strong, nonatomic) UIButton *flashAutoButton;
 @property (strong, nonatomic) NSLayoutConstraint *flashOptionsViewContraint;
 
+@property (assign, nonatomic) BOOL detectFeatures;
+
 @end
 
 @implementation CBPCameraViewController
@@ -112,19 +113,19 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
     
     if (self)
     {
-        self.useFrontCamera = NO;
+        _useFrontCamera = NO;
         
-        self.isTakingPhoto = NO;
+        _isTakingPhoto = NO;
         
-        self.cancelPicture = NO;
+        _cancelPicture = NO;
         
-        self.userDefaults = [NSUserDefaults standardUserDefaults];
+        _userDefaults = [NSUserDefaults standardUserDefaults];
         
-        self.flashMode = AVCaptureFlashModeOn;
+        _flashMode = AVCaptureFlashModeOn;
         
-        if ([self.userDefaults integerForKey:@"flash_setting"])
+        if ([_userDefaults integerForKey:@"flash_setting"])
         {
-            self.flashMode = [self.userDefaults integerForKey:@"flash_setting"];
+            _flashMode = [_userDefaults integerForKey:@"flash_setting"];
         }
     }
     
@@ -231,7 +232,7 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
     
     self.controlBackgroundView = [[UIView alloc] initWithFrame:CGRectZero];
     self.controlBackgroundView.backgroundColor = [UIColor whiteColor];
-    self.controlBackgroundView.alpha = 0.5f;
+    self.controlBackgroundView.alpha = 0.25f;
     self.controlBackgroundView.translatesAutoresizingMaskIntoConstraints = NO;
     
     [self.controlView addSubview:self.controlBackgroundView];
@@ -524,6 +525,9 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
                                              selector:@selector(orientationChanged:)
                                                  name:UIDeviceOrientationDidChangeNotification
                                                object:nil];
+    
+    
+    self.detectFeatures = YES;
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -535,6 +539,9 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
     [[NSNotificationCenter defaultCenter] removeObserver:self
                                                     name:UIDeviceOrientationDidChangeNotification
                                                   object:nil];
+    
+    
+    self.detectFeatures = NO;
 }
 
 - (BOOL)shouldAutorotate
@@ -679,6 +686,9 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
 
 - (void)teardownAVCapture
 {
+    DLog(@"teardownAVCapture");
+    self.detectFeatures = NO;
+    
     [self.session stopRunning];
 	
 	[self.stillImageOutput removeObserver:self forKeyPath:@"capturingStillImage"];
@@ -988,6 +998,11 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
 
 - (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection
 {
+    if (!self.detectFeatures)
+    {
+        return;
+    }
+    
     if (![self.userDefaults boolForKey:@"showed_smile_help"])
     {
         self.roundRectButtonPopTipView = [[CMPopTipView alloc] initWithMessage:NSLocalizedString(@"When all three faces light up, we've found your beautiful smile and will take a photo", nil)];
@@ -1014,11 +1029,11 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
     
 	NSDictionary *imageOptions = @{CIDetectorImageOrientation: @(exifOrientation), CIDetectorSmile:@YES, CIDetectorEyeBlink:@YES};
     
-	NSArray *features = [self.faceDetector featuresInImage:ciImage options:imageOptions];
+    NSArray *features = [self.faceDetector featuresInImage:ciImage options:imageOptions];
     
-	CMFormatDescriptionRef fdesc = CMSampleBufferGetFormatDescription(sampleBuffer);
-	CGRect clap = CMVideoFormatDescriptionGetCleanAperture(fdesc, false /*originIsTopLeft*/);
-	
+    CMFormatDescriptionRef fdesc = CMSampleBufferGetFormatDescription(sampleBuffer);
+    CGRect clap = CMVideoFormatDescriptionGetCleanAperture(fdesc, false /*originIsTopLeft*/);
+    
     dispatch_async(dispatch_get_main_queue(), ^(void) {
         [self detectFaceFeatures:features forVideoBox:clap];
     });
@@ -1205,7 +1220,6 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
     self.cancelPicture = NO;
     self.isTakingPhoto = NO;
     self.detectedFeature = NO;
-    self.faceFrameCount = 0;
     
     [self.smileCounter removeAllObjects];
     [self.winkCounter removeAllObjects];
@@ -1433,6 +1447,8 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
 
 - (UIImage *)mediaFocusManager:(ASMediaFocusManager *)mediaFocusManager fullImageForView:(UIView *)view
 {
+    self.detectFeatures = NO;
+    
     return self.lastSelfie;
 }
 
@@ -1440,6 +1456,11 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
 - (NSString *)mediaFocusManager:(ASMediaFocusManager *)mediaFocusManager titleForView:(UIView *)view
 {
     return nil;
+}
+
+- (void)didDismissView
+{
+    self.detectFeatures = YES;
 }
 
 #pragma mark - CMPopTipViewDelegate methods
