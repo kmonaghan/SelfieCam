@@ -43,6 +43,7 @@
 		34A4CDFC17C164E600C5ECA1 /* CBPAboutViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 34A4CDFA17C15EDD00C5ECA1 /* CBPAboutViewController.m */; };
 		34A4CDFE17C165A200C5ECA1 /* Social.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34A4CDFD17C165A200C5ECA1 /* Social.framework */; };
 		34A4CE0017C165AB00C5ECA1 /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34A4CDFF17C165AB00C5ECA1 /* MessageUI.framework */; };
+		34C4C35117F8795D009BE582 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 34C4C35017F8795D009BE582 /* Images.xcassets */; };
 		F513497817AC084D00869D16 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F513497717AC084D00869D16 /* AVFoundation.framework */; };
 		F513497A17AC0A4200869D16 /* CoreImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F513497917AC0A4200869D16 /* CoreImage.framework */; };
 		F513497C17AC0A4900869D16 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F513497B17AC0A4900869D16 /* ImageIO.framework */; };
@@ -140,6 +141,7 @@
 		34A4CDFB17C15EDD00C5ECA1 /* CBPAboutViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBPAboutViewController.h; sourceTree = "<group>"; };
 		34A4CDFD17C165A200C5ECA1 /* Social.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Social.framework; path = System/Library/Frameworks/Social.framework; sourceTree = SDKROOT; };
 		34A4CDFF17C165AB00C5ECA1 /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = System/Library/Frameworks/MessageUI.framework; sourceTree = SDKROOT; };
+		34C4C35017F8795D009BE582 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		F513497717AC084D00869D16 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		F513497917AC0A4200869D16 /* CoreImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreImage.framework; path = System/Library/Frameworks/CoreImage.framework; sourceTree = SDKROOT; };
 		F513497B17AC0A4900869D16 /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
@@ -436,6 +438,7 @@
 				F5B56EC117C36F1C008D6CDE /* Controllers */,
 				F5F5257317ABF84600BFF158 /* Supporting Files */,
 				F545EF1417CCF06800C41BA5 /* Vendor */,
+				34C4C35017F8795D009BE582 /* Images.xcassets */,
 			);
 			path = SelfieCam;
 			sourceTree = "<group>";
@@ -568,6 +571,7 @@
 				F51F26E717E74B850065AFFC /* 702-share-selected@2x.png in Resources */,
 				34814B1717E98B32004E7A3E /* libraries.html in Resources */,
 				34814B1E17E98D34004E7A3E /* 39-back.png in Resources */,
+				34C4C35117F8795D009BE582 /* Images.xcassets in Resources */,
 				34814B2B17EA1FAB004E7A3E /* 870-smile@2x.png in Resources */,
 				F51F26E317E7488D0065AFFC /* 702-share@2x.png in Resources */,
 				34814B2317E98D34004E7A3E /* 46-no@2x.png in Resources */,
@@ -744,6 +748,8 @@
 		F5F525A217ABF84600BFF158 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
@@ -765,6 +771,8 @@
 		F5F525A317ABF84600BFF158 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
