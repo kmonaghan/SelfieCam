@@ -731,7 +731,8 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
 	// session changes, wrap in a beginConfiguration / commitConfiguration.
 	// This will avoid consecutive session restarts for each configuration
 	// change (noticeable delay and camera flickering)
-	
+	self.cancelPicture = YES;
+    
 	[self.session beginConfiguration];
 	
 	// have to remove old inputs before we test if we can add a new input
