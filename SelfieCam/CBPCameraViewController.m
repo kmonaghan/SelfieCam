@@ -513,6 +513,12 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
         
         [self.userDefaults setBool:YES forKey:@"first_help"];
     }
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(applicationWillResignActive)
+                                                 name:UIApplicationWillResignActiveNotification
+                                               object:nil];
+
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -625,6 +631,11 @@ typedef NS_ENUM(NSInteger, CBPPhotoExif) {
                             self.smile3.transform = transform;
                         }
                      completion:nil];
+}
+
+- (void)applicationWillResignActive
+{
+    self.cancelPicture = YES;
 }
 
 #pragma mark - AV setup
